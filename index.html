@@ -7,9 +7,9 @@
   <meta name="description" content="Pharell Jay Jeyakumar, Software Engineering student at Hochschule Heilbronn. Projects and scientific work.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&family=Silkscreen&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/devicon@2.16.0/devicon.min.css">
-  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="styles.css?v=11">
 </head>
 <body>
   <!-- All text content is rendered from data.js by script.js -->
@@ -32,69 +32,76 @@
         <li><a class="chip chip-sm" data-profile="discord" data-show-value target="_blank" rel="noopener">Discord</a></li>
       </ul>
     </div>
+    <!-- Fills up as you scroll down the page -->
+    <div class="xp-bar" aria-hidden="true"><span id="xp-fill"></span></div>
   </header>
 
   <main id="top">
     <section class="hero">
       <div class="wrap hero-inner">
         <div class="hero-main">
+          <p class="lvl">Player 01</p>
           <h1 id="name"></h1>
           <p class="tagline" id="tagline"></p>
-          <p class="hero-meta" id="hero-meta"></p>
-          <!-- Same status badge as in the top bar, only shown on small screens -->
-          <a href="#contact" class="status-badge status-hero" id="status-hero"></a>
+          <!-- Stat strip: PROFILE.location, PROFILE.languages (and PROFILE.status on small screens) -->
+          <dl class="stats" id="hero-stats"></dl>
           <p class="intro" id="intro"></p>
-          <!-- Links come from PROFILE in data.js; icons are added by script.js -->
-          <ul class="chips">
-            <li><a class="chip" data-profile="github" target="_blank" rel="noopener">GitHub</a></li>
-            <li><a class="chip" data-profile="linkedin" target="_blank" rel="noopener">LinkedIn</a></li>
-            <li><a class="chip" data-profile="email">Email</a></li>
-            <li><a class="chip" data-profile="discord" data-show-value target="_blank" rel="noopener">Discord</a></li>
-          </ul>
+          <div class="cta-row">
+            <a class="btn btn-primary btn-start" href="#projects"><span aria-hidden="true">▶</span> Press start</a>
+            <!-- Links come from PROFILE in data.js; icons are added by script.js -->
+            <ul class="chips">
+              <li><a class="chip" data-profile="github" target="_blank" rel="noopener">GitHub</a></li>
+              <li><a class="chip" data-profile="linkedin" target="_blank" rel="noopener">LinkedIn</a></li>
+              <li><a class="chip" data-profile="email">Email</a></li>
+              <li><a class="chip" data-profile="discord" data-show-value target="_blank" rel="noopener">Discord</a></li>
+            </ul>
+          </div>
         </div>
         <!-- Photo from PROFILE.photo (initials if empty) -->
-        <figure class="hero-photo" id="hero-photo"></figure>
+        <figure class="hero-photo hud" id="hero-photo"></figure>
+        <!-- "Achievement unlocked" toast from PROFILE.achievement -->
+        <div class="achievement" id="achievement" role="status" hidden></div>
       </div>
     </section>
 
     <section class="section" id="projects">
       <div class="wrap section-inner">
-        <div class="section-head"><h2>Projects</h2><p class="section-meta" id="projects-meta"></p></div>
+        <div class="section-head"><p class="lvl">Lvl 01 · Quests</p><h2>Projects</h2><p class="section-meta" id="projects-meta"></p></div>
         <div class="grid" id="projects-list"></div>
       </div>
     </section>
 
     <section class="section" id="research">
       <div class="wrap section-inner">
-        <div class="section-head"><h2>Scientific work</h2><p class="section-meta" id="papers-meta"></p></div>
+        <div class="section-head"><p class="lvl">Lvl 02 · Lore</p><h2>Scientific work</h2><p class="section-meta" id="papers-meta"></p></div>
         <div class="stack-list" id="papers-list"></div>
       </div>
     </section>
 
     <section class="section" id="about">
       <div class="wrap section-inner">
-        <div class="section-head"><h2>About</h2></div>
+        <div class="section-head"><p class="lvl">Lvl 03 · Player bio</p><h2>About</h2></div>
         <div class="about-text" id="about-body"></div>
       </div>
     </section>
 
     <section class="section" id="stack">
       <div class="wrap section-inner">
-        <div class="section-head"><h2>Stack</h2></div>
+        <div class="section-head"><p class="lvl">Lvl 04 · Loadout</p><h2>Stack</h2></div>
         <div class="stack-groups" id="stack-list"></div>
       </div>
     </section>
 
     <section class="section" id="education">
       <div class="wrap section-inner">
-        <div class="section-head"><h2>Education</h2></div>
+        <div class="section-head"><p class="lvl">Lvl 05 · Quest log</p><h2>Education</h2></div>
         <div class="stack-list" id="education-list"></div>
       </div>
     </section>
 
     <section class="section contact" id="contact">
       <div class="wrap section-inner">
-        <div class="section-head"><h2>Contact</h2></div>
+        <div class="section-head"><p class="lvl">Lvl 06 · Multiplayer</p><h2>Contact</h2></div>
         <div>
           <p class="contact-text" id="contact-text"></p>
           <ul class="chips">
@@ -110,8 +117,8 @@
 
   <footer class="footer">
     <div class="wrap footer-inner">
-      <p>© <span id="year"></span> <span id="footer-name"></span></p>
-      <a href="#top">Back to top</a>
+      <p><span class="saved">✓ Game saved</span> © <span id="year"></span> <span id="footer-name"></span></p>
+      <a href="#top"><span aria-hidden="true">▲</span> Back to top</a>
     </div>
   </footer>
 

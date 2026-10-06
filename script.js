@@ -49,11 +49,17 @@
     setText("#tagline", profile.tagline);
     setText("#intro", profile.intro);
 
-    // Location · languages under the tagline
-    const meta = $("#hero-meta");
-    const metaText = [profile.location, profile.languages].filter(Boolean).join(" · ");
-    if (meta && metaText) meta.append(icon("location"), metaText);
-    else meta?.remove();
+    // Stat strip under the tagline (status only shows on small screens, where the top bar hides it)
+    const stats = $("#hero-stats");
+    const statRows = [
+      ["Region", profile.location],
+      ["Lang", profile.languages],
+      ["Status", profile.status, "stat-status"],
+    ].filter(([, value]) => value);
+    if (stats && statRows.length) {
+      stats.append(...statRows.map(([label, value, cls]) =>
+        el("div", cls ? { class: cls } : {}, el("dt", {}, label), el("dd", {}, value))));
+    } else stats?.remove();
     setText("#footer-name", profile.name);
 
     document.querySelectorAll("[data-profile]").forEach((link) => {
@@ -114,7 +120,6 @@
   const ICONS = {
     github: '<path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.7 5.38-5.27 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/>',
     linkedin: '<path fill="currentColor" d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/>',
-    location: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></g>',
     email: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></g>',
     discord: '<path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>',
   };
@@ -129,7 +134,9 @@
   const tags = (items = []) => el("ul", { class: "tags" }, ...items.map((t) => el("li", { class: "tag" }, t)));
 
   /* ---------- projects ---------- */
-  function renderProject(p) {
+  const pad2 = (n) => String(n).padStart(2, "0");
+
+  function renderProject(p, i) {
     const title = el("h3", {}, p.repo ? externalLink(p.repo, p.title) : p.title);
 
     const actions = el("div", { class: "project-actions" });
@@ -137,6 +144,7 @@
     if (p.demo) actions.append(el("a", { href: p.demo, target: "_blank", rel: "noopener", class: "btn" }, "Live demo"));
 
     return el("article", { class: "card project" },
+      el("p", { class: "quest-label" }, `Quest ${pad2(i + 1)}`),
       title,
       p.description ? el("p", {}, p.description) : null,
       p.tech?.length ? tags(p.tech) : null,
@@ -163,7 +171,7 @@
         ),
         p.grade
           ? el("div", { class: "grade" },
-              el("span", { class: "grade-label" }, "Grade"),
+              el("span", { class: "grade-label" }, "Score"),
               el("span", { class: "grade-value" }, p.grade))
           : null
       ),
@@ -274,6 +282,7 @@
     return el("article", { class: `card about-card${c.wide ? " wide" : ""}` },
       iconBox,
       el("div", {},
+        c.wide ? el("p", { class: "quest-label" }, "Side quest") : null,
         el("h3", {}, c.title),
         el("p", {}, c.text),
         c.link ? el("a", { class: "about-link", href: c.link.href }, `${c.link.text} →`) : null
@@ -300,7 +309,7 @@
       : el("div", { class: "avatar", "aria-hidden": "true" }, initials));
   }
 
-  // Status badge: top bar on wide screens, under the tagline on small ones
+  // Status badge in the top bar (on small screens the stat strip in the hero shows it instead)
   function renderStatus() {
     for (const badge of document.querySelectorAll(".status-badge")) {
       if (!profile.status) {
@@ -332,14 +341,72 @@
       el("div", { class: "card edu-body" },
         el("div", { class: "edu-top" },
           el("p", { class: "edu-date" }, e.date || ""),
-          current ? el("span", { class: "edu-badge" }, "Current") : null
+          el("span", { class: `edu-badge${current ? "" : " done"}` }, current ? "In progress" : "Completed ✓")
         ),
         el("h3", {}, e.title),
         e.place ? el("p", { class: "edu-place" }, e.place) : null,
         e.description ? el("p", { class: "edu-text" }, e.description) : null,
-        e.focus?.length ? tags(e.focus) : null
+        e.focus?.length ? tags(e.focus) : null,
+        current ? el("div", { class: "edu-progress", "aria-hidden": "true" }) : null
       )
     );
+  }
+
+  /* ---------- game touches ---------- */
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // "Achievement unlocked" toast in the hero, shown shortly after the page loads
+  function renderAchievement() {
+    const box = $("#achievement");
+    if (!box) return;
+    if (!profile.achievement) {
+      box.remove();
+      return;
+    }
+    const trophy = el("span", { class: "achievement-icon", "aria-hidden": "true" });
+    // Static, trusted markup (Lucide trophy)
+    trophy.innerHTML = svg('<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>');
+    const close = el("button", { type: "button", class: "achievement-close", "aria-label": "Dismiss" }, "×");
+    close.addEventListener("click", () => box.remove());
+    box.append(trophy,
+      el("div", {}, el("p", { class: "achievement-label" }, "Achievement unlocked"), el("p", {}, profile.achievement)),
+      close);
+    setTimeout(() => {
+      box.hidden = false;
+      requestAnimationFrame(() => box.classList.add("show"));
+    }, reducedMotion ? 0 : 900);
+  }
+
+  // Thin bar under the top bar that fills up as you scroll
+  function initXpBar() {
+    const fill = $("#xp-fill");
+    if (!fill) return;
+    let queued = false;
+    const update = () => {
+      queued = false;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      fill.style.transform = `scaleX(${max > 0 ? Math.min(window.scrollY / max, 1) : 0})`;
+    };
+    window.addEventListener("scroll", () => {
+      if (!queued) requestAnimationFrame(update);
+      queued = true;
+    }, { passive: true });
+    update();
+  }
+
+  // Section headings "scan in" once when they come into view
+  function initReveal() {
+    if (reducedMotion || !("IntersectionObserver" in window)) return;
+    const heads = document.querySelectorAll(".section-head");
+    document.documentElement.classList.add("js-reveal");
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add("in");
+        observer.unobserve(entry.target);
+      }
+    }, { rootMargin: "0px 0px -10% 0px" });
+    heads.forEach((h) => observer.observe(h));
   }
 
   /* ---------- PDF viewer ---------- */
@@ -385,6 +452,9 @@
   fillList($("#education-list"), education, "Nothing here yet.", renderEducation);
   setText("#contact-text", contact.text);
   $("#year").textContent = new Date().getFullYear();
+  renderAchievement();
+  initXpBar();
+  initReveal();
 
   /* ---------- highlight the current section in the top bar ---------- */
   const navLinks = [...document.querySelectorAll("#nav a")];

@@ -11,6 +11,7 @@
  *   intro           short sentence under the header
  *   location, languages   small line under the tagline ("" to hide)
  *   status          badge at the top left of the navigation bar, e.g. what you're looking for ("" to hide)
+ *   achievement     "Achievement unlocked" pop-up at the top of the page ("" to hide)
  *   photo           e.g. "assets/photo.jpg", shown next to your name ("" shows initials)
  *   github, linkedin, email   used at the top and in the Contact section
  *   discord         your Discord username (clicking copies it) or a full link,
@@ -23,6 +24,7 @@ const PROFILE = {
   location: "Heilbronn, Germany",
   languages: "German, English",
   status: "Open to internships & working student roles",
+  achievement: "16,000+ players protected by my anticheat",
   photo: "assets/foto.jpg",
   github: "https://github.com/PharellJay",
   linkedin: "https://www.linkedin.com/in/pharell-jay-jeyakumar/",
