@@ -9,7 +9,9 @@
  * PROFILE — top of the page and your links.
  *   name, tagline   shown at the top of the page
  *   intro           short sentence under the header
- *   photo           e.g. "assets/photo.jpg", shown in the profile card at the top ("" shows initials)
+ *   location, languages   small line under the tagline ("" to hide)
+ *   status          badge at the top left of the navigation bar, e.g. what you're looking for ("" to hide)
+ *   photo           e.g. "assets/photo.jpg", shown next to your name ("" shows initials)
  *   github, linkedin, email   used at the top and in the Contact section
  *   discord         your Discord username (clicking copies it) or a full link,
  *                   e.g. "https://discord.com/users/<your id>" ("" to hide)
@@ -17,7 +19,10 @@
 const PROFILE = {
   name: "Pharell Jay Jeyakumar",
   tagline: "Software Engineering student at Hochschule Heilbronn",
-  intro: "I study Software Engineering in Heilbronn. This page collects the projects I've built and the papers I've written.",
+  intro: "I build tools that solve real problems, from an anticheat running on game-servers with 16,000+ players to small apps for everyday learning. Here you'll find my projects and papers.",
+  location: "Heilbronn, Germany",
+  languages: "German, English",
+  status: "Open to internships & working student roles",
   photo: "assets/foto.jpg",
   github: "https://github.com/PharellJay",
   linkedin: "https://www.linkedin.com/in/pharell-jay-jeyakumar/",
@@ -36,7 +41,7 @@ const PROFILE = {
 const PROJECTS = [
   {
     title: "RedM Anticheat",
-    description: "Advanced and precise anticheat for RedM (Red Dead Redemption 2 multiplayer), detecting a wide range of cheats with a focus on performance. Proven on servers with over 16,000 players.",
+    description: "Advanced and precise anticheat for RedM (Red Dead Redemption 2 multiplayer), detecting a wide range of cheats with a focus on performance. Proven on servers with over 16,000 registered players.",
     tech: ["Lua", "HTML",  "JavaScript", "SQL"],
     repo: "https://github.com/your-username/portfolio",
     demo: "",
@@ -46,6 +51,13 @@ const PROJECTS = [
     description: "A small flashcard tool designed to help me and others while learning as public flashcard apps tend to be flooded with paywalls and ads.",
     tech: ["Python", "json", "bash"],
     repo: "https://github.com/PharellJay/Flashcards",
+    demo: "",
+  },
+  {
+    title: "My Website",
+    description: "The logic behind what you see. A personal portfolio built from scratch with plain HTML, CSS and JavaScript, no frameworks. All content lives in a single data file, so adding a new project or paper takes just a few lines.",
+    tech: ["HTML", "JavaScript", "CSS"],
+    repo: "https://github.com/PharellJay/MyWebsite",
     demo: "",
   },
 ];
@@ -75,52 +87,80 @@ const PAPERS = [
 
 /*
  * ABOUT — "About me" section.
- *   paragraphs   list of text paragraphs
- *   facts        label/value rows shown in the profile card at the top
+ *   lead         large opening sentence; the part in *stars* is highlighted
+ *   paragraphs   list of text paragraphs below it
+ *   cards        small cards: icon, title, text, optional link { href, text }, wide: true for a full-width card
+ *                icons: drive, now, offline, philosophy
  */
 const ABOUT = {
+  lead: "It all started with *video games* and the question of what actually happens behind them.",
   paragraphs: [
-    "I'm studying Software Engineering at Hochschule Heilbronn. The program covers how " +
-      "software gets built in practice: requirements, design, implementation, testing and deployment.",
-    "Outside of university I work on my own projects. I'm currently looking for an internship " +
-      "or a working student position.",
+    "That curiosity is what made me fall in love with programming. I hit plenty of walls early on " +
+      "and ran into problem after problem, but instead of letting that get me down, it pushed me further.",
   ],
-  facts: [
-    { label: "Study", value: "B.Sc. Software Engineering" },
-    { label: "University", value: "Hochschule Heilbronn" },
-    { label: "Location", value: "Heilbronn, Germany" },
-    { label: "Languages", value: "German, English" },
+  cards: [
+    {
+      icon: "drive",
+      title: "What I love",
+      text: "Solving hard problems, security (especially in gaming) and performance optimization.",
+    },
+    {
+      icon: "now",
+      title: "Right now",
+      text: "Fully focused on my studies at Hochschule Heilbronn, while building projects that don't just look good but deliver real value.",
+    },
+    {
+      icon: "offline",
+      title: "Off the keyboard",
+      text: "Video games, basketball, reading and music.",
+    },
+    {
+      icon: "philosophy",
+      title: "My other passion: philosophy",
+      text: "In upper school I discovered philosophy, and since then I engage with life's big questions every day, " +
+        "whether that's thinking things through on my own, exploring the great philosophers of history or getting into a good debate.",
+      link: { href: "#research", text: "Read my paper on AI and humanity" },
+      wide: true,
+    },
   ],
 };
 
 /*
- * TECH_STACK — one row per group.
- *   group   label on the left
- *   items   technologies, shown as a comma-separated list
+ * TECH_STACK — one card per group.
+ *   group   card title
+ *   icon    "code", "web", "tools" or "concepts"
+ *   items   technologies, shown as logos (name on hover); logos are mapped in script.js (STACK_ICONS)
  */
 const TECH_STACK = [
-  { group: "Languages", items: ["Java", "Python", "Lua", "C", "C++","JavaScript", "SQL"] },
-  { group: "Web & Frameworks", items: ["HTML & CSS", "React", "Node.js", "Spring Boot"] },
-  { group: "Tools", items: ["Git", "Linux", "Docker", "IntelliJ", "VS Code"] },
-  { group: "Concepts", items: ["OOP", "Design Patterns", "Agile / Scrum", "Testing", "UML"] },
+  { group: "Languages", icon: "code", items: ["Java", "Python", "Lua", "C", "C++", "JavaScript", "SQL"] },
+  { group: "Web & Frameworks", icon: "web", items: ["HTML & CSS", "React", "Node.js", "Spring Boot"] },
+  { group: "Tools", icon: "tools", items: ["Git", "Linux", "Docker", "IntelliJ", "VS Code"] },
+  { group: "Concepts", icon: "concepts", items: ["OOP", "Design Patterns", "Agile / Scrum", "Testing", "UML"] },
 ];
 
 /*
- * EDUCATION — newest first.
+ * EDUCATION — newest first, shown as a timeline.
  *   date, title, place, description ("" to hide the description)
+ *   icon     "university" or "school"
+ *   focus    list of subjects / topics, shown as tags
+ *   A date containing "present" marks the entry as current.
  */
 const EDUCATION = [
   {
     date: "2026 – present",
     title: "B.Sc. Software Engineering",
     place: "Hochschule Heilbronn",
-    description: "Software development, architecture, project management and quality assurance.",
+    icon: "university",
+    description: "Learning how software gets built in practice, from requirements and design to testing and deployment.",
+    focus: ["Software Development", "Architecture", "Project Management", "Quality Assurance"],
   },
   {
     date: "2024",
     title: "Abitur",
     place: "Leibniz Gymnasium Dormagen",
-    description: "General education with a focus on mathematics and computer sciences.",
+    icon: "school",
+    description: "Where I discovered my passion for philosophy and wrote my Facharbeit on whether AI could ever be like a human.",
+    focus: ["Mathematics", "Computer Science"],
   },
 ];
 

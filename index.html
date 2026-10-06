@@ -8,13 +8,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/devicon@2.16.0/devicon.min.css">
+  <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
   <!-- All text content is rendered from data.js by script.js -->
   <header class="topbar">
     <div class="topbar-inner">
-      <a href="#top" class="brand" id="brand"></a>
+      <!-- Status badge from PROFILE.status (links to the Contact section) -->
+      <a href="#contact" class="status-badge status-top" id="status-top"></a>
       <nav aria-label="Sections" id="nav">
         <a href="#projects">Projects</a>
         <a href="#research">Scientific work</a>
@@ -38,6 +40,9 @@
         <div class="hero-main">
           <h1 id="name"></h1>
           <p class="tagline" id="tagline"></p>
+          <p class="hero-meta" id="hero-meta"></p>
+          <!-- Same status badge as in the top bar, only shown on small screens -->
+          <a href="#contact" class="status-badge status-hero" id="status-hero"></a>
           <p class="intro" id="intro"></p>
           <!-- Links come from PROFILE in data.js; icons are added by script.js -->
           <ul class="chips">
@@ -47,8 +52,8 @@
             <li><a class="chip" data-profile="discord" data-show-value target="_blank" rel="noopener">Discord</a></li>
           </ul>
         </div>
-        <!-- Photo and facts come from PROFILE.photo and ABOUT.facts -->
-        <aside class="card profile-card" id="profile-card"></aside>
+        <!-- Photo from PROFILE.photo (initials if empty) -->
+        <figure class="hero-photo" id="hero-photo"></figure>
       </div>
     </section>
 
@@ -76,7 +81,7 @@
     <section class="section" id="stack">
       <div class="wrap section-inner">
         <div class="section-head"><h2>Stack</h2></div>
-        <dl class="card rows" id="stack-list"></dl>
+        <div class="stack-groups" id="stack-list"></div>
       </div>
     </section>
 
