@@ -132,11 +132,12 @@ const ABOUT = {
  *   group   card title
  *   icon    "code", "web", "tools" or "concepts"
  *   items   technologies, shown as logos (name on hover); logos are mapped in script.js (STACK_ICONS)
+ *   wide    true = the card gets a full row of its own (the others sit side by side below it)
  */
 const TECH_STACK = [
-  { group: "Languages", icon: "code", items: ["Java", "Python", "Lua", "C", "C++", "JavaScript", "SQL"] },
-  { group: "Web & Frameworks", icon: "web", items: ["HTML & CSS", "React", "Node.js", "Spring Boot"] },
+  { group: "Languages", icon: "code", wide: true, items: ["Java", "Python", "Lua", "C", "C++", "JavaScript", "SQL"] },
   { group: "Tools", icon: "tools", items: ["Git", "Linux", "Docker", "IntelliJ", "VS Code"] },
+  { group: "Web & Frameworks", icon: "web", items: ["HTML & CSS", "React", "Node.js", "Spring Boot"] },
   { group: "Concepts", icon: "concepts", items: ["OOP", "Design Patterns", "Agile / Scrum", "Testing", "UML"] },
 ];
 

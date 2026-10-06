@@ -251,12 +251,13 @@
     const iconBox = el("span", { class: "about-icon", "aria-hidden": "true" });
     iconBox.innerHTML = STACK_GROUP_ICONS[g.icon] || "";
     const items = g.items || [];
-    // Spread the icons evenly over the rows (7 → 4 + 3 instead of 5 + 2); each row is centered
-    const MAX_PER_ROW = 5;
-    const rows = Math.ceil(items.length / MAX_PER_ROW) || 1;
+    // Spread the icons evenly over the rows (5 → 3 + 2 instead of 4 + 1); each row is centered.
+    // Wide cards fit up to 10 per row, narrow ones 3; on phones (--cols-sm) every card fits up to 5.
+    const balanced = (max) => Math.ceil(items.length / (Math.ceil(items.length / max) || 1));
     const list = el("ul", { class: "stack-icons" }, ...items.map(stackIcon));
-    list.style.setProperty("--cols", Math.ceil(items.length / rows));
-    return el("article", { class: "card stack-group" },
+    list.style.setProperty("--cols", balanced(g.wide ? 10 : 3));
+    list.style.setProperty("--cols-sm", balanced(5));
+    return el("article", { class: `card stack-group${g.wide ? " wide" : ""}` },
       el("div", { class: "stack-group-head" }, iconBox, el("h3", {}, g.group)),
       list
     );
