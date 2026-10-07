@@ -394,9 +394,9 @@ a { color: inherit; text-decoration: none; }
   font: .68rem/1.2 var(--pixel); text-transform: uppercase;
   color: var(--xp); background: rgb(var(--xp-rgb) / 0.12);
 }
-/* discontinued: red, and the dot stops pulsing */
-.featured-status.off { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
-.featured-status.off .dot { background: var(--danger); animation: none; }
+/* archived: neutral grey (not alarming red), and the dot stops pulsing */
+.featured-status.off { color: var(--text-2); background: rgb(255 255 255 / 0.06); }
+.featured-status.off .dot { background: var(--muted); animation: none; }
 /* Buttons sit above the card-wide title link so they stay clickable on their own */
 .project-actions { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
 
@@ -477,45 +477,39 @@ a { color: inherit; text-decoration: none; }
 .about-link:hover { color: var(--accent-hover); }
 
 /* ---------- stack (loadout) ---------- */
-/* one inventory panel per group; logos only, the name appears as an item tooltip on hover / focus */
-/* main card on top, the others two per row below it; where there's room (see the media queries)
-   the main card becomes a tall column on the left with the others in a 2×2 square next to it */
-.stack-groups { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-.stack-group.main { grid-column: 1 / -1; }
-@media (min-width: 1140px), (min-width: 860px) and (max-width: 1000px) {
-  .stack-groups { grid-template-columns: 1.35fr 1fr 1fr; }
-  .stack-group.main { grid-column: 1; grid-row: span 2; justify-content: center; gap: 32px; }
-  .stack-group.main .stack-group-head { flex-direction: column; gap: 18px; }
-  /* one row per language (logo + name) so the tall card is filled like an inventory list */
-  .stack-group.main .stack-icons { flex: none; flex-direction: column; max-width: none; gap: 8px; }
-  .stack-group.main .stack-icon { width: 100%; height: 48px; justify-content: flex-start; gap: 16px; padding: 0 18px; font-size: 1.5rem; }
-  .stack-group.main .stack-icon:hover, .stack-group.main .stack-icon:focus-visible { transform: translateX(4px); }
-  .stack-group.main .stack-icon svg { width: 24px; height: 24px; }
-  .stack-group.main .stack-icon i { width: 24px; text-align: center; }
-  .stack-group.main .stack-icon::after { display: none; } /* the name is already shown */
-  .stack-group.main .stack-name { display: block; }
+/* one panel, one row per group: label on the left, logo + name chips on the right */
+.stack-panel { padding: 6px 28px; }
+.stack-row { display: grid; grid-template-columns: 250px 1fr; gap: 20px; align-items: center; padding: 20px 0; }
+.stack-row + .stack-row { border-top: 1px dashed var(--line-strong); }
+.stack-label { display: flex; align-items: center; gap: 10px; }
+.stack-group-icon { display: grid; place-items: center; color: var(--accent); }
+.stack-group-icon svg { width: 18px; height: 18px; }
+.stack-label h3 { font: 700 .95rem/1.2 var(--display); text-transform: uppercase; letter-spacing: .06em; }
+.stack-count { font: .68rem/1 var(--pixel); color: var(--muted); }
+.stack-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+/* chips look like item slots (same as .tag), lighting up in the brand color on hover */
+.stack-chip {
+  display: flex; align-items: center; gap: 9px;
+  height: 38px; padding: 0 14px;
+  border: 1px solid var(--line-strong); background: var(--bg);
+  font: 600 .8rem/1 var(--display); text-transform: uppercase; letter-spacing: .04em; color: var(--text);
+  transition: border-color .2s, background-color .2s, transform .2s, box-shadow .2s;
 }
-.stack-name { display: none; font: 600 .85rem/1 var(--display); text-transform: uppercase; letter-spacing: .06em; color: var(--text); }
-/* small cards: icon above the title, slightly smaller slots */
-.stack-group:not(.main) { padding: 22px 16px; }
-.stack-group:not(.main) .stack-group-head { flex-direction: column; gap: 14px; text-align: center; }
-.stack-group:not(.main) .stack-group-head h3 { font-size: .9rem; }
-.stack-group:not(.main) .stack-icons { --tile: 46px; --gap: 7px; }
-.stack-group {
-  display: flex; flex-direction: column; gap: 22px; padding: 22px;
-  background-image: radial-gradient(rgb(var(--accent-rgb) / 0.10) 1px, transparent 1px);
-  background-size: 14px 14px;
+.stack-logo { display: flex; align-items: center; gap: 3px; font-size: 1.1rem; line-height: 1; color: var(--text-2); }
+.stack-logo i, .stack-logo .logo { transition: color .2s; }
+.stack-logo i:not(:only-of-type) { font-size: .9rem; } /* two logos in one chip (HTML & CSS) */
+.stack-logo svg { width: 18px; height: 18px; transition: color .2s; }
+.stack-chip:hover {
+  --glow: var(--brand, var(--accent));
+  border-color: var(--glow);
+  background: color-mix(in srgb, var(--glow) 12%, var(--bg));
+  box-shadow: 0 0 16px -6px var(--glow);
+  transform: translateY(-2px);
 }
-.stack-group-head { display: flex; justify-content: center; align-items: center; gap: 12px; }
-.stack-group-head h3 { font: 700 1rem/1 var(--display); text-transform: uppercase; letter-spacing: .06em; }
-/* main card (Languages): a bit more room and bigger logos, same colors as the other cards */
-.stack-group.main { gap: 26px; padding: 30px 22px 34px; }
-.stack-group.main .stack-group-head h3 { font-size: 1.25rem; }
-.stack-group.main .stack-icons { --tile: 58px; --gap: 10px; }
-.stack-group.main .stack-icon { font-size: 1.9rem; }
-.stack-group.main .stack-icon svg { width: 28px; height: 28px; }
-/* equal-size slots; the row width is set by --cols (script.js) so every row is centered and balanced,
-   and the slots sit in the vertical middle of the remaining panel height */
+.stack-chip:hover .stack-logo { color: var(--accent); }
+.stack-chip:hover .stack-logo i, .stack-chip:hover .stack-logo .logo { color: var(--brand); }
+
+/* logo tiles with a name tooltip (used by the project cards) */
 .stack-icons {
   --tile: 50px; --gap: 8px; --c: var(--cols, 5);
   flex: 1; align-content: center;
@@ -657,6 +651,8 @@ a { color: inherit; text-decoration: none; }
   background: #0d0b14; border: 1px solid var(--line-strong); border-top: 2px solid var(--accent);
   box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.8);
 }
+/* invisible bridge over the gap, so moving the mouse up to the list keeps it open */
+.trophies ul::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 10px; }
 .trophies li { display: flex; align-items: center; gap: 10px; font: 600 .8rem/1.2 var(--display); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
 .trophies li.got { color: var(--text); }
 .trophy-mark { width: 14px; text-align: center; font-family: var(--pixel); color: var(--line-strong); }
@@ -758,10 +754,8 @@ a { color: inherit; text-decoration: none; }
   .featured-main, .featured-side { padding: 22px; }
   .featured-side { border-left: 0; border-top: 1px solid var(--line); }
   .paper-top { flex-direction: column-reverse; gap: 14px; }
-  .stack-groups { grid-template-columns: 1fr; }
-  .stack-icons { --c: var(--cols-sm, 5); --tile: 50px; --gap: 8px; }
-  .stack-group:not(.main) .stack-group-head { flex-direction: row; }
-  .stack-group:not(.main) .stack-group-head h3 { font-size: 1rem; }
+  .stack-panel { padding: 6px 18px; }
+  .stack-row { grid-template-columns: 1fr; gap: 12px; padding: 18px 0; }
   .edu { grid-template-columns: 36px 1fr; gap: 12px; }
   .edu-node { width: 26px; height: 26px; margin: 5px; }
   .edu-node svg { width: 14px; height: 14px; }

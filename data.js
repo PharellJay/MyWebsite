@@ -14,6 +14,7 @@
  *   achievement     "Achievement unlocked" pop-up at the top of the page ("" to hide)
  *   photo           e.g. "assets/photo.jpg", shown next to your name ("" to hide)
  *   github, linkedin, email   used at the top and in the Contact section
+ *   cv              path to your CV PDF, e.g. "papers/cv.pdf"; adds a "CV" button at the top and in Contact ("" to hide)
  *   discord         your Discord username (clicking copies it) or a full link,
  *                   e.g. "https://discord.com/users/<your id>" ("" to hide)
  */
@@ -29,7 +30,8 @@ const PROFILE = {
   github: "https://github.com/PharellJay",
   linkedin: "https://www.linkedin.com/in/pharell-jay-jeyakumar/",
   email: "pharelljeyakumar1010@gmail.com",
-  discord: "pharelljay", 
+  discord: "pharelljay",
+  cv: "",
 };
 
 /*
@@ -42,7 +44,7 @@ const PROFILE = {
  *   featured     true = the big "main quest" card above the others (use it for one project)
  *   stat         featured card only: highlighted number, e.g. { value: "16,000+", label: "registered players" }
  *   status       featured card only: small badge text, e.g. "Live" or "Discontinued"
- *   continued    featured card only: false = the status badge is red (discontinued), otherwise green
+ *   continued    featured card only: false = the status badge is grey (archived), otherwise green
  */
 const PROJECTS = [
   {
@@ -53,13 +55,13 @@ const PROJECTS = [
     demo: "",
     featured: true,
     stat: { value: "16,000+", label: "protected players" },
-    status: "Discontinued",
+    status: "Archived",
     continued: false,
   },
   {
     title: "Flashcards",
     description: "A small flashcard tool designed to help me and others while learning as public flashcard apps tend to be flooded with paywalls and ads.",
-    tech: ["Python", "json", "bash"],
+    tech: ["Python", "JSON", "Bash"],
     repo: "https://github.com/PharellJay/Flashcards",
     demo: "",
   },
@@ -136,14 +138,13 @@ const ABOUT = {
 };
 
 /*
- * TECH_STACK — one card per group.
- *   group   card title
+ * TECH_STACK — one row per group, in this order.
+ *   group   row title
  *   icon    "code", "web", "tools", "game" or "concepts"
- *   items   technologies, shown as logos (name on hover); logos are mapped in script.js (STACK_ICONS)
- *   main    true = the highlighted card; on wide screens it sits on the left with the others in a square next to it
+ *   items   technologies, shown as logo + name chips; logos are mapped in script.js (STACK_ICONS)
  */
 const TECH_STACK = [
-  { group: "Languages", icon: "code", main: true, items: ["Java", "Python", "Lua", "C", "C++", "JavaScript", "SQL"] },
+  { group: "Languages", icon: "code", items: ["Java", "Python", "Lua", "C", "C++", "JavaScript", "SQL"] },
   { group: "Tools", icon: "tools", items: ["Git", "Linux", "Docker", "IntelliJ", "VS Code"] },
   { group: "Web & Frameworks", icon: "web", items: ["HTML & CSS", "React", "Node.js", "Spring Boot"] },
   { group: "Concepts", icon: "concepts", items: ["OOP", "Design Patterns", "Agile / Scrum", "Testing", "UML"] },
@@ -153,7 +154,7 @@ const TECH_STACK = [
 /*
  * EDUCATION — newest first, shown as a timeline.
  *   date, title, place, description ("" to hide the description)
- *   icon     "university" or "school"
+ *   icon     "university", "school" or "projects" (game controller, for self-driven work)
  *   focus    list of subjects / topics, shown as tags
  *   A date containing "present" marks the entry as current.
  */
@@ -165,6 +166,15 @@ const EDUCATION = [
     icon: "university",
     description: "Learning how software gets built in practice, from requirements and design to testing and deployment.",
     focus: ["Software Development", "Architecture", "Project Management", "Quality Assurance"],
+  },
+  {
+    date: "2024 – 2026",
+    title: "Independent Developer & Server Operator",
+    place: "RedM (Red Dead Redemption 2 multiplayer)",
+    icon: "projects",
+    description: "Two years between school and university spent building real things: I ran some of the biggest RedM community servers and " +
+      "developed an anticheat from scratch .",
+    focus: ["Lua", "Game Security", "Server Administration", "Game Design", "Team Lead"],
   },
   {
     date: "2024",
@@ -181,5 +191,5 @@ const EDUCATION = [
  */
 const CONTACT = {
   text:
-    "Email or Discord are the best ways to reach me.",
+    "Email or LinkedIn are the best ways to reach me.",
 };
