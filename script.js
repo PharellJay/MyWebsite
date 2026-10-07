@@ -136,19 +136,36 @@
   /* ---------- projects ---------- */
   const pad2 = (n) => String(n).padStart(2, "0");
 
-  function renderProject(p, i) {
-    const title = el("h3", {}, p.repo ? externalLink(p.repo, p.title) : p.title);
-
+  // Card content shared by the featured card and the normal ones; tech is shown as logo tiles
+  // like in the Stack section (names without a logo stay text tags)
+  function projectContent(p, label) {
     const actions = el("div", { class: "project-actions" });
     if (p.repo) actions.append(el("a", { href: p.repo, target: "_blank", rel: "noopener", class: "btn btn-primary" }, "View project"));
     if (p.demo) actions.append(el("a", { href: p.demo, target: "_blank", rel: "noopener", class: "btn" }, "Live demo"));
-
-    return el("article", { class: "card project" },
-      el("p", { class: "quest-label" }, `Quest ${pad2(i + 1)}`),
-      title,
+    return [
+      el("p", { class: "quest-label" }, label),
+      el("h3", {}, p.repo ? externalLink(p.repo, p.title) : p.title),
       p.description ? el("p", {}, p.description) : null,
-      p.tech?.length ? tags(p.tech) : null,
-      actions.childElementCount ? actions : null
+      p.tech?.length ? el("ul", { class: "stack-icons tech-icons" }, ...p.tech.map((t) => stackIcon(t))) : null,
+      actions.childElementCount ? actions : null,
+    ];
+  }
+
+  function renderProject(p) {
+    return el("article", { class: "card project" }, ...projectContent(p, `Quest ${pad2(projects.indexOf(p) + 1)}`));
+  }
+
+  // Featured project: text on the left, highlighted stat + status on the right
+  function renderFeaturedProject(p) {
+    const side = el("div", { class: "featured-side" },
+      p.status ? el("span", { class: `featured-status${p.continued === false ? " off" : ""}` },
+        el("span", { class: "dot", "aria-hidden": "true" }), p.status) : null,
+      p.stat ? el("span", { class: "featured-value" }, p.stat.value) : null,
+      p.stat?.label ? el("span", { class: "featured-label" }, p.stat.label) : null
+    );
+    return el("article", { class: "card project featured" },
+      el("div", { class: "featured-main" }, ...projectContent(p, "Main quest")),
+      side.childElementCount ? side : null
     );
   }
 
@@ -208,6 +225,10 @@
     "JavaScript": dev("javascript-plain", "#f7df1e"),
     "SQL": lucide('<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/>'),
     "HTML & CSS": dev(["html5-plain", "css3-plain"], ["#e34f26", "#2965f1"]),
+    "HTML": dev("html5-plain", "#e34f26"),
+    "CSS": dev("css3-plain", "#2965f1"),
+    "json": dev("json-plain", "#cbcb41"),
+    "bash": dev("bash-plain", "#4eaa25"),
     "React": dev("react-original", "#61dafb"),
     "Node.js": dev("nodejs-plain", "#5fa04e"),
     "Spring Boot": dev("spring-original", "#6db33f"),
@@ -588,7 +609,7 @@
       const burst = 30 + Math.random() * 40;
       return {
         x: (c + offC) * VOXEL_PITCH, y: (r + offR) * VOXEL_PITCH, color: VOXEL_COLORS[ch],
-        rx: dx * 4 + jitter(), ry: dy * 4 + jitter(), rr: (Math.random() - 0.5) * 24,
+        rx: dx * 14 + jitter() * 2, ry: dy * 14 + jitter() * 2, rr: (Math.random() - 0.5) * 60,
         ex: (dx + Math.random() - 0.5) * burst, ey: (dy + Math.random() - 0.5) * burst, er: (Math.random() - 0.5) * 240,
       };
     });
@@ -652,19 +673,23 @@
       box.classList.add("ready");
     }
 
-    // Current section: the last one whose top has passed 70% of the screen height (the last one
-    // once you hit the bottom of the page, since short sections there never reach that line).
+    // Current section: the last one whose top has passed a line on the screen: 70% of the height
+    // while scrolling down, 30% while scrolling up, so it switches early in both directions
+    // (and the last one once you hit the bottom of the page, since short sections there never reach the line).
     // Narrow screens have no room under the section titles, so it stays in the hero there.
     const sections = [...slots.keys()];
     const narrow = window.matchMedia("(max-width: 1000px)");
     const heroSlot = slots.get($(".hero"));
+    let lastY = window.scrollY, scrollingUp = false;
     function currentSlot() {
+      if (window.scrollY !== lastY) scrollingUp = window.scrollY < lastY;
+      lastY = window.scrollY;
       if (narrow.matches) return heroSlot || null;
       const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
       if (atBottom) return slots.get(sections[sections.length - 1]);
       // At the very top it always starts in the first section (on tall screens the next one is already past the line)
       if (window.scrollY < 40) return slots.get(sections[0]);
-      const line = window.innerHeight * 0.7;
+      const line = window.innerHeight * (scrollingUp ? 0.3 : 0.7);
       let current = sections[0];
       for (const section of sections) if (section.getBoundingClientRect().top <= line) current = section;
       return slots.get(current);
@@ -689,16 +714,17 @@
       busy = false;
     }
 
-    // Slots with data-cycle (the hero) rotate through their shapes every 4 seconds,
-    // paused while hovered or while the tab is in the background
-    let cycleTimer = 0;
+    // Slots with data-cycle (the hero) rotate through their shapes every 4 seconds, paused while
+    // hovered, while the tab is in the background and while you scroll (so it doesn't start a
+    // change right before a section switch)
+    let cycleTimer = 0, lastScroll = 0;
     function startCycle(slot) {
       clearInterval(cycleTimer);
       const names = slot ? [slot.dataset.shape, ...(slot.dataset.cycle || "").split(/\s+/).filter((n) => shapes[n])] : [];
       if (names.length < 2 || reducedMotion) return;
       let index = 0;
       cycleTimer = setInterval(() => {
-        if (busy || document.hidden || box.classList.contains("shift")) return;
+        if (busy || document.hidden || box.classList.contains("shift") || performance.now() - lastScroll < 600) return;
         index = (index + 1) % names.length;
         transition(() => setShape(names[index]));
       }, 4000);
@@ -709,7 +735,7 @@
     function update() {
       const slot = currentSlot();
       if (slot !== target) switchTo(slot);
-      place();
+      if (!busy) place(); // while breaking apart it stays put instead of being dragged along by the scroll
     }
     function switchTo(slot) {
       target = slot;
@@ -728,7 +754,10 @@
       if (!queued) requestAnimationFrame(() => { queued = false; update(); });
       queued = true;
     };
-    window.addEventListener("scroll", onMove, { passive: true });
+    window.addEventListener("scroll", () => {
+      lastScroll = performance.now();
+      onMove();
+    }, { passive: true });
     window.addEventListener("resize", onMove);
 
     box.addEventListener("mouseenter", () => box.classList.add("shift"));
@@ -768,7 +797,12 @@
 
   /* ---------- init ---------- */
   renderProfile();
-  fillList($("#projects-list"), projects, "Nothing here yet.", renderProject);
+  const featuredProject = projects.find((p) => p.featured);
+  const otherProjects = projects.filter((p) => p !== featuredProject);
+  if (featuredProject) $("#projects-featured").append(renderFeaturedProject(featuredProject));
+  else $("#projects-featured").remove();
+  if (featuredProject && !otherProjects.length) $("#projects-list").remove();
+  else fillList($("#projects-list"), otherProjects, "Nothing here yet.", renderProject);
   fillList($("#papers-list"), papers, "Nothing here yet.", renderPaper);
   renderAbout();
   renderHeroPhoto();

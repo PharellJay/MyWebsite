@@ -17,6 +17,7 @@
   --accent-ink: #160b2e;
   --xp: #34d399;              /* green: progress / online */
   --xp-rgb: 52 211 153;
+  --danger: #f43f5e;          /* red: discontinued / offline */
   --radius: 3px;
   --cut: 10px;                /* size of chamfered corners */
   --font: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -347,7 +348,35 @@ a { color: inherit; text-decoration: none; }
 /* The title link covers the whole card */
 .project h3 a::after { content: ""; position: absolute; inset: 0; }
 .project p:not(.quest-label) { margin-top: 10px; color: var(--text-2); font-size: .95rem; flex: 1; }
-.project .tags { margin-top: 20px; }
+/* tech logos (tiles from the Stack section, smaller and left-aligned) */
+.project .tech-icons { --tile: 38px; --gap: 6px; flex: none; justify-content: flex-start; max-width: none; margin: 20px 0 0; }
+.project .tech-icons .stack-icon { font-size: 1.15rem; }
+.project .tech-icons .stack-icon svg { width: 18px; height: 18px; }
+
+/* featured project ("main quest"): full width above the row, with a highlighted stat */
+.projects-body { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.project.featured {
+  display: grid; grid-template-columns: 1fr auto; gap: 0; padding: 0;
+  border-color: rgb(var(--accent-rgb) / 0.35);
+  background: linear-gradient(100deg, rgb(var(--accent-rgb) / 0.10), var(--surface) 55%);
+}
+.featured-main { display: flex; flex-direction: column; padding: 30px; }
+.project.featured h3 { font-size: 1.7rem; }
+.featured-side {
+  display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px;
+  min-width: 230px; padding: 30px; border-left: 1px solid var(--line);
+  text-align: center;
+}
+.featured-value { font: 700 3rem/1 var(--display); color: var(--xp); text-shadow: 0 0 24px rgb(var(--xp-rgb) / 0.45); }
+.featured-label { font: .65rem/1.5 var(--pixel); text-transform: uppercase; color: var(--muted); }
+.featured-status {
+  display: inline-flex; align-items: center; gap: 8px; padding: 5px 10px;
+  font: .62rem/1.2 var(--pixel); text-transform: uppercase;
+  color: var(--xp); background: rgb(var(--xp-rgb) / 0.12);
+}
+/* discontinued: red, and the dot stops pulsing */
+.featured-status.off { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
+.featured-status.off .dot { background: var(--danger); animation: none; }
 /* Buttons sit above the card-wide title link so they stay clickable on their own */
 .project-actions { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
 
@@ -624,7 +653,7 @@ a { color: inherit; text-decoration: none; }
   transition: transform .6s cubic-bezier(.2, .9, .3, 1.2) var(--d, 0ms);
 }
 /* hover: every cube shifts a bit (away from the middle) and settles back on mouse leave */
-.voxel.shift .vox { --jx: var(--rx); --jy: var(--ry); --jr: var(--rr); transition-duration: .25s; transition-delay: 0s; }
+.voxel.shift .vox { --jx: var(--rx); --jy: var(--ry); --jr: var(--rr); transition-duration: .35s; transition-delay: 0s; }
 .voxel.scatter .vox {
   --jx: var(--ex); --jy: var(--ey); --jr: var(--er); --js: .35;
   transition: transform .3s cubic-bezier(.5, 0, .9, .6);
@@ -660,6 +689,9 @@ a { color: inherit; text-decoration: none; }
   .section-inner { padding-top: 56px; padding-bottom: 56px; gap: 20px; }
   .grid { grid-auto-columns: 85%; } /* next card peeks in to hint at scrolling */
   .project, .paper { padding: 22px; }
+  .project.featured { grid-template-columns: 1fr; padding: 0; }
+  .featured-main, .featured-side { padding: 22px; }
+  .featured-side { border-left: 0; border-top: 1px solid var(--line); }
   .paper-top { flex-direction: column-reverse; gap: 14px; }
   .stack-groups { grid-template-columns: 1fr; }
   .stack-icons { --c: var(--cols-sm, 5); --tile: 50px; --gap: 8px; }

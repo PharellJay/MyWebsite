@@ -39,14 +39,22 @@ const PROFILE = {
  *   tech         list of technologies
  *   repo         link to the GitHub repository (the title links there)
  *   demo         optional link to a live version ("" to hide)
+ *   featured     true = the big "main quest" card above the others (use it for one project)
+ *   stat         featured card only: highlighted number, e.g. { value: "16,000+", label: "registered players" }
+ *   status       featured card only: small badge text, e.g. "Live" or "Discontinued"
+ *   continued    featured card only: false = the status badge is red (discontinued), otherwise green
  */
 const PROJECTS = [
   {
     title: "RedM Anticheat",
     description: "Advanced and precise anticheat for RedM (Red Dead Redemption 2 multiplayer), detecting a wide range of cheats with a focus on performance. Proven on servers with over 16,000 registered players.",
     tech: ["Lua", "HTML",  "JavaScript", "SQL"],
-    repo: "https://github.com/your-username/portfolio",
+    repo: "https://github.com/PharellJay/RedMAnticheat",
     demo: "",
+    featured: true,
+    stat: { value: "16,000+", label: "protected players" },
+    status: "Discontinued",
+    continued: false,
   },
   {
     title: "Flashcards",
