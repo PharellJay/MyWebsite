@@ -10,7 +10,7 @@
   --line-strong: #363248;
   --text: #efedf5;
   --text-2: #b8b4c7;
-  --muted: #7d7892;
+  --muted: #8c87a1;
   --accent: #9d6bff;          /* purple HUD color */
   --accent-rgb: 157 107 255;  /* same color, for transparent variants */
   --accent-hover: #b48cff;
@@ -56,7 +56,7 @@ a { color: inherit; text-decoration: none; }
 
 /* small pixel-font labels: "LVL 01 · QUESTS", "QUEST 02", ... */
 .lvl, .quest-label {
-  font: .7rem/1.4 var(--pixel); text-transform: uppercase; letter-spacing: .06em;
+  font: .75rem/1.4 var(--pixel); text-transform: uppercase; letter-spacing: .06em;
   color: var(--accent);
 }
 
@@ -207,7 +207,7 @@ a { color: inherit; text-decoration: none; }
 }
 .stats > div { display: flex; align-items: baseline; gap: 10px; }
 .stats > div + div { padding-left: 18px; margin-left: 18px; border-left: 1px solid var(--line); }
-.stats dt { font: .65rem/1 var(--pixel); text-transform: uppercase; color: var(--accent); }
+.stats dt { font: .7rem/1 var(--pixel); text-transform: uppercase; color: var(--accent); }
 .stats dd { font: .85rem/1.4 var(--mono); color: var(--text-2); }
 .stats .stat-status { display: none; }
 .stats .stat-status dd { color: var(--xp); }
@@ -225,7 +225,7 @@ a { color: inherit; text-decoration: none; }
 .hero-photo::after {
   content: "P1"; position: absolute; top: 16px; left: 16px; z-index: 1;
   padding: 3px 6px; background: var(--accent); color: var(--accent-ink);
-  font: .65rem/1 var(--pixel);
+  font: .7rem/1 var(--pixel);
 }
 .hero-photo img { display: block; width: 100%; aspect-ratio: 4 / 5; }
 .hero-photo img { object-fit: cover; object-position: center 35%; filter: saturate(.9) contrast(1.05); transition: filter .2s; }
@@ -249,7 +249,7 @@ a { color: inherit; text-decoration: none; }
   background: rgb(var(--xp-rgb) / 0.14); color: var(--xp);
 }
 .achievement-icon svg { width: 22px; height: 22px; }
-.achievement-label { font: .65rem/1.4 var(--pixel); text-transform: uppercase; color: var(--xp); }
+.achievement-label { font: .7rem/1.4 var(--pixel); text-transform: uppercase; color: var(--xp); }
 .achievement p + p { font-size: .9rem; line-height: 1.35; color: var(--text); }
 
 /* ---------- chips & buttons ---------- */
@@ -273,7 +273,7 @@ a { color: inherit; text-decoration: none; }
   content: "Copied"; position: absolute; top: calc(100% + 6px); right: 0;
   padding: 4px 8px;
   background: var(--accent); color: var(--accent-ink);
-  font: .65rem/1.2 var(--pixel); white-space: nowrap;
+  font: .7rem/1.2 var(--pixel); white-space: nowrap;
 }
 .chip .icon { display: flex; color: var(--text-2); transition: color .15s; }
 .chip:hover .icon { color: var(--text); }
@@ -289,7 +289,20 @@ a { color: inherit; text-decoration: none; }
 .btn-primary:hover { background: var(--accent-hover); box-shadow: none; }
 
 /* ---------- sections ---------- */
-.section { border-bottom: 1px solid var(--line); }
+.section { position: relative; border-bottom: 1px solid var(--line); }
+/* faint purple glow behind each section title (a weaker echo of the hero's glow) */
+.section::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(560px 340px at 12% 0%, rgb(var(--accent-rgb) / 0.07), transparent 70%);
+}
+.section-inner { position: relative; z-index: 1; }
+/* HUD divider: accent segment + tick marks on the line between sections, aligned with the content */
+.section-inner::after {
+  content: ""; position: absolute; left: 40px; bottom: -4px; width: 120px; height: 6px; pointer-events: none;
+  background:
+    linear-gradient(var(--accent), var(--accent)) left center / 36px 2px no-repeat,
+    repeating-linear-gradient(to right, var(--line-strong) 0 2px, transparent 2px 8px) right center / 80px 6px no-repeat;
+}
 .section-inner {
   display: grid; grid-template-columns: 220px 1fr; gap: 56px;
   padding-top: 88px; padding-bottom: 88px;
@@ -312,6 +325,7 @@ a { color: inherit; text-decoration: none; }
 /* heading "scan-in" when it enters the view (only when script.js enables it) */
 .js-reveal .section-head { clip-path: inset(0 100% 0 0); }
 .js-reveal .section-head.in { animation: scan-in .7s steps(14) forwards; }
+.js-reveal .section-head.done { clip-path: none; }
 @keyframes scan-in {
   0% { clip-path: inset(0 100% 0 0); }
   100% { clip-path: inset(0 -20px 0 0); }
@@ -348,6 +362,12 @@ a { color: inherit; text-decoration: none; }
 /* The title link covers the whole card */
 .project h3 a::after { content: ""; position: absolute; inset: 0; }
 .project p:not(.quest-label) { margin-top: 10px; color: var(--text-2); font-size: .95rem; flex: 1; }
+/* ◀ ▶ buttons above the projects row (only while it overflows, see script.js) */
+.grid-nav { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: -6px; }
+.grid-nav[hidden] { display: none; }
+.grid-btn { font-size: .75rem; color: var(--text-2); cursor: pointer; }
+.grid-btn:disabled { opacity: .35; cursor: default; pointer-events: none; }
+
 /* tech logos (tiles from the Stack section, smaller and left-aligned) */
 .project .tech-icons { --tile: 38px; --gap: 6px; flex: none; justify-content: flex-start; max-width: none; margin: 20px 0 0; }
 .project .tech-icons .stack-icon { font-size: 1.15rem; }
@@ -368,10 +388,10 @@ a { color: inherit; text-decoration: none; }
   text-align: center;
 }
 .featured-value { font: 700 3rem/1 var(--display); color: var(--xp); text-shadow: 0 0 24px rgb(var(--xp-rgb) / 0.45); }
-.featured-label { font: .65rem/1.5 var(--pixel); text-transform: uppercase; color: var(--muted); }
+.featured-label { font: .7rem/1.5 var(--pixel); text-transform: uppercase; color: var(--muted); }
 .featured-status {
   display: inline-flex; align-items: center; gap: 8px; padding: 5px 10px;
-  font: .62rem/1.2 var(--pixel); text-transform: uppercase;
+  font: .68rem/1.2 var(--pixel); text-transform: uppercase;
   color: var(--xp); background: rgb(var(--xp-rgb) / 0.12);
 }
 /* discontinued: red, and the dot stops pulsing */
@@ -408,7 +428,7 @@ a { color: inherit; text-decoration: none; }
   box-shadow: 0 0 24px -6px rgb(var(--accent-rgb) / 0.6), inset 0 0 18px -8px rgb(var(--accent-rgb) / 0.8);
   clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
 }
-.grade-label { display: block; font: .65rem/1.4 var(--pixel); text-transform: uppercase; color: var(--muted); }
+.grade-label { display: block; font: .7rem/1.4 var(--pixel); text-transform: uppercase; color: var(--muted); }
 .grade-value { display: block; margin-top: 2px; font: 700 1.15rem/1.2 var(--display); color: var(--accent); white-space: nowrap; }
 .abstract { margin-top: 18px; color: var(--text-2); max-width: 720px; }
 .paper-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
@@ -544,7 +564,7 @@ a { color: inherit; text-decoration: none; }
 }
 .stack-icon:hover::after, .stack-icon:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
 
-/* ---------- education (quest log) ---------- */
+/* ---------- education (skill tree) ---------- */
 /* timeline: diamond nodes on a vertical line, a panel per entry */
 #education-list { gap: 22px; }
 .edu { position: relative; display: grid; grid-template-columns: 44px 1fr; gap: 20px; }
@@ -573,7 +593,7 @@ a { color: inherit; text-decoration: none; }
 .edu.current .edu-date { color: var(--accent); }
 .edu-badge {
   padding: 4px 8px;
-  font: .62rem/1.2 var(--pixel); text-transform: uppercase;
+  font: .68rem/1.2 var(--pixel); text-transform: uppercase;
   color: var(--accent); background: rgb(var(--accent-rgb) / 0.15);
 }
 .edu-badge.done { color: var(--xp); background: rgb(var(--xp-rgb) / 0.12); }
@@ -591,7 +611,15 @@ a { color: inherit; text-decoration: none; }
 @keyframes stripes { to { background-position: 22.6px 0; } }
 
 /* ---------- contact (multiplayer) ---------- */
-.contact-text { font: 700 clamp(1.6rem, 3vw, 2.3rem)/1.2 var(--display); max-width: 640px; }
+/* "final level" panel: status, headline and links in one framed card */
+.contact-panel {
+  padding: 40px;
+  border-color: rgb(var(--accent-rgb) / 0.35);
+  background: linear-gradient(100deg, rgb(var(--accent-rgb) / 0.12), var(--surface) 60%);
+  box-shadow: 0 0 60px -24px rgb(var(--xp-rgb) / 0.35);
+}
+.contact-status { margin-top: 14px; }
+.contact-text { margin-top: 18px; font: 700 clamp(1.6rem, 3vw, 2.3rem)/1.2 var(--display); max-width: 640px; }
 .contact .chips { margin-top: 28px; }
 /* the email address is the main call to action */
 .contact .chip[data-profile="email"] {
@@ -607,9 +635,40 @@ a { color: inherit; text-decoration: none; }
 /* ---------- footer ---------- */
 .footer { color: var(--muted); font-size: .85rem; }
 .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-top: 28px; padding-bottom: 40px; }
-.footer .saved { margin-right: 10px; font: .65rem/1 var(--pixel); text-transform: uppercase; color: var(--xp); }
+.footer .saved { margin-right: 10px; font: .7rem/1 var(--pixel); text-transform: uppercase; color: var(--xp); }
 .footer a { font: 600 .8rem/1 var(--display); text-transform: uppercase; letter-spacing: .06em; transition: color .15s; }
 .footer a:hover { color: var(--accent); }
+.footer-hud { display: flex; align-items: center; gap: 18px; }
+.level-hint { font: .68rem/1 var(--pixel); text-transform: uppercase; color: var(--muted); }
+/* achievements list: opens upwards from the footer */
+.trophies { position: relative; }
+.trophies summary {
+  list-style: none; cursor: pointer;
+  padding: 8px 10px; border: 1px solid var(--line-strong); background: var(--bg);
+  font: .68rem/1 var(--pixel); text-transform: uppercase; color: var(--accent);
+  transition: border-color .15s, color .15s;
+}
+.trophies summary::-webkit-details-marker { display: none; }
+.trophies summary::before { content: "★ "; }
+.trophies summary:hover, .trophies[open] summary { border-color: rgb(var(--accent-rgb) / 0.7); color: var(--text); }
+.trophies ul {
+  position: absolute; right: 0; bottom: calc(100% + 8px); z-index: 6;
+  display: grid; gap: 9px; min-width: 230px; padding: 14px 16px;
+  background: #0d0b14; border: 1px solid var(--line-strong); border-top: 2px solid var(--accent);
+  box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.8);
+}
+.trophies li { display: flex; align-items: center; gap: 10px; font: 600 .8rem/1.2 var(--display); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.trophies li.got { color: var(--text); }
+.trophy-mark { width: 14px; text-align: center; font-family: var(--pixel); color: var(--line-strong); }
+.trophies li.got .trophy-mark { color: var(--xp); }
+
+/* unlocked achievements pop up in the bottom right (same look as the hero toast) */
+.achievement.toast { position: fixed; right: 24px; bottom: 24px; z-index: 30; margin: 0; max-width: 380px; }
+
+/* no JavaScript: short notice instead of the empty page */
+.noscript { padding-top: 80px; padding-bottom: 80px; color: var(--text-2); }
+.noscript p + p { margin-top: 12px; max-width: 560px; }
+.noscript a { color: var(--accent); }
 
 /* ---------- PDF dialog ---------- */
 .pdf-dialog {
@@ -629,11 +688,11 @@ a { color: inherit; text-decoration: none; }
 
 /* ---------- cube companion ---------- */
 /* invisible spots that reserve room: right of the name in the hero, under each section title */
-.voxel-slot { width: 100%; max-width: 220px; aspect-ratio: 20 / 14; margin-top: 28px; }
+.voxel-slot { position: relative; z-index: 5; width: 100%; max-width: 220px; aspect-ratio: 20 / 14; margin-top: 28px; }
 .hero .voxel-slot { width: 260px; max-width: none; margin-top: 0; }
-/* the figure itself: fixed, moved onto the current slot by script.js */
+/* the figure itself: moved into the current slot by script.js (scaled to the slot's width) */
 .voxel {
-  position: fixed; top: 0; left: 0; z-index: 5;
+  position: absolute; top: 0; left: 0;
   transform-origin: 0 0;
   opacity: 0; transition: opacity .2s;
 }
@@ -659,6 +718,9 @@ a { color: inherit; text-decoration: none; }
   transition: transform .3s cubic-bezier(.5, 0, .9, .6);
 }
 .voxel.instant .vox { transition: none; }
+/* Konami code easter egg: colors cycle through the rainbow */
+.voxel.rainbow { animation: rainbow 1.2s linear infinite; }
+@keyframes rainbow { to { filter: hue-rotate(360deg); } }
 
 /* ---------- medium screens ---------- */
 /* Below this width the social buttons would push the navigation off-center */
@@ -689,6 +751,9 @@ a { color: inherit; text-decoration: none; }
   .section-inner { padding-top: 56px; padding-bottom: 56px; gap: 20px; }
   .grid { grid-auto-columns: 85%; } /* next card peeks in to hint at scrolling */
   .project, .paper { padding: 22px; }
+  .contact-panel { padding: 24px; }
+  .contact-status { height: auto; padding: 8px 12px; white-space: normal; line-height: 1.3; }
+  .section-inner::after { left: 16px; }
   .project.featured { grid-template-columns: 1fr; padding: 0; }
   .featured-main, .featured-side { padding: 22px; }
   .featured-side { border-left: 0; border-top: 1px solid var(--line); }
@@ -706,6 +771,13 @@ a { color: inherit; text-decoration: none; }
   .about-cards { grid-template-columns: 1fr; }
   .about-card.wide { flex-direction: column; gap: 18px; }
   .footer-inner { flex-direction: column; align-items: flex-start; }
+  .trophies ul { right: auto; left: 0; }
+  .achievement.toast { left: 16px; right: 16px; bottom: 16px; max-width: none; }
+}
+
+/* touch screens: no keyboard shortcuts and swiping instead of arrow buttons */
+@media (hover: none) {
+  .level-hint, .grid-nav { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

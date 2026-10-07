@@ -20,7 +20,7 @@
 const PROFILE = {
   name: "Pharell Jay Jeyakumar",
   tagline: "Software Engineering student at Hochschule Heilbronn",
-  intro: "I build tools that solve real problems, from an anticheat running on game-servers with 16,000+ players to small apps for everyday learning. Here you'll find my projects and papers.",
+  intro: "I build tools that solve real problems, from an anticheat protecting large game servers to small apps for everyday learning. Here you'll find my projects and papers.",
   location: "Heilbronn, Germany",
   languages: "German, English",
   status: "Open to internships & working student roles",
@@ -47,7 +47,7 @@ const PROFILE = {
 const PROJECTS = [
   {
     title: "RedM Anticheat",
-    description: "Advanced and precise anticheat for RedM (Red Dead Redemption 2 multiplayer), detecting a wide range of cheats with a focus on performance. Proven on servers with over 16,000 registered players.",
+    description: "Advanced and precise anticheat for RedM (Red Dead Redemption 2 multiplayer), detecting a wide range of cheats with a focus on performance.",
     tech: ["Lua", "HTML",  "JavaScript", "SQL"],
     repo: "https://github.com/PharellJay/RedMAnticheat",
     demo: "",

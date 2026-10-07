@@ -83,18 +83,28 @@
       if (!label) link.classList.add("chip-icon");
 
       if (key === "discord" && !isUrl) {
-        makeCopyLink(link, label, value);
+        makeCopyLink(link, label, value, "Discord username");
+        return;
+      }
+      // Email with the address shown (Contact): clicking copies it, the paper plane next to it
+      // opens the mail app (mailto: often does nothing on PCs without one)
+      if (key === "email" && label) {
+        makeCopyLink(link, label, value, "email address");
+        const send = el("a", { class: "chip chip-icon", href: `mailto:${value}`, "aria-label": "Write an email", title: "Write an email" }, icon("send"));
+        const item = link.closest("li");
+        if (item) item.after(el("li", {}, send));
+        else link.after(send);
         return;
       }
       link.href = key === "email" ? `mailto:${value}` : value;
     });
   }
 
-  // For a plain username (e.g. Discord): clicking copies it instead of navigating.
-  function makeCopyLink(link, label, value) {
+  // For a plain username (e.g. Discord) or the email address: clicking copies it instead of navigating.
+  function makeCopyLink(link, label, value, what) {
     link.href = "#";
     link.removeAttribute("target");
-    link.title = `Copy Discord username "${value}"`;
+    link.title = `Copy ${what} "${value}"`;
     link.addEventListener("click", async (e) => {
       e.preventDefault();
       let copied = true;
@@ -103,6 +113,7 @@
       } catch {
         copied = false;
       }
+      if (copied) unlock("multiplayer");
       if (label) {
         label.textContent = copied ? "Copied" : value;
         setTimeout(() => (label.textContent = value), 1500);
@@ -111,7 +122,7 @@
         link.classList.add("copied");
         setTimeout(() => link.classList.remove("copied"), 1500);
       } else {
-        window.prompt("Discord username:", value);
+        window.prompt(`${what[0].toUpperCase()}${what.slice(1)}:`, value);
       }
     });
   }
@@ -121,6 +132,8 @@
     github: '<path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.7 5.38-5.27 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/>',
     linkedin: '<path fill="currentColor" d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/>',
     email: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></g>',
+    // Lucide "send" (paper plane)
+    send: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></g>',
     discord: '<path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>',
   };
 
@@ -387,6 +400,13 @@
   /* ---------- game touches ---------- */
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  function trophyIcon() {
+    const trophy = el("span", { class: "achievement-icon", "aria-hidden": "true" });
+    // Static, trusted markup (Lucide trophy)
+    trophy.innerHTML = svg('<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>');
+    return trophy;
+  }
+
   // "Achievement unlocked" toast in the hero, shown shortly after the page loads
   function renderAchievement() {
     const box = $("#achievement");
@@ -395,15 +415,165 @@
       box.remove();
       return;
     }
-    const trophy = el("span", { class: "achievement-icon", "aria-hidden": "true" });
-    // Static, trusted markup (Lucide trophy)
-    trophy.innerHTML = svg('<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>');
-    box.append(trophy,
+    box.append(trophyIcon(),
       el("div", {}, el("p", { class: "achievement-label" }, "Achievement unlocked"), el("p", {}, profile.achievement)));
     setTimeout(() => {
       box.hidden = false;
       requestAnimationFrame(() => box.classList.add("show"));
     }, reducedMotion ? 0 : 900);
+  }
+
+  /* ---------- achievements ---------- */
+  // Unlocked while exploring the page and saved in the browser ("Game saved" in the footer).
+  // Each new one pops up as a toast in the bottom right; the footer lists them.
+  const ACHIEVEMENTS = [
+    { id: "start", title: "First steps", text: "Pressed start" },
+    { id: "explorer", title: "Explorer", text: "Visited every level" },
+    { id: "bookworm", title: "Bookworm", text: "Opened a paper" },
+    { id: "multiplayer", title: "Multiplayer", text: "Copied a contact to party up" },
+    { id: "levelselect", title: "Level select", text: "Jumped to a level with the number keys" },
+    { id: "cheater", title: "Cheat code", text: "Entered the Konami code. The anticheat saw that." },
+  ];
+  const SAVE_KEY = "achievements";
+  const unlocked = new Set(loadAchievements());
+
+  // Storage can be blocked (private mode etc.); then achievements just last for this visit
+  function loadAchievements() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+      return Array.isArray(saved) ? saved : [];
+    } catch {
+      return [];
+    }
+  }
+  function saveAchievements() {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify([...unlocked]));
+    } catch {
+      /* not saved, still works for this visit */
+    }
+  }
+
+  function unlock(id) {
+    const achievement = ACHIEVEMENTS.find((a) => a.id === id);
+    if (!achievement || unlocked.has(id)) return;
+    unlocked.add(id);
+    saveAchievements();
+    renderTrophies();
+    toastQueue.push(achievement);
+    if (!toastShowing) nextToast();
+  }
+
+  // One toast at a time, each for a few seconds
+  const toastQueue = [];
+  let toastShowing = false;
+  function nextToast() {
+    const achievement = toastQueue.shift();
+    toastShowing = Boolean(achievement);
+    if (!achievement) return;
+    const toast = el("div", { class: "achievement toast", role: "status" }, trophyIcon(),
+      el("div", {},
+        el("p", { class: "achievement-label" }, `Achievement unlocked · ${achievement.title}`),
+        el("p", {}, achievement.text)));
+    document.body.append(toast);
+    requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add("show")));
+    setTimeout(() => {
+      toast.classList.remove("show");
+      setTimeout(() => {
+        toast.remove();
+        nextToast();
+      }, reducedMotion ? 0 : 400);
+    }, 3500);
+  }
+
+  // Footer: "x/6 achievements", opens a list (locked ones stay a mystery)
+  function renderTrophies() {
+    const box = $("#trophies");
+    if (!box) return;
+    $("summary", box).textContent = `${unlocked.size}/${ACHIEVEMENTS.length} achievements`;
+    $("ul", box).replaceChildren(...ACHIEVEMENTS.map((a) => {
+      const got = unlocked.has(a.id);
+      return el("li", got ? { class: "got" } : {},
+        el("span", { class: "trophy-mark", "aria-hidden": "true" }, got ? "✓" : "?"),
+        el("span", {}, got ? a.title : "???"));
+    }));
+  }
+
+  // "Explorer": every section seen (at least a quarter of it on screen); "First steps": Press start
+  function initProgress() {
+    $(".btn-start")?.addEventListener("click", () => unlock("start"));
+    const sections = [...document.querySelectorAll("main section[id]")];
+    if (!("IntersectionObserver" in window) || !sections.length) return;
+    const seen = new Set();
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        seen.add(entry.target.id);
+        observer.unobserve(entry.target);
+      }
+      if (seen.size === sections.length) unlock("explorer");
+    }, { threshold: 0.25 });
+    sections.forEach((section) => observer.observe(section));
+  }
+
+  /* ---------- keyboard: level select (1–6) and the Konami code ---------- */
+  const KONAMI = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+
+  function initKeys(voxel) {
+    const levels = [...document.querySelectorAll("#nav a")];
+    let progress = 0;
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || dialog?.open) return;
+      if (e.target.closest?.("input, textarea, select, [contenteditable]")) return;
+
+      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      if (key === KONAMI[progress]) progress++;
+      else if (key === "ArrowUp") progress = progress === 2 ? 2 : 1; // extra "up" at the start
+      else progress = 0;
+      if (progress === KONAMI.length) {
+        progress = 0;
+        unlock("cheater");
+        voxel?.celebrate();
+        return;
+      }
+
+      // 1–6: jump to that level (section), like the numbers in the "Lvl" labels
+      const level = Number(e.key);
+      if (!Number.isInteger(level) || level < 1 || level > levels.length) return;
+      const target = $(levels[level - 1].hash);
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
+      unlock("levelselect");
+    });
+  }
+
+  /* ---------- projects row: ◀ ▶ buttons ---------- */
+  // Only shown while the row has more cards than fit (mouse users can't easily scroll sideways);
+  // hidden on touch screens, where swiping works
+  function initGridNav() {
+    const grid = $("#projects-list");
+    if (!grid) return;
+    const button = (label, glyph) => el("button", { type: "button", class: "chip chip-icon grid-btn", "aria-label": label, title: label }, glyph);
+    const prev = button("Previous projects", "◀");
+    const next = button("Next projects", "▶");
+    const nav = el("div", { class: "grid-nav" }, prev, next);
+    grid.before(nav);
+
+    const step = () => (grid.firstElementChild?.offsetWidth || grid.clientWidth) + 20;
+    const go = (dir) => grid.scrollBy({ left: dir * step(), behavior: reducedMotion ? "auto" : "smooth" });
+    prev.addEventListener("click", () => go(-1));
+    next.addEventListener("click", () => go(1));
+
+    // 10px tolerance: the row's padding (room for the corner brackets) shifts the snap points a bit
+    const refresh = () => {
+      nav.hidden = grid.scrollWidth <= grid.clientWidth + 10;
+      prev.disabled = grid.scrollLeft <= 10;
+      next.disabled = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 10;
+    };
+    grid.addEventListener("scroll", refresh, { passive: true });
+    window.addEventListener("resize", refresh);
+    refresh();
   }
 
   // Thin bar under the top bar that fills up as you scroll
@@ -432,6 +602,8 @@
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
         entry.target.classList.add("in");
+        // Drop the clip once the scan-in is done, so nothing inside (e.g. the cube figure) gets cut off
+        entry.target.addEventListener("animationend", () => entry.target.classList.add("done"), { once: true });
         observer.unobserve(entry.target);
       }
     }, { rootMargin: "0px 0px -10% 0px" });
@@ -590,6 +762,19 @@
       ".......rrrr.........",
       "........rr..........",
     ],
+    // Konami code easter egg (shown in rainbow colors, see .rainbow)
+    oneup: [
+      "..gg...gg..gg.gggg..",
+      "..gg...gg..gg.gggg..",
+      "gggg...gg..gg.gg..gg",
+      "gggg...gg..gg.gg..gg",
+      "..gg...gg..gg.gggg..",
+      "..gg...gg..gg.gggg..",
+      "..gg...gg..gg.gg....",
+      "..gg...gg..gg.gg....",
+      "gggggg.gggggg.gg....",
+      "gggggg.gggggg.gg....",
+    ],
   };
 
   // Grid → list of cubes { x, y, color, rx, ry, rr, ex, ey, er }
@@ -661,15 +846,17 @@
       });
     }
 
-    // Follow the current slot (sticky section heads keep it in place while you read)
+    // The figure lives inside the current slot, so it scrolls (and sticks under the section
+    // title) together with the page instead of being repositioned from JavaScript, which lags a frame
     let active = null;
-    function place() {
-      const r = active?.getBoundingClientRect();
-      if (!r || !r.width) {
+    function mount() {
+      const width = active?.clientWidth;
+      if (!width) {
         box.classList.remove("ready");
         return;
       }
-      box.style.transform = `translate(${r.left}px, ${r.top}px) scale(${r.width / (VOXEL_COLS * VOXEL_PITCH)})`;
+      if (box.parentElement !== active) active.append(box);
+      box.style.transform = `scale(${width / (VOXEL_COLS * VOXEL_PITCH)})`;
       box.classList.add("ready");
     }
 
@@ -708,7 +895,7 @@
     function finish(apply) {
       box.classList.add("instant"); // cubes jump straight into the new (still scattered) shape
       apply();
-      place();
+      mount(); // moves to the new slot while invisible
       void box.offsetWidth; // apply the jump before the cube transitions come back
       box.classList.remove("instant", "fading", "scatter");
       busy = false;
@@ -724,7 +911,7 @@
       if (names.length < 2 || reducedMotion) return;
       let index = 0;
       cycleTimer = setInterval(() => {
-        if (busy || document.hidden || box.classList.contains("shift") || performance.now() - lastScroll < 600) return;
+        if (busy || celebrating || document.hidden || box.classList.contains("shift") || performance.now() - lastScroll < 600) return;
         index = (index + 1) % names.length;
         transition(() => setShape(names[index]));
       }, 4000);
@@ -735,12 +922,12 @@
     function update() {
       const slot = currentSlot();
       if (slot !== target) switchTo(slot);
-      if (!busy) place(); // while breaking apart it stays put instead of being dragged along by the scroll
     }
     function switchTo(slot) {
       target = slot;
       clearInterval(cycleTimer);
       transition(() => {
+        stopCelebrating();
         active = slot;
         if (slot) setShape(slot.dataset.shape);
         startCycle(slot);
@@ -758,11 +945,35 @@
       lastScroll = performance.now();
       onMove();
     }, { passive: true });
-    window.addEventListener("resize", onMove);
+    window.addEventListener("resize", () => {
+      onMove();
+      mount(); // slot size can change (e.g. the hero slot on narrow screens)
+    });
+
+    // Easter egg: "1UP" in rainbow colors for a few seconds, then back to the current shape
+    let celebrating = 0;
+    function stopCelebrating() {
+      clearTimeout(celebrating);
+      celebrating = 0;
+      box.classList.remove("rainbow");
+    }
+    function celebrate() {
+      if (!active) return;
+      clearTimeout(celebrating);
+      transition(() => {
+        setShape("oneup");
+        box.classList.add("rainbow");
+      });
+      celebrating = setTimeout(() => transition(() => {
+        stopCelebrating();
+        if (active) setShape(active.dataset.shape);
+      }), 3000);
+    }
 
     box.addEventListener("mouseenter", () => box.classList.add("shift"));
     box.addEventListener("mouseleave", () => box.classList.remove("shift"));
     update();
+    return { celebrate };
   }
 
   /* ---------- PDF viewer ---------- */
@@ -771,6 +982,7 @@
   const smallScreen = window.matchMedia("(max-width: 720px)");
 
   function openPdf(src, title) {
+    unlock("bookworm");
     // Mobile browsers often can't render embedded PDFs, so use their own viewer instead.
     if (smallScreen.matches || !dialog?.showModal) {
       window.open(src, "_blank", "noopener");
@@ -816,7 +1028,11 @@
   renderAchievement();
   initXpBar();
   initReveal();
-  initVoxel();
+  const voxel = initVoxel();
+  renderTrophies();
+  initProgress();
+  initKeys(voxel);
+  initGridNav();
 
   /* ---------- highlight the current section in the top bar ---------- */
   const navLinks = [...document.querySelectorAll("#nav a")];
@@ -824,7 +1040,12 @@
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
-        navLinks.forEach((a) => a.classList.toggle("active", a.hash === `#${entry.target.id}`));
+        navLinks.forEach((a) => {
+          const current = a.hash === `#${entry.target.id}`;
+          a.classList.toggle("active", current);
+          if (current) a.setAttribute("aria-current", "true");
+          else a.removeAttribute("aria-current");
+        });
       }
     }, { rootMargin: "-45% 0px -50% 0px" });
     document.querySelectorAll("main section[id]").forEach((section) => observer.observe(section));

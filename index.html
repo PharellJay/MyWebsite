@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&family=Silkscreen&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/devicon@2.16.0/devicon.min.css">
-  <link rel="stylesheet" href="styles.css?v=13">
+  <link rel="stylesheet" href="styles.css?v=16">
 </head>
 <body>
   <!-- All text content is rendered from data.js by script.js -->
@@ -37,6 +37,13 @@
   </header>
 
   <main id="top">
+    <noscript>
+      <div class="wrap noscript">
+        <p class="lvl">Player 01</p>
+        <p>Pharell Jay Jeyakumar, Software Engineering student. This page needs JavaScript to load its content;
+          you can also find my work on <a href="https://github.com/PharellJay">GitHub</a>.</p>
+      </div>
+    </noscript>
     <section class="hero">
       <div class="wrap hero-inner">
         <div class="hero-main">
@@ -62,7 +69,10 @@
         <!-- Photo from PROFILE.photo (hidden if empty) -->
         <figure class="hero-photo hud" id="hero-photo"></figure>
         <!-- Spot for the cube companion (script.js), used when there is no photo; data-cycle = shapes it rotates through -->
-        <div class="voxel-slot" data-shape="controller" data-cycle="invader code heart" aria-hidden="true"></div>
+        <div class="voxel-slot" data-shape="controller" data-cycle="invader code heart" aria-hidden="true">
+          <!-- Cube companion: script.js moves it into the .voxel-slot of the section you're in -->
+          <div class="voxel" id="voxel"></div>
+        </div>
       </div>
     </section>
 
@@ -93,7 +103,7 @@
 
     <section class="section" id="education">
       <div class="wrap section-inner">
-        <div class="section-head"><p class="lvl">Lvl 04 · Quest log</p><h2>Education</h2><div class="voxel-slot" data-shape="cap" aria-hidden="true"></div></div>
+        <div class="section-head"><p class="lvl">Lvl 04 · Skill tree</p><h2>Education</h2><div class="voxel-slot" data-shape="cap" aria-hidden="true"></div></div>
         <div class="stack-list" id="education-list"></div>
       </div>
     </section>
@@ -108,7 +118,10 @@
     <section class="section contact" id="contact">
       <div class="wrap section-inner">
         <div class="section-head"><p class="lvl">Lvl 06 · Multiplayer</p><h2>Contact</h2><div class="voxel-slot" data-shape="envelope" aria-hidden="true"></div></div>
-        <div>
+        <!-- Final level: status badge (PROFILE.status), CONTACT.text as the headline, links -->
+        <div class="card contact-panel">
+          <p class="quest-label">Final level</p>
+          <span class="status-badge contact-status"></span>
           <p class="contact-text" id="contact-text"></p>
           <ul class="chips">
             <li><a class="chip" data-profile="email" data-show-value>Email</a></li>
@@ -124,6 +137,11 @@
   <footer class="footer">
     <div class="wrap footer-inner">
       <p><span class="saved">✓ Game saved</span> © <span id="year"></span> <span id="footer-name"></span></p>
+      <div class="footer-hud">
+        <p class="level-hint">Press 1–6 for level select</p>
+        <!-- Achievements unlocked while exploring (script.js) -->
+        <details class="trophies" id="trophies"><summary></summary><ul></ul></details>
+      </div>
       <a href="#top"><span aria-hidden="true">▲</span> Back to top</a>
     </div>
   </footer>
@@ -140,10 +158,8 @@
     <iframe id="pdf-frame" title="PDF document"></iframe>
   </dialog>
 
-  <!-- Cube companion: flies to the .voxel-slot of the current section (script.js) -->
-  <div class="voxel" id="voxel" aria-hidden="true"></div>
-
-  <script src="data.js"></script>
-  <script src="script.js"></script>
+  <!-- Bump the ?v= numbers after editing a file so browsers load the new version instead of a cached one -->
+  <script src="data.js?v=16"></script>
+  <script src="script.js?v=16"></script>
 </body>
 </html>
