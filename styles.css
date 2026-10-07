@@ -226,20 +226,14 @@ a { color: inherit; text-decoration: none; }
   padding: 3px 6px; background: var(--accent); color: var(--accent-ink);
   font: .65rem/1 var(--pixel);
 }
-.hero-photo img, .hero-photo .avatar { display: block; width: 100%; aspect-ratio: 4 / 5; }
+.hero-photo img { display: block; width: 100%; aspect-ratio: 4 / 5; }
 .hero-photo img { object-fit: cover; object-position: center 35%; filter: saturate(.9) contrast(1.05); transition: filter .2s; }
 .hero-photo:hover img { filter: none; }
-.avatar {
-  display: grid; place-items: center;
-  background: var(--bg);
-  font: 700 2.5rem/1 var(--display); color: var(--accent);
-}
 
 /* "Achievement unlocked" toast */
 .achievement {
-  position: absolute; right: 40px; bottom: 36px; z-index: 2;
   display: flex; align-items: center; gap: 14px;
-  max-width: 360px; padding: 12px 14px 12px 12px;
+  margin-top: 34px; max-width: 420px; padding: 12px 14px 12px 12px;
   background: rgb(16 14 24 / 0.95);
   border: 1px solid rgb(var(--xp-rgb) / 0.45);
   border-left: 3px solid var(--xp); border-radius: var(--radius);
@@ -256,12 +250,6 @@ a { color: inherit; text-decoration: none; }
 .achievement-icon svg { width: 22px; height: 22px; }
 .achievement-label { font: .65rem/1.4 var(--pixel); text-transform: uppercase; color: var(--xp); }
 .achievement p + p { font-size: .9rem; line-height: 1.35; color: var(--text); }
-.achievement-close {
-  align-self: flex-start; margin-left: 4px;
-  padding: 0 4px; border: 0; background: none; cursor: pointer;
-  color: var(--muted); font-size: 1.1rem; line-height: 1;
-}
-.achievement-close:hover { color: var(--text); }
 
 /* ---------- chips & buttons ---------- */
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
@@ -441,13 +429,29 @@ a { color: inherit; text-decoration: none; }
 
 /* ---------- stack (loadout) ---------- */
 /* one inventory panel per group; logos only, the name appears as an item tooltip on hover / focus */
-.stack-groups { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.stack-group.wide { grid-column: 1 / -1; }
-/* narrow cards: icon above the title, slightly smaller slots so three fit per row */
-.stack-group:not(.wide) { padding: 22px 16px; }
-.stack-group:not(.wide) .stack-group-head { flex-direction: column; gap: 14px; text-align: center; }
-.stack-group:not(.wide) .stack-group-head h3 { font-size: .9rem; }
-.stack-group:not(.wide) .stack-icons { --tile: 46px; --gap: 7px; }
+/* main card on top, the others two per row below it; where there's room (see the media queries)
+   the main card becomes a tall column on the left with the others in a 2×2 square next to it */
+.stack-groups { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.stack-group.main { grid-column: 1 / -1; }
+@media (min-width: 1140px), (min-width: 860px) and (max-width: 1000px) {
+  .stack-groups { grid-template-columns: 1.35fr 1fr 1fr; }
+  .stack-group.main { grid-column: 1; grid-row: span 2; justify-content: center; gap: 32px; }
+  .stack-group.main .stack-group-head { flex-direction: column; gap: 18px; }
+  /* one row per language (logo + name) so the tall card is filled like an inventory list */
+  .stack-group.main .stack-icons { flex: none; flex-direction: column; max-width: none; gap: 8px; }
+  .stack-group.main .stack-icon { width: 100%; height: 48px; justify-content: flex-start; gap: 16px; padding: 0 18px; font-size: 1.5rem; }
+  .stack-group.main .stack-icon:hover, .stack-group.main .stack-icon:focus-visible { transform: translateX(4px); }
+  .stack-group.main .stack-icon svg { width: 24px; height: 24px; }
+  .stack-group.main .stack-icon i { width: 24px; text-align: center; }
+  .stack-group.main .stack-icon::after { display: none; } /* the name is already shown */
+  .stack-group.main .stack-name { display: block; }
+}
+.stack-name { display: none; font: 600 .85rem/1 var(--display); text-transform: uppercase; letter-spacing: .06em; color: var(--text); }
+/* small cards: icon above the title, slightly smaller slots */
+.stack-group:not(.main) { padding: 22px 16px; }
+.stack-group:not(.main) .stack-group-head { flex-direction: column; gap: 14px; text-align: center; }
+.stack-group:not(.main) .stack-group-head h3 { font-size: .9rem; }
+.stack-group:not(.main) .stack-icons { --tile: 46px; --gap: 7px; }
 .stack-group {
   display: flex; flex-direction: column; gap: 22px; padding: 22px;
   background-image: radial-gradient(rgb(var(--accent-rgb) / 0.10) 1px, transparent 1px);
@@ -455,6 +459,12 @@ a { color: inherit; text-decoration: none; }
 }
 .stack-group-head { display: flex; justify-content: center; align-items: center; gap: 12px; }
 .stack-group-head h3 { font: 700 1rem/1 var(--display); text-transform: uppercase; letter-spacing: .06em; }
+/* main card (Languages): a bit more room and bigger logos, same colors as the other cards */
+.stack-group.main { gap: 26px; padding: 30px 22px 34px; }
+.stack-group.main .stack-group-head h3 { font-size: 1.25rem; }
+.stack-group.main .stack-icons { --tile: 58px; --gap: 10px; }
+.stack-group.main .stack-icon { font-size: 1.9rem; }
+.stack-group.main .stack-icon svg { width: 28px; height: 28px; }
 /* equal-size slots; the row width is set by --cols (script.js) so every row is centered and balanced,
    and the slots sit in the vertical middle of the remaining panel height */
 .stack-icons {
@@ -475,8 +485,8 @@ a { color: inherit; text-decoration: none; }
   cursor: default;
   transition: color .2s, border-color .2s, background-color .2s, transform .2s, box-shadow .2s;
 }
-.stack-icon i { transition: color .2s; }
-.stack-icon i:not(:only-child) { font-size: 1.05rem; } /* two logos in one slot (HTML & CSS) */
+.stack-icon i, .stack-icon .logo { transition: color .2s; }
+.stack-icon i:not(:only-of-type) { font-size: 1.05rem; } /* two logos in one slot (HTML & CSS) */
 .stack-icon svg { width: 22px; height: 22px; }
 /* light up in the brand color (accent for concept icons) */
 .stack-icon:hover, .stack-icon:focus-visible {
@@ -487,7 +497,8 @@ a { color: inherit; text-decoration: none; }
   box-shadow: inset 0 0 0 3px var(--bg), 0 0 18px -4px var(--glow);
   transform: translateY(-3px);
 }
-.stack-icon:hover i, .stack-icon:focus-visible i { color: var(--brand); }
+.stack-icon:hover i, .stack-icon:focus-visible i,
+.stack-icon:hover .logo, .stack-icon:focus-visible .logo { color: var(--brand); }
 .stack-icon:focus-visible { outline: none; }
 /* item tooltip */
 .stack-icon::after {
@@ -587,6 +598,39 @@ a { color: inherit; text-decoration: none; }
 .pdf-actions { display: flex; gap: 8px; flex-shrink: 0; }
 .pdf-dialog iframe { flex: 1; width: 100%; border: 0; background: var(--bg); }
 
+/* ---------- cube companion ---------- */
+/* invisible spots that reserve room: right of the name in the hero, under each section title */
+.voxel-slot { width: 100%; max-width: 220px; aspect-ratio: 20 / 14; margin-top: 28px; }
+.hero .voxel-slot { width: 260px; max-width: none; margin-top: 0; }
+/* the figure itself: fixed, moved onto the current slot by script.js */
+.voxel {
+  position: fixed; top: 0; left: 0; z-index: 5;
+  transform-origin: 0 0;
+  opacity: 0; transition: opacity .2s;
+}
+.voxel.ready { opacity: 1; }
+/* switching sections: breaks apart while fading out, then snaps together as the next shape while fading in */
+.voxel.ready { transition-duration: .45s; }
+.voxel.fading { opacity: 0; transition: opacity .25s ease-out; }
+.vox {
+  position: absolute; top: 0; left: 0;
+  width: 11px; height: 11px;
+  background: var(--c, var(--accent));
+  box-shadow: inset 2px 2px 0 rgb(255 255 255 / 0.28), inset -2px -2px 0 rgb(0 0 0 / 0.35);
+  transform:
+    translate(var(--x, 0px), var(--y, 0px))
+    translate(var(--jx, 0px), var(--jy, 0px))
+    rotate(var(--jr, 0deg)) scale(var(--s, 1)) scale(var(--js, 1));
+  transition: transform .6s cubic-bezier(.2, .9, .3, 1.2) var(--d, 0ms);
+}
+/* hover: every cube shifts a bit (away from the middle) and settles back on mouse leave */
+.voxel.shift .vox { --jx: var(--rx); --jy: var(--ry); --jr: var(--rr); transition-duration: .25s; transition-delay: 0s; }
+.voxel.scatter .vox {
+  --jx: var(--ex); --jy: var(--ey); --jr: var(--er); --js: .35;
+  transition: transform .3s cubic-bezier(.5, 0, .9, .6);
+}
+.voxel.instant .vox { transition: none; }
+
 /* ---------- medium screens ---------- */
 /* Below this width the social buttons would push the navigation off-center */
 @media (max-width: 1100px) {
@@ -597,7 +641,8 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 1000px) {
   .hero-inner { grid-template-columns: 1fr; gap: 40px; padding-top: 80px; padding-bottom: 72px; }
   .hero-photo { width: 200px; }
-  .achievement { position: static; max-width: 420px; }
+  .hero .voxel-slot { width: 200px; }
+  .section-head .voxel-slot { display: none; }
   .status-top { display: none; }
   .stats .stat-status { display: flex; }
   .section-inner { grid-template-columns: 1fr; gap: 28px; padding-top: 72px; padding-bottom: 72px; }
@@ -618,8 +663,8 @@ a { color: inherit; text-decoration: none; }
   .paper-top { flex-direction: column-reverse; gap: 14px; }
   .stack-groups { grid-template-columns: 1fr; }
   .stack-icons { --c: var(--cols-sm, 5); --tile: 50px; --gap: 8px; }
-  .stack-group:not(.wide) .stack-group-head { flex-direction: row; }
-  .stack-group:not(.wide) .stack-group-head h3 { font-size: 1rem; }
+  .stack-group:not(.main) .stack-group-head { flex-direction: row; }
+  .stack-group:not(.main) .stack-group-head h3 { font-size: 1rem; }
   .edu { grid-template-columns: 36px 1fr; gap: 12px; }
   .edu-node { width: 26px; height: 26px; margin: 5px; }
   .edu-node svg { width: 14px; height: 14px; }
@@ -634,4 +679,5 @@ a { color: inherit; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   * { transition: none !important; animation: none !important; }
+  .voxel.shift .vox { --jx: 0px; --jy: 0px; --jr: 0deg; }
 }

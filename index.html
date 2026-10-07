@@ -21,8 +21,8 @@
         <a href="#projects">Projects</a>
         <a href="#research">Scientific work</a>
         <a href="#stack">Stack</a>
-        <a href="#about">About</a>
         <a href="#education">Education</a>
+        <a href="#about">About</a>
         <a href="#contact">Contact</a>
       </nav>
       <ul class="topbar-socials">
@@ -56,52 +56,54 @@
               <li><a class="chip" data-profile="discord" data-show-value target="_blank" rel="noopener">Discord</a></li>
             </ul>
           </div>
+          <!-- "Achievement unlocked" toast from PROFILE.achievement -->
+          <div class="achievement" id="achievement" role="status" hidden></div>
         </div>
-        <!-- Photo from PROFILE.photo (initials if empty) -->
+        <!-- Photo from PROFILE.photo (hidden if empty) -->
         <figure class="hero-photo hud" id="hero-photo"></figure>
-        <!-- "Achievement unlocked" toast from PROFILE.achievement -->
-        <div class="achievement" id="achievement" role="status" hidden></div>
+        <!-- Spot for the cube companion (script.js), used when there is no photo; data-cycle = shapes it rotates through -->
+        <div class="voxel-slot" data-shape="controller" data-cycle="invader code heart" aria-hidden="true"></div>
       </div>
     </section>
 
     <section class="section" id="projects">
       <div class="wrap section-inner">
-        <div class="section-head"><p class="lvl">Lvl 01 · Quests</p><h2>Projects</h2><p class="section-meta" id="projects-meta"></p></div>
+        <div class="section-head"><p class="lvl">Lvl 01 · Quests</p><h2>Projects</h2><p class="section-meta" id="projects-meta"></p><div class="voxel-slot" data-shape="computer" aria-hidden="true"></div></div>
         <div class="grid" id="projects-list"></div>
       </div>
     </section>
 
     <section class="section" id="research">
       <div class="wrap section-inner">
-        <div class="section-head"><p class="lvl">Lvl 02 · Lore</p><h2>Scientific work</h2><p class="section-meta" id="papers-meta"></p></div>
+        <div class="section-head"><p class="lvl">Lvl 02 · Lore</p><h2>Scientific work</h2><p class="section-meta" id="papers-meta"></p><div class="voxel-slot" data-shape="paper" aria-hidden="true"></div></div>
         <div class="stack-list" id="papers-list"></div>
       </div>
     </section>
 
     <section class="section" id="stack">
       <div class="wrap section-inner">
-        <div class="section-head"><p class="lvl">Lvl 03 · Loadout</p><h2>Stack</h2></div>
+        <div class="section-head"><p class="lvl">Lvl 03 · Loadout</p><h2>Stack</h2><div class="voxel-slot" data-shape="toolbox" aria-hidden="true"></div></div>
         <div class="stack-groups" id="stack-list"></div>
-      </div>
-    </section>
-
-    <section class="section" id="about">
-      <div class="wrap section-inner">
-        <div class="section-head"><p class="lvl">Lvl 04 · Player bio</p><h2>About</h2></div>
-        <div class="about-text" id="about-body"></div>
       </div>
     </section>
 
     <section class="section" id="education">
       <div class="wrap section-inner">
-        <div class="section-head"><p class="lvl">Lvl 05 · Quest log</p><h2>Education</h2></div>
+        <div class="section-head"><p class="lvl">Lvl 04 · Quest log</p><h2>Education</h2><div class="voxel-slot" data-shape="cap" aria-hidden="true"></div></div>
         <div class="stack-list" id="education-list"></div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="wrap section-inner">
+        <div class="section-head"><p class="lvl">Lvl 05 · Player bio</p><h2>About</h2><div class="voxel-slot" data-shape="player" aria-hidden="true"></div></div>
+        <div class="about-text" id="about-body"></div>
       </div>
     </section>
 
     <section class="section contact" id="contact">
       <div class="wrap section-inner">
-        <div class="section-head"><p class="lvl">Lvl 06 · Multiplayer</p><h2>Contact</h2></div>
+        <div class="section-head"><p class="lvl">Lvl 06 · Multiplayer</p><h2>Contact</h2><div class="voxel-slot" data-shape="envelope" aria-hidden="true"></div></div>
         <div>
           <p class="contact-text" id="contact-text"></p>
           <ul class="chips">
@@ -133,6 +135,9 @@
     </div>
     <iframe id="pdf-frame" title="PDF document"></iframe>
   </dialog>
+
+  <!-- Cube companion: flies to the .voxel-slot of the current section (script.js) -->
+  <div class="voxel" id="voxel" aria-hidden="true"></div>
 
   <script src="data.js"></script>
   <script src="script.js"></script>

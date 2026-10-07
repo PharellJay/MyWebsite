@@ -193,11 +193,12 @@
 
   /* ---------- about, stack, education ---------- */
 
-  // Stack icons: Devicon logos, or inline SVG (Lucide) for things Devicon has no logo for.
+  // Stack icons: Devicon logos, a filled brand logo (logo), or inline SVG (Lucide) for things without a logo.
   // Each logo lights up in its brand color on hover. Items without an entry fall back to a text tag.
   const svg = (paths) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
   const dev = (names, colors) => ({ names: [].concat(names), colors: [].concat(colors) });
   const lucide = (paths) => ({ svg: svg(paths) });
+  const logo = (viewBox, path, color) => ({ svg: `<svg class="logo" viewBox="${viewBox}" fill="currentColor"><path d="${path}"/></svg>`, colors: [color] });
   const STACK_ICONS = {
     "Java": dev("java-plain", "#f89820"),
     "Python": dev("python-plain", "#4b8bbe"),
@@ -210,6 +211,10 @@
     "React": dev("react-original", "#61dafb"),
     "Node.js": dev("nodejs-plain", "#5fa04e"),
     "Spring Boot": dev("spring-original", "#6db33f"),
+    "Unity": dev("unity-plain", "#ffffff"),
+    "Godot": dev("godot-plain", "#478cbf"),
+    // Cfx.re logo (from cfx.re), cropped to the symbol
+    "Cfx.re (FiveM / RedM)": logo("118.95 -5 70 70", "M166.457 6.585L188.633 53.415H161.123L160.223 42.288H147.608L146.708 53.415H119.276L141.452 6.585H150.506L149.75 15.99H158.099L157.343 6.585ZM159.608 34.539L158.42 19.902H149.432L148.244 34.539Z", "#f40552"),
     "Git": dev("git-plain", "#f05032"),
     "Linux": dev("linux-plain", "#fcc624"),
     "Docker": dev("docker-plain", "#2496ed"),
@@ -226,17 +231,21 @@
   const STACK_GROUP_ICONS = {
     code: svg('<path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/>'),
     web: svg('<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>'),
+    game: svg('<line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/>'),
     tools: svg('<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>'),
     concepts: svg('<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>'),
   };
 
-  function stackIcon(name) {
+  // withName: also show the name next to the logo (main card, shown as a list on wide screens)
+  function stackIcon(name, withName) {
     const icon = STACK_ICONS[name];
     if (!icon) return el("li", { class: "tag" }, name);
     const item = el("li", { class: "stack-icon", tabindex: "0", "aria-label": name, "data-name": name });
     // Static, trusted markup from STACK_ICONS (never user data)
-    if (icon.svg) item.innerHTML = icon.svg;
-    else {
+    if (icon.svg) {
+      item.innerHTML = icon.svg;
+      if (icon.colors) item.style.setProperty("--brand", icon.colors[0]);
+    } else {
       item.style.setProperty("--brand", icon.colors[0]);
       item.append(...icon.names.map((n, i) => {
         const logo = el("i", { class: `devicon-${n}`, "aria-hidden": "true" });
@@ -244,6 +253,7 @@
         return logo;
       }));
     }
+    if (withName) item.append(el("span", { class: "stack-name", "aria-hidden": "true" }, name));
     return item;
   }
 
@@ -254,10 +264,10 @@
     // Spread the icons evenly over the rows (5 → 3 + 2 instead of 4 + 1); each row is centered.
     // Wide cards fit up to 10 per row, narrow ones 3; on phones (--cols-sm) every card fits up to 5.
     const balanced = (max) => Math.ceil(items.length / (Math.ceil(items.length / max) || 1));
-    const list = el("ul", { class: "stack-icons" }, ...items.map(stackIcon));
-    list.style.setProperty("--cols", balanced(g.wide ? 10 : 3));
+    const list = el("ul", { class: "stack-icons" }, ...items.map((name) => stackIcon(name, g.main)));
+    list.style.setProperty("--cols", balanced(g.main ? 4 : 3));
     list.style.setProperty("--cols-sm", balanced(5));
-    return el("article", { class: `card stack-group${g.wide ? " wide" : ""}` },
+    return el("article", { class: `card stack-group${g.main ? " main" : ""}` },
       el("div", { class: "stack-group-head" }, iconBox, el("h3", {}, g.group)),
       list
     );
@@ -299,15 +309,15 @@
     if (about.cards?.length) body.append(el("div", { class: "about-cards" }, ...about.cards.map(renderAboutCard)));
   }
 
-  // Photo next to the name (initials if there is no photo)
+  // Photo next to the name (hidden if there is no photo)
   function renderHeroPhoto() {
     const frame = $("#hero-photo");
     if (!frame) return;
-    const name = profile.name || "";
-    const initials = name.split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join("");
-    frame.append(profile.photo
-      ? el("img", { src: profile.photo, alt: name })
-      : el("div", { class: "avatar", "aria-hidden": "true" }, initials));
+    if (!profile.photo) {
+      frame.remove();
+      return;
+    }
+    frame.append(el("img", { src: profile.photo, alt: profile.name || "" }));
   }
 
   // Status badge in the top bar (on small screens the stat strip in the hero shows it instead)
@@ -367,11 +377,8 @@
     const trophy = el("span", { class: "achievement-icon", "aria-hidden": "true" });
     // Static, trusted markup (Lucide trophy)
     trophy.innerHTML = svg('<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>');
-    const close = el("button", { type: "button", class: "achievement-close", "aria-label": "Dismiss" }, "×");
-    close.addEventListener("click", () => box.remove());
     box.append(trophy,
-      el("div", {}, el("p", { class: "achievement-label" }, "Achievement unlocked"), el("p", {}, profile.achievement)),
-      close);
+      el("div", {}, el("p", { class: "achievement-label" }, "Achievement unlocked"), el("p", {}, profile.achievement)));
     setTimeout(() => {
       box.hidden = false;
       requestAnimationFrame(() => box.classList.add("show"));
@@ -408,6 +415,325 @@
       }
     }, { rootMargin: "0px 0px -10% 0px" });
     heads.forEach((h) => observer.observe(h));
+  }
+
+  /* ---------- cube companion ---------- */
+  // A pixel figure made of small cubes. It sits in the .voxel-slot of the section you're in
+  // (hero: controller, Projects: computer, ...); when you scroll on it fades out and fades back in
+  // at the next slot as that slot's shape. Hovering nudges the cubes apart a little.
+  const VOXEL_COLS = 20;
+  const VOXEL_ROWS = 14;
+  const VOXEL_PITCH = 12; // px per cube (11px cube + 1px gap), before scaling to the slot
+  const VOXEL_COLORS = {
+    a: "var(--accent)", l: "var(--accent-hover)", d: "#4c2f8f", k: "#1c1630",
+    w: "var(--text)", m: "var(--muted)", g: "var(--xp)",
+    y: "#fbbf24", p: "#f472b6", c: "#38bdf8", n: "#f1c27d", r: "#f43f5e", e: "#059669",
+  };
+  // 20 × 14 grids, "." = empty, letters = VOXEL_COLORS; each shape is centered in the grid
+  const VOXEL_SHAPES = {
+    controller: [
+      "..lll..........lll..",
+      "..aaaaaaaaaaaaaaaa..",
+      ".aaaaaaaaaaaaaaaaaa.",
+      "aaaawaaaaaaaaaagaaaa",
+      "aaawwwaadaadaayapaaa",
+      "aaaawaaaaaaaaaacaaaa",
+      "aaaaaaaaaaaaaaaaaaaa",
+      "aaaaaa........aaaaaa",
+      ".aaaa..........aaaa.",
+      "..aa............aa..",
+    ],
+    computer: [
+      "..aaaaaaaaaaaaaaaa..",
+      "..akkkkkkkkkkkkkka..",
+      "..akgkkkkkkkkkkkka..",
+      "..akkgkkkkkkkkkkka..",
+      "..akgkkgggkkkkkkka..",
+      "..akkkkkkkkkkkkkka..",
+      "..aaaaaaaaaaaaaaaa..",
+      "........dddd........",
+      "......dddddddd......",
+      "....................",
+      ".lwlwlwlwlwlwlwlwll.",
+      ".lllllwwwwwwwwlllll.",
+    ],
+    paper: [
+      ".wwwwwwwwww.........",
+      ".wwwwwwwwwwm.....pp.",
+      ".wwwwwwwwwwww...mm..",
+      ".wwllllllllww..yy...",
+      ".wwwwwwwwwwww.yy....",
+      ".wwllllllllwwyy.....",
+      ".wwwwwwwwwwwyy......",
+      ".wwllllllllyy.......",
+      ".wwwwwwwwwyyw.......",
+      ".wwllllllnnww.......",
+      ".wwwwwwwkkwww.......",
+      ".wwwwwwwwwwww.......",
+      ".wwwwwwwwwwww.......",
+    ],
+    toolbox: [
+      "....................",
+      ".......mmmmmm.......",
+      ".......m....m.......",
+      ".......m....m.......",
+      ".llllllllllllllllll.",
+      ".llllllllyyllllllll.",
+      ".aaaaaaaayyaaaaaaaa.",
+      ".aaaaaaaayyaaaaaaaa.",
+      ".dddddddddddddddddd.",
+      ".aaaaaaaaaaaaaaaaaa.",
+      ".aaaaaaaaaaaaaaaaaa.",
+      ".aaaaaaaaaaaaaaaaaa.",
+    ],
+    cap: [
+      ".......dddddd.......",
+      "...ddddddlldddddd...",
+      "ddddddddddyyyyyyyddd",
+      "...ddddddddddddddy..",
+      ".....aaddddddaa..y..",
+      ".....aaaaaaaaaa..y..",
+      ".....aaaaaaaaaa..y..",
+      ".....aaaaaaaaaa..y..",
+      ".....llllllllll.yyy.",
+      "................yyy.",
+    ],
+    player: [
+      ".......kkkkkk.......",
+      "......kkkkkkkk......",
+      "......knnnnnnk......",
+      "......nnknnknn......",
+      "......nnnnnnnn......",
+      ".......nnppnn.......",
+      ".....aaaaaaaaaa.....",
+      "....aaaaaggaaaaa....",
+      "....naaaaaaaaaan....",
+      "......dddddddd......",
+      "......ddd..ddd......",
+      "......ddd..ddd......",
+      ".....kkkk..kkkk.....",
+    ],
+    envelope: [
+      ".................gg.",
+      "..daaaaaaaaaaaaaagg.",
+      "..adaaaaaaaaaaaada..",
+      "..aadaaaaaaaaaadaa..",
+      "..aaadaaaaaaaadaaa..",
+      "..aaaadaaaaaadaaaa..",
+      "..aaaaadaaaadaaaaa..",
+      "..aaaaaadaadaaaaaa..",
+      "..aaaaaaaddaaaaaaa..",
+      "..aaaaaaaaaaaaaaaa..",
+      "..aaaaaaaaaaaaaaaa..",
+    ],
+    invader: [
+      "....dd.......dd.....",
+      "....dd.......dd.....",
+      "......d.....d.......",
+      "....ddddddddddd.....",
+      "....ddddddddddd.....",
+      "...ddd.ddddd.ddd....",
+      ".ddddddddddddddddd..",
+      ".ddddddddddddddddd..",
+      ".dd.ddddddddddd.dd..",
+      ".dd.dd.......dd.dd..",
+      ".dd.dd.......dd.dd..",
+      "......ddd.ddd.......",
+    ],
+    code: [
+      "...........ee.......",
+      "...........ee.......",
+      "....gg....ee..gg....",
+      "...gg.....ee...gg...",
+      "..gg.....ee.....gg..",
+      ".gg......ee......gg.",
+      ".gg.....ee.......gg.",
+      "..gg....ee......gg..",
+      "...gg..ee......gg...",
+      "....gg.ee.....gg....",
+      "......ee............",
+      "......ee............",
+    ],
+    heart: [
+      "...rrrr....rrrr.....",
+      "..rrrrrr..rrrrrr....",
+      ".rrwwrrrrrrrrrrrr...",
+      ".rwwrrrrrrrrrrrrr...",
+      ".rwrrrrrrrrrrrrrr...",
+      ".rrrrrrrrrrrrrrrr...",
+      "..rrrrrrrrrrrrrr....",
+      "...rrrrrrrrrrrr.....",
+      "....rrrrrrrrrr......",
+      ".....rrrrrrrr.......",
+      "......rrrrrr........",
+      ".......rrrr.........",
+      "........rr..........",
+    ],
+  };
+
+  // Grid → list of cubes { x, y, color, rx, ry, rr, ex, ey, er }
+  // (rx/ry/rr: hover nudge away from the center; ex/ey/er: where it flies when the shape breaks apart)
+  function voxelCells(rows) {
+    const cells = [];
+    rows.forEach((row, r) => [...row].forEach((ch, c) => { if (ch !== ".") cells.push({ r, c, ch }); }));
+    const minC = Math.min(...cells.map((p) => p.c)), maxC = Math.max(...cells.map((p) => p.c));
+    const minR = Math.min(...cells.map((p) => p.r)), maxR = Math.max(...cells.map((p) => p.r));
+    const offC = Math.floor((VOXEL_COLS - (maxC - minC + 1)) / 2) - minC;
+    const offR = Math.floor((VOXEL_ROWS - (maxR - minR + 1)) / 2) - minR;
+    const mid = (n) => (n - 1) / 2;
+    return cells.map(({ r, c, ch }) => {
+      const dx = (c + offC - mid(VOXEL_COLS)) / mid(VOXEL_COLS);
+      const dy = (r + offR - mid(VOXEL_ROWS)) / mid(VOXEL_ROWS);
+      const jitter = () => (Math.random() - 0.5) * 3;
+      const burst = 30 + Math.random() * 40;
+      return {
+        x: (c + offC) * VOXEL_PITCH, y: (r + offR) * VOXEL_PITCH, color: VOXEL_COLORS[ch],
+        rx: dx * 4 + jitter(), ry: dy * 4 + jitter(), rr: (Math.random() - 0.5) * 24,
+        ex: (dx + Math.random() - 0.5) * burst, ey: (dy + Math.random() - 0.5) * burst, er: (Math.random() - 0.5) * 240,
+      };
+    });
+  }
+
+  function initVoxel() {
+    const box = $("#voxel");
+    if (!box) return;
+    // The photo (if any) takes the hero's right column
+    if ($("#hero-photo")) $(".hero .voxel-slot")?.remove();
+    const slots = new Map(); // section → its slot
+    for (const slot of document.querySelectorAll(".voxel-slot")) {
+      if (VOXEL_SHAPES[slot.dataset.shape]) slots.set(slot.closest("section"), slot);
+    }
+    if (!slots.size) {
+      box.remove();
+      return;
+    }
+
+    const shapes = Object.fromEntries(Object.entries(VOXEL_SHAPES).map(([k, rows]) => [k, voxelCells(rows)]));
+    const cubes = Array.from({ length: Math.max(...Object.values(shapes).map((s) => s.length)) }, () => {
+      const cube = el("span", { class: "vox" });
+      cube.style.setProperty("--d", `${Math.round(Math.random() * 250)}ms`);
+      return cube;
+    });
+    box.style.width = `${VOXEL_COLS * VOXEL_PITCH}px`;
+    box.style.height = `${VOXEL_ROWS * VOXEL_PITCH}px`;
+    box.append(...cubes);
+
+    // Cube i takes cell i of the shape; spare cubes shrink away in the middle
+    let shape = null;
+    function setShape(name) {
+      if (name === shape) return;
+      shape = name;
+      const cells = shapes[name];
+      cubes.forEach((cube, i) => {
+        const cell = cells[i] || { x: (VOXEL_COLS / 2) * VOXEL_PITCH, y: (VOXEL_ROWS / 2) * VOXEL_PITCH, rx: 0, ry: 0, rr: 0, ex: 0, ey: 0, er: 0 };
+        const s = cube.style;
+        s.setProperty("--x", `${cell.x}px`);
+        s.setProperty("--y", `${cell.y}px`);
+        s.setProperty("--rx", `${cell.rx.toFixed(1)}px`);
+        s.setProperty("--ry", `${cell.ry.toFixed(1)}px`);
+        s.setProperty("--rr", `${cell.rr.toFixed(1)}deg`);
+        s.setProperty("--ex", `${cell.ex.toFixed(1)}px`);
+        s.setProperty("--ey", `${cell.ey.toFixed(1)}px`);
+        s.setProperty("--er", `${cell.er.toFixed(1)}deg`);
+        s.setProperty("--s", cells[i] ? 1 : 0);
+        if (cell.color) s.setProperty("--c", cell.color);
+      });
+    }
+
+    // Follow the current slot (sticky section heads keep it in place while you read)
+    let active = null;
+    function place() {
+      const r = active?.getBoundingClientRect();
+      if (!r || !r.width) {
+        box.classList.remove("ready");
+        return;
+      }
+      box.style.transform = `translate(${r.left}px, ${r.top}px) scale(${r.width / (VOXEL_COLS * VOXEL_PITCH)})`;
+      box.classList.add("ready");
+    }
+
+    // Current section: the last one whose top has passed 70% of the screen height (the last one
+    // once you hit the bottom of the page, since short sections there never reach that line).
+    // Narrow screens have no room under the section titles, so it stays in the hero there.
+    const sections = [...slots.keys()];
+    const narrow = window.matchMedia("(max-width: 1000px)");
+    const heroSlot = slots.get($(".hero"));
+    function currentSlot() {
+      if (narrow.matches) return heroSlot || null;
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      if (atBottom) return slots.get(sections[sections.length - 1]);
+      // At the very top it always starts in the first section (on tall screens the next one is already past the line)
+      if (window.scrollY < 40) return slots.get(sections[0]);
+      const line = window.innerHeight * 0.7;
+      let current = sections[0];
+      for (const section of sections) if (section.getBoundingClientRect().top <= line) current = section;
+      return slots.get(current);
+    }
+
+    // Shape changes: the shape breaks apart while fading out, apply() swaps the slot and/or shape
+    // while it's invisible (cubes still scattered), then it snaps together while fading back in
+    let fadeTimer = 0, busy = false;
+    function transition(apply) {
+      clearTimeout(fadeTimer);
+      if (!active || reducedMotion) return finish(apply);
+      busy = true;
+      box.classList.add("scatter", "fading");
+      fadeTimer = setTimeout(() => finish(apply), 300);
+    }
+    function finish(apply) {
+      box.classList.add("instant"); // cubes jump straight into the new (still scattered) shape
+      apply();
+      place();
+      void box.offsetWidth; // apply the jump before the cube transitions come back
+      box.classList.remove("instant", "fading", "scatter");
+      busy = false;
+    }
+
+    // Slots with data-cycle (the hero) rotate through their shapes every 4 seconds,
+    // paused while hovered or while the tab is in the background
+    let cycleTimer = 0;
+    function startCycle(slot) {
+      clearInterval(cycleTimer);
+      const names = slot ? [slot.dataset.shape, ...(slot.dataset.cycle || "").split(/\s+/).filter((n) => shapes[n])] : [];
+      if (names.length < 2 || reducedMotion) return;
+      let index = 0;
+      cycleTimer = setInterval(() => {
+        if (busy || document.hidden || box.classList.contains("shift")) return;
+        index = (index + 1) % names.length;
+        transition(() => setShape(names[index]));
+      }, 4000);
+    }
+
+    // Switching sections: break apart at the old slot, come together at the new one
+    let target = null;
+    function update() {
+      const slot = currentSlot();
+      if (slot !== target) switchTo(slot);
+      place();
+    }
+    function switchTo(slot) {
+      target = slot;
+      clearInterval(cycleTimer);
+      transition(() => {
+        active = slot;
+        if (slot) setShape(slot.dataset.shape);
+        startCycle(slot);
+      });
+    }
+
+    narrow.addEventListener("change", update);
+
+    let queued = false;
+    const onMove = () => {
+      if (!queued) requestAnimationFrame(() => { queued = false; update(); });
+      queued = true;
+    };
+    window.addEventListener("scroll", onMove, { passive: true });
+    window.addEventListener("resize", onMove);
+
+    box.addEventListener("mouseenter", () => box.classList.add("shift"));
+    box.addEventListener("mouseleave", () => box.classList.remove("shift"));
+    update();
   }
 
   /* ---------- PDF viewer ---------- */
@@ -456,6 +782,7 @@
   renderAchievement();
   initXpBar();
   initReveal();
+  initVoxel();
 
   /* ---------- highlight the current section in the top bar ---------- */
   const navLinks = [...document.querySelectorAll("#nav a")];

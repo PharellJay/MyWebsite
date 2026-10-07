@@ -12,7 +12,7 @@
  *   location, languages   small line under the tagline ("" to hide)
  *   status          badge at the top left of the navigation bar, e.g. what you're looking for ("" to hide)
  *   achievement     "Achievement unlocked" pop-up at the top of the page ("" to hide)
- *   photo           e.g. "assets/photo.jpg", shown next to your name ("" shows initials)
+ *   photo           e.g. "assets/photo.jpg", shown next to your name ("" to hide)
  *   github, linkedin, email   used at the top and in the Contact section
  *   discord         your Discord username (clicking copies it) or a full link,
  *                   e.g. "https://discord.com/users/<your id>" ("" to hide)
@@ -25,7 +25,7 @@ const PROFILE = {
   languages: "German, English",
   status: "Open to internships & working student roles",
   achievement: "16,000+ players protected by my anticheat",
-  photo: "assets/foto.jpg",
+  photo: "",
   github: "https://github.com/PharellJay",
   linkedin: "https://www.linkedin.com/in/pharell-jay-jeyakumar/",
   email: "pharelljeyakumar1010@gmail.com",
@@ -130,15 +130,16 @@ const ABOUT = {
 /*
  * TECH_STACK — one card per group.
  *   group   card title
- *   icon    "code", "web", "tools" or "concepts"
+ *   icon    "code", "web", "tools", "game" or "concepts"
  *   items   technologies, shown as logos (name on hover); logos are mapped in script.js (STACK_ICONS)
- *   wide    true = the card gets a full row of its own (the others sit side by side below it)
+ *   main    true = the highlighted card; on wide screens it sits on the left with the others in a square next to it
  */
 const TECH_STACK = [
-  { group: "Languages", icon: "code", wide: true, items: ["Java", "Python", "Lua", "C", "C++", "JavaScript", "SQL"] },
+  { group: "Languages", icon: "code", main: true, items: ["Java", "Python", "Lua", "C", "C++", "JavaScript", "SQL"] },
   { group: "Tools", icon: "tools", items: ["Git", "Linux", "Docker", "IntelliJ", "VS Code"] },
   { group: "Web & Frameworks", icon: "web", items: ["HTML & CSS", "React", "Node.js", "Spring Boot"] },
   { group: "Concepts", icon: "concepts", items: ["OOP", "Design Patterns", "Agile / Scrum", "Testing", "UML"] },
+  { group: "Game Dev", icon: "game", items: ["Unity", "Godot", "Cfx.re (FiveM / RedM)"] },
 ];
 
 /*
