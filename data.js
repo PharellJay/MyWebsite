@@ -14,9 +14,9 @@
  *   achievement     "Achievement unlocked" pop-up at the top of the page ("" to hide)
  *   photo           e.g. "assets/photo.jpg", shown next to your name ("" to hide)
  *   github, linkedin, email   used at the top and in the Contact section
+ *   githubStats     true = "Activity log" card under the projects with live GitHub stats
+ *                   and a contribution graph for the github account above (false to hide)
  *   cv              path to your CV PDF, e.g. "papers/cv.pdf"; adds a "CV" button at the top and in Contact ("" to hide)
- *   discord         your Discord username (clicking copies it) or a full link,
- *                   e.g. "https://discord.com/users/<your id>" ("" to hide)
  */
 const PROFILE = {
   name: "Pharell Jay Jeyakumar",
@@ -28,9 +28,9 @@ const PROFILE = {
   achievement: "16,000+ players protected by my anticheat",
   photo: "",
   github: "https://github.com/PharellJay",
+  githubStats: true,
   linkedin: "https://www.linkedin.com/in/pharell-jay-jeyakumar/",
   email: "pharelljeyakumar1010@gmail.com",
-  discord: "pharelljay",
   cv: "",
 };
 

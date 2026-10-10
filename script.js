@@ -90,10 +90,6 @@
       link.title = name;
       if (!label) link.classList.add("chip-icon");
 
-      if (key === "discord" && !isUrl) {
-        makeCopyLink(link, label, value, "Discord username");
-        return;
-      }
       // Email with the address shown (Contact): clicking copies it, the paper plane next to it
       // opens the mail app (mailto: often does nothing on PCs without one)
       if (key === "email" && label) {
@@ -108,7 +104,7 @@
     });
   }
 
-  // For a plain username (e.g. Discord) or the email address: clicking copies it instead of navigating.
+  // For the email address with the value shown: clicking copies it instead of navigating.
   function makeCopyLink(link, label, value, what) {
     link.href = "#";
     link.removeAttribute("target");
@@ -122,20 +118,12 @@
         copied = false;
       }
       if (copied) unlock("multiplayer");
-      if (label) {
-        label.textContent = copied ? "Copied" : value;
-        setTimeout(() => (label.textContent = value), 1500);
-      } else if (copied) {
-        // Icon-only button: show a small "Copied" bubble instead
-        link.classList.add("copied");
-        setTimeout(() => link.classList.remove("copied"), 1500);
-      } else {
-        window.prompt(`${what[0].toUpperCase()}${what.slice(1)}:`, value);
-      }
+      label.textContent = copied ? "Copied" : value;
+      setTimeout(() => (label.textContent = value), 1500);
     });
   }
 
-  /* ---------- icons (GitHub, LinkedIn and Discord logos from Simple Icons) ---------- */
+  /* ---------- icons (GitHub and LinkedIn logos from Simple Icons) ---------- */
   const ICONS = {
     github: '<path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.7 5.38-5.27 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/>',
     linkedin: '<path fill="currentColor" d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/>',
@@ -144,7 +132,6 @@
     cv: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></g>',
     // Lucide "send" (paper plane)
     send: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></g>',
-    discord: '<path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>',
   };
 
   function icon(key) {
@@ -190,6 +177,149 @@
       el("div", { class: "featured-main" }, ...projectContent(p, "Main quest")),
       side.childElementCount ? side : null
     );
+  }
+
+  /* ---------- GitHub activity ---------- */
+  // Card under the projects: repos, stars, followers and contributions of the last 12 months, plus a
+  // contribution graph. Data comes live from the GitHub API and github-contributions-api.jogruber.de
+  // and is cached in the browser for a few hours (the GitHub API allows 60 requests per hour without a token).
+  const GH_CACHE_KEY = "gh-activity-v1";
+  const GH_CACHE_MS = 6 * 60 * 60 * 1000;
+  const SVG_NS = "http://www.w3.org/2000/svg";
+
+  function svgEl(tag, attrs = {}) {
+    const node = document.createElementNS(SVG_NS, tag);
+    for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
+    return node;
+  }
+
+  async function fetchGithubStats(user) {
+    try {
+      const cached = JSON.parse(localStorage.getItem(GH_CACHE_KEY));
+      if (cached?.user === user && Date.now() - cached.ts < GH_CACHE_MS) return cached.data;
+    } catch { /* storage blocked or empty */ }
+
+    const json = (res) => (res.ok ? res.json() : null);
+    const [userData, repos, contrib] = await Promise.all([
+      fetch(`https://api.github.com/users/${user}`).then(json).catch(() => null),
+      fetch(`https://api.github.com/users/${user}/repos?per_page=100`).then(json).catch(() => null),
+      fetch(`https://github-contributions-api.jogruber.de/v4/${user}?y=last`).then(json).catch(() => null),
+    ]);
+    if (!userData && !contrib) return null;
+
+    const data = {
+      repos: userData?.public_repos ?? null,
+      followers: userData?.followers ?? null,
+      stars: Array.isArray(repos) ? repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0) : null,
+      contributions: contrib?.total?.lastYear ?? null,
+      days: contrib?.contributions ?? null,
+    };
+    try {
+      localStorage.setItem(GH_CACHE_KEY, JSON.stringify({ user, ts: Date.now(), data }));
+    } catch { /* fine, just not cached */ }
+    return data;
+  }
+
+  const formatDay = (date) =>
+    new Date(`${date}T00:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+  // One square per day, weeks as columns (like on GitHub); month names above the first week of each month
+  function contributionGraph(days, readout, idleText) {
+    const cell = 11, gap = 3, step = cell + gap, top = 16;
+    const offset = new Date(`${days[0].date}T00:00:00`).getDay();
+    const weeks = Math.ceil((offset + days.length) / 7);
+    const svg = svgEl("svg", { viewBox: `0 0 ${weeks * step - gap} ${top + 7 * step - gap}`, "aria-hidden": "true" });
+
+    let lastMonth = null, lastLabelWeek = -Infinity;
+    days.forEach((day, i) => {
+      const slot = offset + i;
+      const week = Math.floor(slot / 7);
+      const date = new Date(`${day.date}T00:00:00`);
+      // Label each month at the first week column it shows up in (skipped if it would overlap a label)
+      if ((i === 0 || slot % 7 === 0) && date.getMonth() !== lastMonth) {
+        lastMonth = date.getMonth();
+        if (week - lastLabelWeek >= 3 && week < weeks - 2) {
+          const label = svgEl("text", { x: week * step, y: 9, class: "gh-month" });
+          label.textContent = date.toLocaleDateString("en-US", { month: "short" });
+          svg.append(label);
+          lastLabelWeek = week;
+        }
+      }
+      const rect = svgEl("rect", {
+        x: week * step, y: top + (slot % 7) * step, width: cell, height: cell,
+        class: `gh-day lv${Math.min(4, Math.max(0, day.level || 0))}`,
+      });
+      rect.dataset.info = `${count(day.count, "contribution")} on ${formatDay(day.date)}`;
+      svg.append(rect);
+    });
+
+    // Hovering a day shows its count in the HUD line under the graph
+    svg.addEventListener("pointerover", (e) => {
+      if (e.target.dataset?.info) readout.textContent = e.target.dataset.info;
+    });
+    svg.addEventListener("pointerleave", () => { readout.textContent = idleText; });
+    return svg;
+  }
+
+  function renderGithubActivity() {
+    const box = $("#github-activity");
+    const user = profile.github?.match(/github\.com\/([^/?#]+)/)?.[1];
+    if (!box || !user || profile.githubStats === false) {
+      box?.remove();
+      return;
+    }
+
+    const stat = (label, cls = "") => {
+      const value = el("dd", {}, "—");
+      return [el("div", { class: `gh-stat ${cls}` }, el("dt", {}, label), value), value];
+    };
+    const [contribRow, contribValue] = stat("Contributions", "gh-stat-main");
+    const [reposRow, reposValue] = stat("Repos");
+    const [starsRow, starsValue] = stat("Stars");
+    const [followersRow, followersValue] = stat("Followers");
+    const graph = el("div", { class: "gh-graph", role: "img", "aria-label": "GitHub contribution graph of the last 12 months" });
+    const readout = el("p", { class: "gh-readout" }, "Loading save data…");
+    const legend = el("div", { class: "gh-legend", "aria-hidden": "true" },
+      "Less", ...[0, 1, 2, 3, 4].map((lv) => el("span", { class: `lv${lv}` })), "More");
+
+    box.className = "card gh-card";
+    box.append(
+      el("div", { class: "gh-head" },
+        el("p", { class: "quest-label" }, "Activity log · last 12 months"),
+        el("a", { class: "gh-link", href: profile.github, target: "_blank", rel: "noopener" }, `github.com/${user} ↗`)
+      ),
+      el("dl", { class: "gh-stats" }, contribRow, reposRow, starsRow, followersRow),
+      graph,
+      el("div", { class: "gh-foot" }, readout, legend)
+    );
+
+    fetchGithubStats(user).then((data) => {
+      if (!data) {
+        readout.textContent = "Couldn't load live stats right now.";
+        graph.remove();
+        legend.remove();
+        return;
+      }
+      const show = (node, n) => { if (n != null) node.textContent = n.toLocaleString("en-US"); };
+      show(contribValue, data.contributions);
+      show(reposValue, data.repos);
+      show(starsValue, data.stars);
+      show(followersValue, data.followers);
+      if (!data.days?.length) {
+        readout.textContent = "Contribution graph unavailable right now.";
+        graph.remove();
+        legend.remove();
+        return;
+      }
+      const activeDays = data.days.filter((d) => d.count > 0).length;
+      const action = matchMedia("(hover: none)").matches ? "tap" : "hover";
+      const idleText = `${count(activeDays, "active day")} · ${action} a square for details`;
+      readout.textContent = idleText;
+      graph.append(contributionGraph(data.days, readout, idleText));
+      // Narrow screens: start at the most recent weeks (after the graph has been laid out)
+      requestAnimationFrame(() => { graph.scrollLeft = graph.scrollWidth; });
+      box.classList.add("is-live");
+    });
   }
 
   /* ---------- scientific works ---------- */
@@ -1049,6 +1179,7 @@
   else $("#projects-featured").remove();
   if (featuredProject && !otherProjects.length) $("#projects-list").remove();
   else fillList($("#projects-list"), otherProjects, "Nothing here yet.", renderProject);
+  renderGithubActivity();
   fillList($("#papers-list"), papers, "Nothing here yet.", renderPaper);
   renderAbout();
   renderHeroPhoto();

@@ -17,9 +17,9 @@ It shows my projects, scientific work, tech stack, education and contact links, 
 - **Achievements**: unlocked while exploring the page and saved in the browser. Some are hidden, so feel free to look around.
 - **Keyboard navigation**: press `1` to `6` to jump straight to a level.
 - **Built-in PDF viewer**: papers open in a dialog on desktop and in the browser's own viewer on mobile.
-- **Copy-to-clipboard contacts**: email address and Discord username are copied with a click.
+- **Copy-to-clipboard email**: the email address in the Contact section is copied with a click.
 - **Responsive and accessible**: works on phones, supports keyboard use and respects `prefers-reduced-motion`.
-- **Link previews**: Open Graph tags for nice previews on LinkedIn, Discord, WhatsApp and others.
+- **Link previews**: Open Graph tags for nice previews on LinkedIn, WhatsApp and others.
 
 ## Project structure
 
