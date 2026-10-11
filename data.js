@@ -66,6 +66,13 @@ const PROJECTS = [
     demo: "",
   },
   {
+    title: "Questlog",
+    description: "A to-do list disguised as an RPG quest journal, right in the terminal. Organise tasks into nested questlines with due dates and priorities, see today and the week ahead on a JRPG-style dashboard, earn XP and levels for every completed quest, and share whole questlines with friends via a short code.",
+    tech: ["Python", "Textual", "JSON"],
+    repo: "https://github.com/PharellJay/Questlog",
+    demo: "",
+  },
+  {
     title: "My Website",
     description: "The logic behind what you see. A personal portfolio built from scratch with plain HTML, CSS and JavaScript, no frameworks. All content lives in a single data file, so adding a new project or paper takes just a few lines.",
     tech: ["HTML", "JavaScript", "CSS"],
