@@ -59,6 +59,13 @@ const PROJECTS = [
     continued: false,
   },
   {
+    title: "Lua Obfuscator",
+    description: "A source-to-source Lua obfuscator written entirely in Lua. It runs real code through its own lexer and parser to build an AST, then layers on dead-code injection, variable renaming, control-flow flattening, numeric and string encoding, constant pooling and minification to make the output hard to read while keeping it functionally identical.",
+    tech: ["Lua"],
+    repo: "https://github.com/PharellJay/LuaObfuscator",
+    demo: "",
+  },
+  {
     title: "Flashcards",
     description: "A small flashcard tool designed to help me and others while learning as public flashcard apps tend to be flooded with paywalls and ads.",
     tech: ["Python", "JSON", "Bash"],
