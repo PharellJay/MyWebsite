@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&family=Silkscreen&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/devicon@2.16.0/devicon.min.css">
-  <link rel="stylesheet" href="styles.css?v=24">
+  <link rel="stylesheet" href="styles.css?v=27">
 </head>
 <body>
   <!-- All text content is rendered from data.js by script.js -->
@@ -84,9 +84,10 @@
       <div class="wrap section-inner">
         <div class="section-head"><p class="lvl">Lvl 01 · Quests</p><h2>Projects</h2><p class="section-meta" id="projects-meta"></p><div class="voxel-slot" data-shape="computer" aria-hidden="true"></div></div>
         <div class="projects-body">
-          <!-- PROJECTS entry with featured: true as a big card, the rest in a sideways-scrolling row -->
+          <!-- PROJECTS entry with featured: true as a big card, highlight: true as cards below it, the rest as a compact list -->
           <div id="projects-featured"></div>
-          <div class="grid" id="projects-list"></div>
+          <div class="project-grid" id="projects-list"></div>
+          <div class="other-projects" id="projects-other"></div>
           <!-- GitHub stats + contribution graph, loaded live for the PROFILE.github account (script.js) -->
           <div id="github-activity"></div>
         </div>
@@ -103,7 +104,7 @@
     <section class="section" id="stack">
       <div class="wrap section-inner">
         <div class="section-head"><p class="lvl">Lvl 03 · Loadout</p><h2>Stack</h2><div class="voxel-slot" data-shape="toolbox" aria-hidden="true"></div></div>
-        <div class="card stack-panel" id="stack-list"></div>
+        <div class="loadout" id="stack-list"></div>
       </div>
     </section>
 
@@ -125,11 +126,11 @@
       <div class="wrap section-inner">
         <div class="section-head"><p class="lvl">Lvl 06 · Multiplayer</p><h2>Contact</h2><div class="voxel-slot" data-shape="envelope" aria-hidden="true"></div></div>
         <!-- Final level: status badge (PROFILE.status), CONTACT.text as the headline, links -->
-        <div class="card contact-panel">
+        <div class="contact-panel">
           <p class="quest-label">Final level</p>
           <span class="status-badge contact-status"></span>
           <p class="contact-text" id="contact-text"></p>
-          <ul class="chips">
+          <ul class="chips rule-top">
             <li><a class="chip" data-profile="email" data-show-value>Email</a></li>
             <li><a class="chip" data-profile="linkedin" target="_blank" rel="noopener">LinkedIn</a></li>
             <li><a class="chip" data-profile="cv" target="_blank" rel="noopener">CV</a></li>
@@ -165,7 +166,7 @@
   </dialog>
 
   <!-- Bump the ?v= numbers after editing a file so browsers load the new version instead of a cached one -->
-  <script src="data.js?v=24"></script>
-  <script src="script.js?v=24"></script>
+  <script src="data.js?v=27"></script>
+  <script src="script.js?v=27"></script>
 </body>
 </html>

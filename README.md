@@ -53,7 +53,7 @@ All text lives in `data.js`, and every block there is documented with comments e
 | Block        | What it controls                                                     |
 | ------------ | -------------------------------------------------------------------- |
 | `PROFILE`    | Name, tagline, intro, status badge, photo, social links, CV          |
-| `PROJECTS`   | Project cards; one can be marked `featured` as the big "main quest"  |
+| `PROJECTS`   | One `featured` "main quest", `highlight` projects as cards, the rest as a compact list |
 | `PAPERS`     | Scientific works with abstract and an optional PDF                   |
 | `ABOUT`      | The "About me" text and cards                                        |
 | `TECH_STACK` | Technology groups shown with logos in the Stack section              |

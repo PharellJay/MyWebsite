@@ -42,6 +42,8 @@ const PROFILE = {
  *   repo         link to the GitHub repository (the title links there)
  *   demo         optional link to a live version ("" to hide)
  *   featured     true = the big "main quest" card above the others (use it for one project)
+ *   highlight    true = shown as a large card under the main quest; projects without it are listed
+ *                compactly under "Other projects"
  *   stat         featured card only: highlighted number, e.g. { value: "16,000+", label: "registered players" }
  *   status       featured card only: small badge text, e.g. "Live" or "Discontinued"
  *   continued    featured card only: false = the status badge is grey (archived), otherwise green
@@ -64,6 +66,22 @@ const PROJECTS = [
     tech: ["Lua"],
     repo: "https://github.com/PharellJay/LuaObfuscator",
     demo: "",
+    highlight: true,
+  },
+  {
+    title: "Discord Music Bot",
+    description: "A music bot for private usage on discord. Paste a YouTube or Spotify link or just type a song name, and everyone in the voice channel can control the queue with slash commands or buttons. Spotify is used to find the right track, which is then streamed from YouTube Music, with extras like autoplay, lyrics, looping and seeking.",
+    tech: ["Python", "discord.py", "yt-dlp", "Spotify API"],
+    repo: "https://github.com/PharellJay/DiscordMusicbot",
+    demo: "",
+    highlight: true,
+  },
+  {
+    title: "My Website",
+    description: "The logic behind what you see. A personal portfolio built from scratch with plain HTML, CSS and JavaScript, no frameworks. All content lives in a single data file, so adding a new project or paper takes just a few lines.",
+    tech: ["HTML", "JavaScript", "CSS"],
+    repo: "https://github.com/PharellJay/MyWebsite",
+    demo: "",
   },
   {
     title: "Flashcards",
@@ -77,13 +95,6 @@ const PROJECTS = [
     description: "A to-do list disguised as an RPG quest journal, right in the terminal. Organise tasks into nested questlines with due dates and priorities, see today and the week ahead on a JRPG-style dashboard, earn XP and levels for every completed quest, and share whole questlines with friends via a short code.",
     tech: ["Python", "Textual", "JSON"],
     repo: "https://github.com/PharellJay/Questlog",
-    demo: "",
-  },
-  {
-    title: "My Website",
-    description: "The logic behind what you see. A personal portfolio built from scratch with plain HTML, CSS and JavaScript, no frameworks. All content lives in a single data file, so adding a new project or paper takes just a few lines.",
-    tech: ["HTML", "JavaScript", "CSS"],
-    repo: "https://github.com/PharellJay/MyWebsite",
     demo: "",
   },
 ];
@@ -155,7 +166,7 @@ const ABOUT = {
  * TECH_STACK — one row per group, in this order.
  *   group   row title
  *   icon    "code", "web", "tools", "game" or "concepts"
- *   items   technologies, shown as logo + name chips; logos are mapped in script.js (STACK_ICONS)
+ *   items   technologies, shown as a logo + name list; logos are mapped in script.js (STACK_ICONS)
  */
 const TECH_STACK = [
   { group: "Languages", icon: "code", items: ["Java", "Python", "Lua", "C", "C++", "JavaScript", "SQL"] },

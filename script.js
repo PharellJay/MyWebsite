@@ -141,40 +141,64 @@
     return span;
   }
 
-  const tags = (items = []) => el("ul", { class: "tags" }, ...items.map((t) => el("li", { class: "tag" }, t)));
+  // Muted mono line "a · b · c" (tech of other projects, education focus)
+  const techLine = (items) => el("p", { class: "tech-line" }, items.join(" · "));
 
   /* ---------- projects ---------- */
   const pad2 = (n) => String(n).padStart(2, "0");
 
-  // Card content shared by the featured card and the normal ones; tech is shown as logo tiles
-  // like in the Stack section (names without a logo stay text tags)
-  function projectContent(p, label) {
+  // Row content shared by the main quest and the highlighted projects: label (+ extra, e.g. the
+  // status badge) and tech over a hairline, then title, description and buttons.
+  // Tech uses the logo + name items from the Stack section.
+  function projectContent(p, label, extra) {
     const actions = el("div", { class: "project-actions" });
     if (p.repo) actions.append(el("a", { href: p.repo, target: "_blank", rel: "noopener", class: "btn btn-primary" }, "View project"));
     if (p.demo) actions.append(el("a", { href: p.demo, target: "_blank", rel: "noopener", class: "btn" }, "Live demo"));
     return [
-      el("p", { class: "quest-label" }, label),
+      el("div", { class: "project-head rule-head" },
+        el("div", { class: "project-label" }, el("p", { class: "quest-label" }, label), extra),
+        p.tech?.length ? el("ul", { class: "project-tech" }, ...p.tech.map(stackItem)) : null),
       el("h3", {}, p.repo ? externalLink(p.repo, p.title) : p.title),
       p.description ? el("p", {}, p.description) : null,
-      p.tech?.length ? el("ul", { class: "stack-icons tech-icons" }, ...p.tech.map((t) => stackIcon(t))) : null,
       actions.childElementCount ? actions : null,
     ];
   }
 
-  function renderProject(p) {
-    return el("article", { class: "card project" }, ...projectContent(p, `Quest ${pad2(projects.indexOf(p) + 1)}`));
+  function renderProject(p, i) {
+    return el("article", { class: "project" }, ...projectContent(p, `Quest ${pad2(i + 1)}`));
   }
 
-  // Featured project: text on the left, highlighted stat + status on the right
+  // Compact row for the "Other projects" list: title on the left, description + tech on the right
+  function renderOtherProject(p) {
+    return el("li", { class: "side-quest" },
+      el("h3", {}, p.repo ? externalLink(p.repo, p.title) : p.title),
+      el("div", {},
+        p.description ? el("p", {}, p.description) : null,
+        p.tech?.length ? techLine(p.tech) : null)
+    );
+  }
+
+  function renderOtherProjects(list) {
+    return [
+      el("div", { class: "other-head" },
+        el("p", { class: "quest-label" }, "Side quests"),
+        el("h3", {}, "Other projects")),
+      el("ul", { class: "side-quests" }, ...list.map(renderOtherProject)),
+    ];
+  }
+
+  // Featured project: larger row with a purple glow, status badge in the header, highlighted stat on the right
   function renderFeaturedProject(p) {
+    const status = p.status
+      ? el("span", { class: `featured-status${p.continued === false ? " off" : ""}` },
+          el("span", { class: "dot", "aria-hidden": "true" }), p.status)
+      : null;
     const side = el("div", { class: "featured-side" },
-      p.status ? el("span", { class: `featured-status${p.continued === false ? " off" : ""}` },
-        el("span", { class: "dot", "aria-hidden": "true" }), p.status) : null,
       p.stat ? el("span", { class: "featured-value" }, p.stat.value) : null,
       p.stat?.label ? el("span", { class: "featured-label" }, p.stat.label) : null
     );
-    return el("article", { class: "card project featured" },
-      el("div", { class: "featured-main" }, ...projectContent(p, "Main quest")),
+    return el("article", { class: "project featured" },
+      el("div", { class: "featured-main" }, ...projectContent(p, "Main quest", status)),
       side.childElementCount ? side : null
     );
   }
@@ -282,9 +306,9 @@
     const legend = el("div", { class: "gh-legend", "aria-hidden": "true" },
       "Less", ...[0, 1, 2, 3, 4].map((lv) => el("span", { class: `lv${lv}` })), "More");
 
-    box.className = "card gh-card";
+    box.className = "gh-card";
     box.append(
-      el("div", { class: "gh-head" },
+      el("div", { class: "gh-head rule-head" },
         el("p", { class: "quest-label" }, "Activity log · last 12 months"),
         el("a", { class: "gh-link", href: profile.github, target: "_blank", rel: "noopener" }, `github.com/${user} ↗`)
       ),
@@ -333,18 +357,16 @@
       actions.append(read, el("a", { href: p.pdf, download: "", class: "btn" }, "Download PDF"));
     }
 
-    const card = el("article", { class: p.pdf ? "card paper clickable" : "card paper" },
-      el("div", { class: "paper-top" },
-        el("div", {},
-          meta ? el("p", { class: "paper-meta" }, meta) : null,
-          el("h3", {}, p.title)
-        ),
+    const card = el("article", { class: p.pdf ? "paper clickable" : "paper" },
+      el("div", { class: "paper-top rule-head" },
+        el("p", { class: "paper-meta" }, meta),
         p.grade
-          ? el("div", { class: "grade" },
+          ? el("p", { class: "grade" },
               el("span", { class: "grade-label" }, "Score"),
               el("span", { class: "grade-value" }, p.grade))
           : null
       ),
+      el("h3", {}, p.title),
       p.abstract ? el("p", { class: "abstract" }, p.abstract) : null,
       actions.childElementCount ? actions : null
     );
@@ -426,37 +448,23 @@
     }
   }
 
-  // Logo-only tile with the name as a tooltip (project cards)
-  function stackIcon(name) {
+  // Logo + name list item (Stack section and project rows); names without a logo get a small square instead
+  function stackItem(name) {
     const icon = STACK_ICONS[name];
-    if (!icon) return el("li", { class: "tag" }, name);
-    const item = el("li", { class: "stack-icon", tabindex: "0", "aria-label": name, "data-name": name });
-    fillStackLogo(item, icon);
-    return item;
+    const logo = el("span", { class: `stack-logo${icon ? "" : " none"}`, "aria-hidden": "true" });
+    if (icon) fillStackLogo(logo, icon);
+    return el("li", { class: "stack-item" }, logo, el("span", {}, name));
   }
 
-  // Logo + name chip (Stack section); names without a logo are text only
-  function stackChip(name) {
-    const icon = STACK_ICONS[name];
-    const chip = el("li", { class: "stack-chip" });
-    if (icon) {
-      const logo = el("span", { class: "stack-logo", "aria-hidden": "true" });
-      fillStackLogo(logo, icon);
-      chip.append(logo);
-    }
-    chip.append(el("span", {}, name));
-    return chip;
-  }
-
-  // One row per group: label (icon, name, item count) on the left, chips on the right
+  // One column per group: label (icon, name, item count) above a plain list of items
   function renderStackGroup(g) {
     const iconBox = el("span", { class: "stack-group-icon", "aria-hidden": "true" });
     iconBox.innerHTML = STACK_GROUP_ICONS[g.icon] || "";
     const items = g.items || [];
-    return el("div", { class: "stack-row" },
-      el("div", { class: "stack-label" }, iconBox, el("h3", {}, g.group),
+    return el("div", { class: "stack-group" },
+      el("div", { class: "stack-label rule-head" }, iconBox, el("h3", {}, g.group),
         el("span", { class: "stack-count", "aria-label": `${items.length} items` }, `×${items.length}`)),
-      el("ul", { class: "stack-chips" }, ...items.map(stackChip))
+      el("ul", { class: "stack-items" }, ...items.map(stackItem))
     );
   }
 
@@ -477,14 +485,15 @@
     const iconBox = el("span", { class: "about-icon", "aria-hidden": "true" });
     // Static, trusted markup from ABOUT_ICONS (never user data)
     iconBox.innerHTML = ABOUT_ICONS[c.icon] || "";
-    return el("article", { class: `card about-card${c.wide ? " wide" : ""}` },
-      iconBox,
-      el("div", {},
-        c.wide ? el("p", { class: "quest-label" }, "Side quest") : null,
-        el("h3", {}, c.title),
-        el("p", {}, c.text),
-        c.link ? el("a", { class: "about-link", href: c.link.href }, `${c.link.text} →`) : null
-      )
+    return el("article", { class: `about-card${c.wide ? " wide" : ""}` },
+      el("div", { class: "about-head rule-head" },
+        iconBox,
+        el("div", {},
+          c.wide ? el("p", { class: "quest-label" }, "Side quest") : null,
+          el("h3", {}, c.title))
+      ),
+      el("p", {}, c.text),
+      c.link ? el("a", { class: "about-link", href: c.link.href }, `${c.link.text} →`) : null
     );
   }
 
@@ -538,16 +547,16 @@
 
     return el("article", { class: `edu${current ? " current" : ""}` },
       node,
-      el("div", { class: "card edu-body" },
+      el("div", { class: "edu-body" },
         el("div", { class: "edu-top" },
           el("p", { class: "edu-date" }, e.date || ""),
           el("span", { class: `edu-badge${current ? "" : " done"}` }, current ? "In progress" : "Completed ✓")
         ),
         el("h3", {}, e.title),
         e.place ? el("p", { class: "edu-place" }, e.place) : null,
+        current ? el("div", { class: "edu-progress", "aria-hidden": "true" }) : null,
         e.description ? el("p", { class: "edu-text" }, e.description) : null,
-        e.focus?.length ? tags(e.focus) : null,
-        current ? el("div", { class: "edu-progress", "aria-hidden": "true" }) : null
+        e.focus?.length ? techLine(e.focus) : null
       )
     );
   }
@@ -710,34 +719,6 @@
       target.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
       unlock("levelselect");
     });
-  }
-
-  /* ---------- projects row: ◀ ▶ buttons ---------- */
-  // Only shown while the row has more cards than fit (mouse users can't easily scroll sideways);
-  // hidden on touch screens, where swiping works
-  function initGridNav() {
-    const grid = $("#projects-list");
-    if (!grid) return;
-    const button = (label, glyph) => el("button", { type: "button", class: "chip chip-icon grid-btn", "aria-label": label, title: label }, glyph);
-    const prev = button("Previous projects", "◀");
-    const next = button("Next projects", "▶");
-    const nav = el("div", { class: "grid-nav" }, prev, next);
-    grid.before(nav);
-
-    const step = () => (grid.firstElementChild?.offsetWidth || grid.clientWidth) + 20;
-    const go = (dir) => grid.scrollBy({ left: dir * step(), behavior: reducedMotion ? "auto" : "smooth" });
-    prev.addEventListener("click", () => go(-1));
-    next.addEventListener("click", () => go(1));
-
-    // 10px tolerance: the row's padding (room for the corner brackets) shifts the snap points a bit
-    const refresh = () => {
-      nav.hidden = grid.scrollWidth <= grid.clientWidth + 10;
-      prev.disabled = grid.scrollLeft <= 10;
-      next.disabled = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 10;
-    };
-    grid.addEventListener("scroll", refresh, { passive: true });
-    window.addEventListener("resize", refresh);
-    refresh();
   }
 
   // Thin bar under the top bar that fills up as you scroll
@@ -1173,12 +1154,19 @@
 
   /* ---------- init ---------- */
   renderProfile();
+  // featured: big card · highlight: cards below it · the rest: compact "Other projects" list
+  // (if nothing is marked as highlight, every project gets a card)
   const featuredProject = projects.find((p) => p.featured);
-  const otherProjects = projects.filter((p) => p !== featuredProject);
+  const restProjects = projects.filter((p) => p !== featuredProject);
+  const anyHighlight = restProjects.some((p) => p.highlight);
+  const highlightProjects = anyHighlight ? restProjects.filter((p) => p.highlight) : restProjects;
+  const sideProjects = anyHighlight ? restProjects.filter((p) => !p.highlight) : [];
   if (featuredProject) $("#projects-featured").append(renderFeaturedProject(featuredProject));
   else $("#projects-featured").remove();
-  if (featuredProject && !otherProjects.length) $("#projects-list").remove();
-  else fillList($("#projects-list"), otherProjects, "Nothing here yet.", renderProject);
+  if (featuredProject && !highlightProjects.length) $("#projects-list").remove();
+  else fillList($("#projects-list"), highlightProjects, "Nothing here yet.", renderProject);
+  if (sideProjects.length) $("#projects-other").append(...renderOtherProjects(sideProjects));
+  else $("#projects-other").remove();
   renderGithubActivity();
   fillList($("#papers-list"), papers, "Nothing here yet.", renderPaper);
   renderAbout();
@@ -1198,7 +1186,6 @@
   initTrophyHover();
   initProgress();
   initKeys(voxel);
-  initGridNav();
 
   /* ---------- highlight the current section in the top bar ---------- */
   const navLinks = [...document.querySelectorAll("#nav a")];
