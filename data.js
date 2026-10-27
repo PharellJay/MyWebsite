@@ -77,6 +77,13 @@ const PROJECTS = [
     highlight: true,
   },
   {
+    title: "Language Practice Tool",
+    description: "Practise the sentences and words you actually need for everyday conversation, in any language pair. Content is written once in English and translated on demand by a self-hosted LibreTranslate server, with read-aloud and Anki-style spaced repetition deciding what comes up next.",
+    tech: ["JavaScript", "HTML", "CSS", "LibreTranslate"],
+    repo: "https://github.com/PharellJay/LanguagePracticeTool",
+    demo: "",
+  },
+  {
     title: "My Website",
     description: "The logic behind what you see. A personal portfolio built from scratch with plain HTML, CSS and JavaScript, no frameworks. All content lives in a single data file, so adding a new project or paper takes just a few lines.",
     tech: ["HTML", "JavaScript", "CSS"],
