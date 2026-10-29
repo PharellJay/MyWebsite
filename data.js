@@ -77,6 +77,13 @@ const PROJECTS = [
     highlight: true,
   },
   {
+    title: "ChessML",
+    description: "A chess engine that learns purely by playing against itself, AlphaZero-style, sized to train on a CPU-only machine. A residual policy/value network guides Monte Carlo tree search, and a local web interface lets you control training, watch losses and live self-play games, and play against any checkpoint.",
+    tech: ["Python", "PyTorch", "FastAPI", "JavaScript"],
+    repo: "https://github.com/PharellJay/ChessML",
+    demo: "",
+  },
+  {
     title: "Language Practice Tool",
     description: "Practise the sentences and words you actually need for everyday conversation, in any language pair. Content is written once in English and translated on demand by a self-hosted LibreTranslate server, with read-aloud and Anki-style spaced repetition deciding what comes up next.",
     tech: ["JavaScript", "HTML", "CSS", "LibreTranslate"],
