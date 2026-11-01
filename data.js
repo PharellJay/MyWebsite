@@ -69,12 +69,18 @@ const PROJECTS = [
     highlight: true,
   },
   {
+    title: "Decentralised VPN",
+    description: "A peer-to-peer VPN with no central server. Traffic is routed through two encrypted hops (a relay, then another peer's exit), so no single peer sees both who you are and where you're going. To use the network you also lend your own IP as an exit. A terminal dashboard handles connecting, latency-based exit selection and a kill switch that blocks traffic instead of leaking it when the tunnel drops.",
+    tech: ["Rust", "libp2p", "Noise Protocol", "Tokio", "Ratatui"],
+    repo: "https://github.com/PharellJay/DecentralisedVPN",
+    demo: "",
+  },
+  {
     title: "Discord Music Bot",
     description: "A music bot for private usage on discord. Paste a YouTube or Spotify link or just type a song name, and everyone in the voice channel can control the queue with slash commands or buttons. Spotify is used to find the right track, which is then streamed from YouTube Music, with extras like autoplay, lyrics, looping and seeking.",
     tech: ["Python", "discord.py", "yt-dlp", "Spotify API"],
     repo: "https://github.com/PharellJay/DiscordMusicbot",
     demo: "",
-    highlight: true,
   },
   {
     title: "ChessML",
