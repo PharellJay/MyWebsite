@@ -76,13 +76,6 @@ const PROJECTS = [
     demo: "",
   },
   {
-    title: "Discord Music Bot",
-    description: "A music bot for private usage on discord. Paste a YouTube or Spotify link or just type a song name, and everyone in the voice channel can control the queue with slash commands or buttons. Spotify is used to find the right track, which is then streamed from YouTube Music, with extras like autoplay, lyrics, looping and seeking.",
-    tech: ["Python", "discord.py", "yt-dlp", "Spotify API"],
-    repo: "https://github.com/PharellJay/DiscordMusicbot",
-    demo: "",
-  },
-  {
     title: "ChessML",
     description: "A chess engine that learns purely by playing against itself, AlphaZero-style, sized to train on a CPU-only machine. A residual policy/value network guides Monte Carlo tree search, and a local web interface lets you control training, watch losses and live self-play games, and play against any checkpoint.",
     tech: ["Python", "PyTorch", "FastAPI", "JavaScript"],
@@ -90,17 +83,24 @@ const PROJECTS = [
     demo: "",
   },
   {
-    title: "Language Practice Tool",
-    description: "Practise the sentences and words you actually need for everyday conversation, in any language pair. Content is written once in English and translated on demand by a self-hosted LibreTranslate server, with read-aloud and Anki-style spaced repetition deciding what comes up next.",
-    tech: ["JavaScript", "HTML", "CSS", "LibreTranslate"],
-    repo: "https://github.com/PharellJay/LanguagePracticeTool",
-    demo: "",
-  },
-  {
     title: "My Website",
     description: "The logic behind what you see. A personal portfolio built from scratch with plain HTML, CSS and JavaScript, no frameworks. All content lives in a single data file, so adding a new project or paper takes just a few lines.",
     tech: ["HTML", "JavaScript", "CSS"],
     repo: "https://github.com/PharellJay/MyWebsite",
+    demo: "",
+  },
+  {
+    title: "Discord Music Bot",
+    description: "A music bot for private usage on discord. Paste a YouTube or Spotify link or just type a song name, and everyone in the voice channel can control the queue with slash commands or buttons. Spotify is used to find the right track, which is then streamed from YouTube Music, with extras like autoplay, lyrics, looping and seeking.",
+    tech: ["Python", "discord.py", "yt-dlp", "Spotify API"],
+    repo: "https://github.com/PharellJay/DiscordMusicbot",
+    demo: "",
+  },
+  {
+    title: "Language Practice Tool",
+    description: "Practise the sentences and words you actually need for everyday conversation, in any language pair. Content is written once in English and translated on demand by a self-hosted LibreTranslate server, with read-aloud and Anki-style spaced repetition deciding what comes up next.",
+    tech: ["JavaScript", "HTML", "CSS", "LibreTranslate"],
+    repo: "https://github.com/PharellJay/LanguagePracticeTool",
     demo: "",
   },
   {
