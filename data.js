@@ -35,7 +35,9 @@ const PROFILE = {
 /*
  * PROJECTS — one object per project.
  *   title        (required)
- *   description  (required) one or two sentences
+ *   description  (required) one short sentence, shown on the page
+ *   details      longer description, shown in the "Details" window (list of paragraphs)
+ *   highlights   technical highlights, shown as a list in the "Details" window
  *   tech         list of technologies
  *   repo         link to the GitHub repository (the title links there)
  *   demo         optional link to a live version ("" to hide)
@@ -49,8 +51,21 @@ const PROFILE = {
 const PROJECTS = [
   {
     title: "RedM Anticheat",
-    description: "Advanced and precise anticheat for RedM (Red Dead Redemption 2 multiplayer), detecting a wide range of cheats with a focus on performance.",
-    tech: ["Lua", "HTML",  "JavaScript", "SQL"],
+    description: "A server-side driven anticheat for RedM (Red Dead Redemption 2 multiplayer) with 25+ detection modules, hardware-token bans and protected client code.",
+    details: [
+      "Deadeye Anticheat protected some of the biggest RedM community servers, with more than 16,000 players. " +
+        "Detection runs on the server wherever possible, so a modified client can't simply switch it off.",
+      "Every module can be toggled and tuned on its own, with separate log, kick and ban settings, exempt groups " +
+        "and exempt zones, so server owners can fit it to their game modes without false positives.",
+    ],
+    highlights: [
+      "25+ detection modules: godmode, invisibility, teleport, freecam, killaura, triggerbot (inhuman reaction times), enlarged hitboxes, infinite ammo, injected resources, entity spam and more",
+      "Persistent MySQL bans matched on license, Steam, Discord, IP and hardware tokens, so a new account on the same machine is still recognised",
+      "Built-in clientloader: the client code is sent to each player at runtime and executed in memory, so it can't be dumped from the cache; repeated requests are flagged as a dump attempt",
+      "Discord integration: per-module webhook logs, a role check for online players and a priority connect queue with reserved slots and reconnect grace",
+      "Stealth mode that hides the anticheat from players while ban checks keep running",
+    ],
+    tech: ["Lua", "SQL", "JavaScript", "HTML"],
     repo: "https://github.com/PharellJay/RedMAnticheat",
     demo: "",
     featured: true,
@@ -60,15 +75,43 @@ const PROJECTS = [
   },
   {
     title: "Lua Obfuscator",
-    description: "A source-to-source Lua obfuscator written entirely in Lua. It runs real code through its own lexer and parser to build an AST, then layers on dead-code injection, variable renaming, control-flow flattening, numeric and string encoding, constant pooling and minification to make the output hard to read while keeping it functionally identical.",
-    tech: ["Lua"],
+    description: "A Lua obfuscator written in pure Lua, built around a bytecode virtual machine that turns protected functions into encrypted, per-build randomised bytecode.",
+    details: [
+      "The obfuscator reads Lua with its own lexer and parser and compiles selected functions into a private instruction set, " +
+        "run by an interpreter that is emitted into the output. The original logic of a virtualised function no longer exists as code, only as opaque data.",
+      "Around the VM, a pipeline of source-to-source passes hardens everything else. A round-trip test harness runs the original and the " +
+        "obfuscated program side by side to prove they still behave identically, and an optional web UI runs the whole obfuscator in the browser, with nothing uploaded.",
+    ],
+    highlights: [
+      "Lexer, parser, expression IR, VM compiler and interpreter generator, all in pure Lua with no dependencies",
+      "The VM handles all control flow, varargs, multiple returns, closures with shared upvalues and coroutines, and falls back to native code for anything it can't compile safely",
+      "Per-build hardening: permuted opcodes, encrypted string and number constants, and interpreter handlers emitted in a random order",
+      "Control-flow flattening into state machines, dead code behind opaque predicates, scope-aware renaming, string and number encoding, constant pooling",
+      "Anti-tamper loader whose decryption key is derived from a checksum of the payload, so editing a single byte breaks it",
+      "Browser UI that runs the real obfuscator client-side in a Web Worker via Fengari (Lua compiled to JavaScript)",
+    ],
+    tech: ["Lua", "JavaScript"],
     repo: "https://github.com/PharellJay/LuaObfuscator",
     demo: "",
     highlight: true,
   },
   {
     title: "ChessML",
-    description: "A chess engine that learns purely by playing against itself, AlphaZero-style, sized to train on a CPU-only machine. A residual policy/value network guides Monte Carlo tree search, and a local web interface lets you control training, watch losses and live self-play games, and play against any checkpoint.",
+    description: "A chess engine that teaches itself by self-play, AlphaZero-style, sized to train on an ordinary CPU, with a live dashboard to watch and play against it.",
+    details: [
+      "ChessML only knows the rules of chess. A small residual policy/value network guides a Monte Carlo tree search, plays against itself and learns from the results: " +
+        "the AlphaZero approach, scaled down from months of TPU time to hours on a CPU.",
+      "A local web interface controls the whole process. You can start, pause and resume training, follow losses, throughput and the current self-play game live, " +
+        "measure strength in real Elo against Stockfish and play against any checkpoint.",
+    ],
+    highlights: [
+      "Residual network (4 blocks × 48 channels, ~266k parameters), sized by benchmarking so network calls and tree search cost about the same on a CPU",
+      "Batched MCTS: each worker plays 16 games at once and scores all their leaves in one network call; playout cap randomisation (from KataGo) for more games per CPU hour",
+      "Multi-process pipeline of self-play workers, a trainer with a replay buffer and a separate evaluation process",
+      "Self-calibrating resignation threshold and learning-rate drops based on averaged evaluation ratings",
+      "Strength measured in Elo against Stockfish's rated mode, with a 95% confidence interval",
+      "FastAPI + WebSocket dashboard with live charts, move probabilities and a playable board",
+    ],
     tech: ["Python", "PyTorch", "FastAPI", "JavaScript"],
     repo: "https://github.com/PharellJay/ChessML",
     demo: "",
@@ -76,42 +119,113 @@ const PROJECTS = [
   },
   {
     title: "Decentralised VPN",
-    description: "A peer-to-peer VPN with no central server. Traffic is routed through two encrypted hops (a relay, then another peer's exit), so no single peer sees both who you are and where you're going. To use the network you also lend your own IP as an exit. A terminal dashboard handles connecting, latency-based exit selection and a kill switch that blocks traffic instead of leaking it when the tunnel drops.",
-    tech: ["Rust", "libp2p", "Noise Protocol", "Tokio", "Ratatui"],
+    description: "A peer-to-peer VPN with no central server: traffic is routed through two encrypted hops and leaves the internet from another peer's IP.",
+    details: [
+      "Peers find each other through a distributed hash table, without any central server. Your traffic first goes to a relay, then to another peer's exit, " +
+        "so the relay knows who you are but not where you're going, and the exit sees the destination but not you.",
+      "The network works on a \"lend to use\" principle: you can only route traffic through it while your own machine lends its IP as an exit for others. " +
+        "It installs as a Debian/Ubuntu package with a background service, a terminal dashboard and a desktop app.",
+    ],
+    highlights: [
+      "Two-hop circuits with a Noise handshake against the exit's signed key; the relay only ever forwards encrypted bytes",
+      "Serverless discovery via Kademlia DHT and mDNS, NAT traversal with AutoNAT, hole punching and relays (libp2p)",
+      "Kill switch: once connected, traffic is blocked instead of leaked when the tunnel drops; IPv6 blocked, DNS forced through the tunnel",
+      "Exit choice at random or by latency, measured through encrypted test circuits so exits never see your IP",
+      "systemd service controlled over a permission-checked Unix socket, used by the CLI, the Ratatui dashboard and a Tauri tray app",
+      "Packets padded to size buckets against fingerprinting; routes and firewall rules are restored even after a crash",
+    ],
+    tech: ["Rust", "libp2p", "Tokio", "Noise Protocol", "Ratatui", "Tauri"],
     repo: "https://github.com/PharellJay/DecentralisedVPN",
     demo: "",
   },
   {
     title: "My Website",
-    description: "The logic behind what you see. A personal portfolio built from scratch with plain HTML, CSS and JavaScript, no frameworks. All content lives in a single data file, so adding a new project or paper takes just a few lines.",
-    tech: ["HTML", "JavaScript", "CSS"],
+    description: "This portfolio, built from scratch in plain HTML, CSS and JavaScript, with all content in a single data file.",
+    details: [
+      "No framework and no build step: everything you see is rendered by one script from a single data file, " +
+        "so adding a new project or paper takes a few lines.",
+      "The focus was on a clean, fast page that works just as well on a phone as on a large screen, with a few playful details along the way.",
+    ],
+    highlights: [
+      "Content and logic fully separated: data.js holds the text, script.js renders every section",
+      "A cube companion made of small voxels that follows you through the sections and morphs into a new shape for each one",
+      "Live GitHub stats and a contribution graph, cached in the browser to stay within the API's rate limit",
+      "Responsive down to small phones, with a fold-out menu, touch-sized buttons and reduced-motion support",
+      "Built-in PDF viewer for papers and detail windows for projects, using the native <dialog> element",
+    ],
+    tech: ["HTML", "CSS", "JavaScript"],
     repo: "https://github.com/PharellJay/MyWebsite",
     demo: "",
   },
   {
     title: "Discord Music Bot",
-    description: "A music bot for private usage on discord. Paste a YouTube or Spotify link or just type a song name, and everyone in the voice channel can control the queue with slash commands or buttons. Spotify is used to find the right track, which is then streamed from YouTube Music, with extras like autoplay, lyrics, looping and seeking.",
+    description: "A music bot for our Discord server: play songs from YouTube or Spotify and control the shared queue with slash commands or buttons.",
+    details: [
+      "Paste a YouTube or Spotify link, or just type the name of a song, and everyone in the voice channel can manage the queue together.",
+      "Spotify doesn't allow bots to stream its music, so the bot uses Spotify only to find the right track and then plays the official audio from YouTube Music.",
+    ],
+    highlights: [
+      "Spotify search and links (tracks, albums, playlists), matched to YouTube Music audio; YouTube, SoundCloud and other yt-dlp sources work directly",
+      "Full queue control: skip, previous, seek, move, shuffle, loop, remove duplicates or one person's songs, history",
+      "Autoplay of similar songs when the queue runs out, plus lyrics for any song",
+      "Now-playing message with buttons and a progress bar, and song names that autocomplete as you type",
+      "Leaves by itself when it's alone or idle; actions are posted in the chat with who did them",
+    ],
     tech: ["Python", "discord.py", "yt-dlp", "Spotify API"],
     repo: "https://github.com/PharellJay/DiscordMusicbot",
     demo: "",
   },
   {
     title: "Language Practice Tool",
-    description: "Practise the sentences and words you actually need for everyday conversation, in any language pair. Content is written once in English and translated on demand by a self-hosted LibreTranslate server, with read-aloud and Anki-style spaced repetition deciding what comes up next.",
+    description: "Practise the everyday sentences and words you actually need, in any language pair, with read-aloud and spaced repetition.",
+    details: [
+      "Pick the language you speak and the one you want to learn. All content is written once in English and translated on demand by a self-hosted LibreTranslate server, " +
+        "so any language pair works without extra content.",
+      "Spaced repetition decides what comes next, so you don't see the same item over and over, but everything comes back often enough to stick.",
+    ],
+    highlights: [
+      "Simplified SM-2 scheduler (as used by Anki) with a daily goal, due reviews first and in-session repeats",
+      "Translations fetched in batches and cached in IndexedDB, so the server is only needed for new items",
+      "Read-aloud through the browser's Web Speech API, no server required",
+      "Plain ES modules with no build step and no dependencies; progress kept separately per language",
+      "Tests for the scheduler and the translation client against a fake server",
+    ],
     tech: ["JavaScript", "HTML", "CSS", "LibreTranslate"],
     repo: "https://github.com/PharellJay/LanguagePracticeTool",
     demo: "",
   },
   {
     title: "Flashcards",
-    description: "A small flashcard tool designed to help me and others while learning as public flashcard apps tend to be flooded with paywalls and ads.",
-    tech: ["Python", "JSON", "Bash"],
+    description: "A keyboard-friendly flashcard app for the terminal, with nested folders and decks you can share as a short code.",
+    details: [
+      "Public flashcard apps tend to be full of paywalls and ads, so I built my own: organise cards in nested folders, study them and share whole folders with friends.",
+      "A folder, with all its subfolders, can be exported as one line of text that anyone can paste into the app to get the same cards.",
+    ],
+    highlights: [
+      "Textual-based terminal UI with a folder tree, card list and preview; every action has a button and a hotkey",
+      "Two study modes: Study for due cards with Again / Done grading, Cram for all cards shuffled; either side can be shown first",
+      "Tracks how often each card was missed, and offers undo for grades and deletions",
+      "Share codes for folders or the whole collection, copied straight to the clipboard",
+      "Every change is saved right away with a backup of the previous version",
+    ],
+    tech: ["Python", "Textual", "JSON"],
     repo: "https://github.com/PharellJay/Flashcards",
     demo: "",
   },
   {
     title: "Questlog",
-    description: "A to-do list disguised as an RPG quest journal, right in the terminal. Organise tasks into nested questlines with due dates and priorities, see today and the week ahead on a JRPG-style dashboard, earn XP and levels for every completed quest, and share whole questlines with friends via a short code.",
+    description: "A to-do list disguised as an RPG quest journal in the terminal, with XP, levels and a JRPG-style dashboard.",
+    details: [
+      "Organise tasks into nested questlines with due dates and priorities, see today and the week ahead at a glance, and earn XP and levels for every quest you complete.",
+      "Underneath the quest words it is a full task tracker, and whole questlines can be shared with friends through a short code.",
+    ],
+    highlights: [
+      "JRPG-style dashboard built with Textual: questlines, a command menu, today's quests and a week view in framed windows",
+      "XP by priority, levels with titles from Novice to Legend, and a daily streak",
+      "Quick date input (today, fri, +3, 2w, …) with a live preview, plus filters and sensible sorting",
+      "Undo for completions (XP included) and deletions; share codes for questlines",
+      "Unit tests for the data model; every change is saved right away with a backup",
+    ],
     tech: ["Python", "Textual", "JSON"],
     repo: "https://github.com/PharellJay/Questlog",
     demo: "",

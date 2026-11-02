@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/devicon@2.16.0/devicon.min.css">
-  <link rel="stylesheet" href="styles.css?v=33">
+  <link rel="stylesheet" href="styles.css?v=34">
 </head>
 <body>
   <!-- All text content is rendered from data.js by script.js -->
@@ -151,6 +151,15 @@
     </div>
   </footer>
 
+  <!-- Project details (filled by script.js from PROJECTS: details, highlights, tech) -->
+  <dialog class="details-dialog" id="details-dialog" aria-labelledby="details-title">
+    <div class="details-header">
+      <p class="quest-label">Project details</p>
+      <button type="button" class="btn btn-sm" id="details-close">Close</button>
+    </div>
+    <div class="details-body" id="details-body"></div>
+  </dialog>
+
   <!-- PDF viewer -->
   <dialog class="pdf-dialog" id="pdf-dialog" aria-labelledby="pdf-title">
     <div class="pdf-header">
@@ -164,7 +173,7 @@
   </dialog>
 
   <!-- Bump the ?v= numbers after editing a file so browsers load the new version instead of a cached one -->
-  <script src="data.js?v=29"></script>
-  <script src="script.js?v=31"></script>
+  <script src="data.js?v=30"></script>
+  <script src="script.js?v=32"></script>
 </body>
 </html>

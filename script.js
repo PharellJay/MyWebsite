@@ -145,12 +145,67 @@
   const techLine = (items) => el("p", { class: "tech-line" }, items.join(" · "));
 
   /* ---------- projects ---------- */
-  // "View project" / "Live demo" buttons (null if the project has neither link)
-  function projectActions(p) {
+  // "View project" / "Live demo" links (null if the project has neither)
+  function projectLinks(p) {
     const actions = el("div", { class: "project-actions" });
     if (p.repo) actions.append(el("a", { href: p.repo, target: "_blank", rel: "noopener", class: "btn btn-primary" }, "View project"));
     if (p.demo) actions.append(el("a", { href: p.demo, target: "_blank", rel: "noopener", class: "btn" }, "Live demo"));
     return actions.childElementCount ? actions : null;
+  }
+
+  // Project links plus a "Details" button that opens the details window
+  function projectActions(p) {
+    const actions = projectLinks(p);
+    if (!hasDetails(p)) return actions;
+    const button = detailsButton(p, "btn");
+    if (!actions) return el("div", { class: "project-actions" }, button);
+    actions.append(button);
+    return actions;
+  }
+
+  const hasDetails = (p) => Boolean(p.details?.length || p.highlights?.length);
+
+  function detailsButton(p, className) {
+    const button = el("button", { type: "button", class: className, "aria-haspopup": "dialog" }, "Details");
+    button.addEventListener("click", () => openDetails(p));
+    return button;
+  }
+
+  // Details window: longer description and technical highlights from PROJECTS
+  const detailsDialog = $("#details-dialog");
+  function openDetails(p) {
+    if (!detailsDialog?.showModal) {
+      if (p.repo) window.open(p.repo, "_blank", "noopener");
+      return;
+    }
+    const paragraphs = [].concat(p.details?.length ? p.details : p.description || []);
+    const parts = [
+      el("h2", { id: "details-title" }, p.title),
+      ...paragraphs.map((text) => el("p", { class: "details-text" }, text)),
+      p.highlights?.length
+        ? el("section", { class: "details-block" },
+            el("h3", { class: "quest-label" }, "Technical highlights"),
+            el("ul", { class: "details-highlights" }, ...p.highlights.map((h) => el("li", {}, h))))
+        : null,
+      p.tech?.length
+        ? el("section", { class: "details-block" },
+            el("h3", { class: "quest-label" }, "Built with"),
+            el("ul", { class: "tech-pills", "aria-label": "Technologies" }, ...p.tech.map(techPill)))
+        : null,
+      projectLinks(p),
+    ];
+    $("#details-body").replaceChildren(...parts.filter(Boolean));
+    detailsDialog.showModal();
+    $("#details-body").scrollTop = 0;
+    document.body.classList.add("no-scroll");
+  }
+
+  if (detailsDialog) {
+    $("#details-close").addEventListener("click", () => detailsDialog.close());
+    detailsDialog.addEventListener("click", (e) => {
+      if (e.target === detailsDialog) detailsDialog.close();
+    });
+    detailsDialog.addEventListener("close", () => document.body.classList.remove("no-scroll"));
   }
 
   // Featured project content: label + status badge and tech over a hairline, then title, description
@@ -182,13 +237,15 @@
     return item;
   }
 
-  // Compact row for the "Other projects" list: title on the left, description + tech on the right
+  // Compact row for the "Other projects" list: title on the left, description + tech in the middle,
+  // "Details" button on the right
   function renderOtherProject(p) {
     return el("li", { class: "side-quest" },
       el("h3", {}, p.repo ? externalLink(p.repo, p.title) : p.title),
       el("div", {},
         p.description ? el("p", {}, p.description) : null,
-        p.tech?.length ? techLine(p.tech) : null)
+        p.tech?.length ? techLine(p.tech) : null),
+      hasDetails(p) ? detailsButton(p, "btn btn-sm side-details") : null
     );
   }
 

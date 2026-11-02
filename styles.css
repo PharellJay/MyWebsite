@@ -203,6 +203,7 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
   background: var(--accent); color: var(--accent-ink); font-weight: 600;
 }
 .btn-primary:hover { border-color: transparent; background: var(--accent-hover); }
+.btn-sm { height: 32px; padding: 0 12px; font-size: .8125rem; }
 
 /* ---------- sections ---------- */
 .section { position: relative; border-bottom: 1px solid var(--line); }
@@ -215,6 +216,11 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 .section h2, .section-title {
   margin-top: 10px;
   font: 600 1.75rem/1.15 var(--font); letter-spacing: -0.025em;
+}
+/* Scientific work is short: extra room below it, so the cube companion has time to show the paper
+   before it moves on to the Stack section (only where the cube sits under the section titles) */
+@media (min-width: 1001px) {
+  #research .section-inner { min-height: 72vh; padding-bottom: 160px; }
 }
 .section-meta { margin-top: 8px; font: .8125rem/1.5 var(--mono); color: var(--muted); }
 .empty { color: var(--muted); }
@@ -297,7 +303,7 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 .side-quests { margin-top: 12px; border-top: 1px solid var(--line); }
 .side-quest {
   position: relative;
-  display: grid; grid-template-columns: 200px 1fr; gap: 6px 28px;
+  display: grid; grid-template-columns: 200px 1fr auto; align-items: start; gap: 6px 28px;
   padding: 18px 16px; border-bottom: 1px solid var(--line);
   transition: background-color .2s;
 }
@@ -315,6 +321,8 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 .side-quest:hover h3::after { color: var(--accent-hover); transform: translate(2px, -2px); }
 .side-quest p { color: var(--text-2); font-size: .9rem; }
 .side-quest .tech-line { margin-top: 8px; }
+/* sits above the row-wide link so it opens the details instead of the repository */
+.side-details { position: relative; z-index: 2; align-self: center; }
 .tech-line { font: .75rem/1.5 var(--mono); color: var(--muted); }
 
 /* featured project: a panel with a faint accent glow in the corner */
@@ -526,6 +534,38 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 .pdf-actions { display: flex; gap: 8px; flex-shrink: 0; }
 .pdf-dialog iframe { flex: 1; width: 100%; border: 0; background: var(--bg); }
 
+/* ---------- project details dialog ---------- */
+.details-dialog {
+  width: min(720px, calc(100vw - 32px)); max-width: none; max-height: min(86vh, 860px);
+  padding: 0; border: 1px solid var(--line-strong); border-radius: 12px;
+  background: radial-gradient(520px 220px at 0% 0%, rgb(var(--accent-rgb) / 0.08), transparent 70%), var(--surface);
+  color: var(--text); overflow: hidden;
+}
+.details-dialog[open] { display: flex; flex-direction: column; animation: details-in .2s ease; }
+.details-dialog::backdrop { background: rgb(0 0 0 / 0.7); backdrop-filter: blur(4px); }
+@keyframes details-in { from { opacity: 0; transform: translateY(8px); } }
+.details-header {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: 10px 12px 10px 24px; border-bottom: 1px solid var(--line);
+}
+.details-body {
+  overflow-y: auto; padding: 26px 24px 28px;
+  scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent;
+}
+.details-body h2 { font: 600 1.625rem/1.2 var(--font); letter-spacing: -0.025em; }
+.details-text { margin-top: 12px; color: var(--text-2); font-size: .95rem; }
+.details-body h2 + .details-text { margin-top: 14px; }
+.details-block { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); }
+.details-block .tech-pills { margin-top: 14px; }
+.details-block .tech-pill .stack-logo i, .details-block .tech-pill .stack-logo .logo { color: var(--brand); }
+.details-highlights { display: grid; gap: 10px; margin-top: 14px; }
+.details-highlights li { position: relative; padding-left: 20px; color: var(--text-2); font-size: .925rem; line-height: 1.55; }
+/* square "pixel" bullet in the accent color */
+.details-highlights li::before {
+  content: ""; position: absolute; left: 2px; top: .62em; width: 6px; height: 6px; background: var(--accent);
+}
+.details-body .project-actions { margin-top: 28px; }
+
 /* ---------- cube companion ---------- */
 /* invisible spots that reserve room: right of the name in the hero, under each section title */
 .voxel-slot { position: relative; z-index: 5; width: 100%; max-width: 220px; aspect-ratio: 20 / 14; margin-top: 32px; }
@@ -655,6 +695,12 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
   }
   .featured-value { font-size: 2rem; }
   .side-quest { grid-template-columns: 1fr; padding: 16px 12px; }
+  .side-details { justify-self: start; margin-top: 6px; }
+  .details-dialog { width: calc(100vw - 24px); max-height: 90vh; }
+  .details-header { padding-left: 18px; }
+  .details-body { padding: 22px 18px 24px; }
+  .details-body h2 { font-size: 1.4rem; }
+  .details-body .project-actions .btn { flex: 1; justify-content: center; }
   .other-toggle { padding: 14px; }
   .other-preview { display: none; }
 
