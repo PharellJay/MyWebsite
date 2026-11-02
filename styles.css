@@ -300,12 +300,12 @@ a { color: inherit; text-decoration: none; }
   padding-top: 88px; padding-bottom: 88px;
 }
 .section-head { position: sticky; top: 92px; align-self: start; }
-.section h2 {
+.section h2, .section-title {
   margin-top: 8px;
   font: 700 1.6rem/1.1 var(--display); text-transform: uppercase; letter-spacing: .01em;
 }
 /* tick-mark divider under the heading */
-.section h2::after {
+.section h2::after, .section-title::after {
   content: ""; display: block; width: 120px; height: 6px; margin-top: 14px;
   background:
     linear-gradient(var(--accent), var(--accent)) left center / 36px 2px no-repeat,
@@ -577,6 +577,20 @@ a { color: inherit; text-decoration: none; }
 .footer a { font: 600 .8rem/1 var(--display); text-transform: uppercase; letter-spacing: .06em; transition: color .15s; }
 .footer a:hover { color: var(--accent); }
 .footer-hud { display: flex; align-items: center; gap: 18px; }
+.footer-links { display: flex; gap: 20px; }
+
+/* ---------- imprint page ---------- */
+.section-title { margin: 8px 0 0; }
+.legal { max-width: 720px; color: var(--text-2); font-size: 1.05rem; }
+.section .legal h2 {
+  margin: 36px 0 10px;
+  font: 600 .8rem/1.4 var(--display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
+}
+.section .legal h2:first-child { margin-top: 0; }
+.section .legal h2::after { display: none; }
+.legal address { font-style: normal; color: var(--text); }
+.legal a { color: var(--accent); }
+.legal a:hover { color: var(--accent-hover); }
 .level-hint { font: .68rem/1 var(--pixel); text-transform: uppercase; color: var(--muted); }
 /* achievements list: opens upwards from the footer */
 .trophies { position: relative; }

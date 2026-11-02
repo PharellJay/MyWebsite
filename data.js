@@ -30,7 +30,7 @@ const PROFILE = {
   github: "https://github.com/PharellJay",
   githubStats: true,
   linkedin: "https://www.linkedin.com/in/pharell-jay-jeyakumar/",
-  email: "pharelljeyakumar1010@gmail.com",
+  email: "contact@pharelljay.me",
   cv: "",
 };
 
