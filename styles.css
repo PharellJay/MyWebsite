@@ -581,7 +581,8 @@ a { color: inherit; text-decoration: none; }
 
 /* ---------- imprint page ---------- */
 .section-title { margin: 8px 0 0; }
-.legal { max-width: 720px; color: var(--text-2); font-size: 1.05rem; }
+.legal { max-width: 720px; color: var(--text-2); font-size: 1.05rem; line-height: 1.65; }
+.legal p + p { margin-top: .9em; }
 .section .legal h2 {
   margin: 36px 0 10px;
   font: 600 .8rem/1.4 var(--display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
