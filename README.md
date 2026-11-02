@@ -2,7 +2,7 @@
 
 My personal portfolio website, built from scratch with plain **HTML, CSS and JavaScript**. No frameworks, no build step, no dependencies to install.
 
-It shows my projects, scientific work, tech stack, education and contact links, wrapped in a retro game theme: every section is a "level", a pixel-cube companion follows you through the page, and there are a few achievements to unlock along the way.
+It shows my projects, scientific work, tech stack, education and contact links in a clean dark design with a light retro touch: a pixel-cube companion follows you through the page and changes its shape for each section.
 
 ![HTML](https://img.shields.io/badge/HTML-E34F26?logo=html5&logoColor=white)
 ![CSS](https://img.shields.io/badge/CSS-1572B6?logo=css3&logoColor=white)
@@ -12,10 +12,10 @@ It shows my projects, scientific work, tech stack, education and contact links, 
 ## Features
 
 - **Content in one file**: everything on the page comes from `data.js`. Adding a project or paper takes just a few lines, no HTML needed.
-- **Game-themed sections**: Projects, Scientific work, Stack, Education, About and Contact, each presented as a level (Lvl 01 to Lvl 06).
-- **Voxel companion**: a figure made of small cubes that moves to the section you're reading and changes its shape for each one.
-- **Achievements**: unlocked while exploring the page and saved in the browser. Some are hidden, so feel free to look around.
-- **Keyboard navigation**: press `1` to `6` to jump straight to a level.
+- **Numbered sections**: Projects, Scientific work, Stack, Education, About and Contact (01 to 06).
+- **Voxel companion**: a figure made of small cubes that moves to the section you're reading and changes its shape for each one. There's also a hidden easter egg, so feel free to look around.
+- **Live GitHub activity**: stats and a contribution graph loaded from the GitHub API.
+- **Keyboard navigation**: press `1` to `6` to jump straight to a section.
 - **Built-in PDF viewer**: papers open in a dialog on desktop and in the browser's own viewer on mobile.
 - **Copy-to-clipboard email**: the email address in the Contact section is copied with a click.
 - **Responsive and accessible**: works on phones, supports keyboard use and respects `prefers-reduced-motion`.
@@ -53,7 +53,7 @@ All text lives in `data.js`, and every block there is documented with comments e
 | Block        | What it controls                                                     |
 | ------------ | -------------------------------------------------------------------- |
 | `PROFILE`    | Name, tagline, intro, status badge, photo, social links, CV          |
-| `PROJECTS`   | One `featured` "main quest", `highlight` projects as cards, the rest as a compact list |
+| `PROJECTS`   | One `featured` project, `highlight` projects as large rows, the rest as a compact list |
 | `PAPERS`     | Scientific works with abstract and an optional PDF                   |
 | `ABOUT`      | The "About me" text and cards                                        |
 | `TECH_STACK` | Technology groups shown with logos in the Stack section              |
@@ -82,7 +82,7 @@ The site is fully static, so it can be hosted anywhere that serves files, for ex
 
 ## Credits
 
-- Fonts: [Chakra Petch](https://fonts.google.com/specimen/Chakra+Petch), [Geist](https://vercel.com/font) and [Silkscreen](https://fonts.google.com/specimen/Silkscreen) via Google Fonts
+- Fonts: [Geist and Geist Mono](https://vercel.com/font) via Google Fonts
 - Technology logos: [Devicon](https://devicon.dev/)
 - Icons: [Lucide](https://lucide.dev/)
 

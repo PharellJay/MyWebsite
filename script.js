@@ -49,18 +49,17 @@
     setText("#tagline", profile.tagline);
     setText("#intro", profile.intro);
 
-    // Stat strip under the tagline (status only shows on small screens, where the top bar hides it)
+    // Location / languages line under the tagline
     const stats = $("#hero-stats");
     const statRows = [
-      ["Region", profile.location],
-      ["Lang", profile.languages],
-      ["Status", profile.status, "stat-status"],
+      ["Based in", profile.location],
+      ["Speaks", profile.languages],
     ].filter(([, value]) => value);
     if (stats && statRows.length) {
-      stats.append(...statRows.map(([label, value, cls]) =>
-        el("div", cls ? { class: cls } : {}, el("dt", {}, label), el("dd", {}, value))));
+      stats.append(...statRows.map(([label, value]) => el("div", {}, el("dt", {}, label), el("dd", {}, value))));
     } else stats?.remove();
     setText("#footer-name", profile.name);
+    setText("#brand-name", profile.name);
 
     document.querySelectorAll("[data-profile]").forEach((link) => {
       const key = link.dataset.profile;
@@ -117,7 +116,6 @@
       } catch {
         copied = false;
       }
-      if (copied) unlock("multiplayer");
       label.textContent = copied ? "Copied" : value;
       setTimeout(() => (label.textContent = value), 1500);
     });
@@ -130,6 +128,8 @@
     email: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></g>',
     // Lucide "file-text" (CV download)
     cv: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></g>',
+    // Lucide "chevron-down" (Other projects toggle)
+    chevron: '<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>',
     // Lucide "send" (paper plane)
     send: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></g>',
   };
@@ -145,27 +145,41 @@
   const techLine = (items) => el("p", { class: "tech-line" }, items.join(" · "));
 
   /* ---------- projects ---------- */
-  const pad2 = (n) => String(n).padStart(2, "0");
-
-  // Row content shared by the main quest and the highlighted projects: label (+ extra, e.g. the
-  // status badge) and tech over a hairline, then title, description and buttons.
-  // Tech uses the logo + name items from the Stack section.
-  function projectContent(p, label, extra) {
+  // "View project" / "Live demo" buttons (null if the project has neither link)
+  function projectActions(p) {
     const actions = el("div", { class: "project-actions" });
     if (p.repo) actions.append(el("a", { href: p.repo, target: "_blank", rel: "noopener", class: "btn btn-primary" }, "View project"));
     if (p.demo) actions.append(el("a", { href: p.demo, target: "_blank", rel: "noopener", class: "btn" }, "Live demo"));
+    return actions.childElementCount ? actions : null;
+  }
+
+  // Featured project content: label + status badge and tech over a hairline, then title, description
+  // and buttons. Tech uses the logo + name items from the Stack section.
+  function projectContent(p, label, extra) {
     return [
       el("div", { class: "project-head rule-head" },
         el("div", { class: "project-label" }, el("p", { class: "quest-label" }, label), extra),
         p.tech?.length ? el("ul", { class: "project-tech" }, ...p.tech.map(stackItem)) : null),
       el("h3", {}, p.repo ? externalLink(p.repo, p.title) : p.title),
       p.description ? el("p", {}, p.description) : null,
-      actions.childElementCount ? actions : null,
+      projectActions(p),
     ];
   }
 
-  function renderProject(p, i) {
-    return el("article", { class: "project" }, ...projectContent(p, `Quest ${pad2(i + 1)}`));
+  // Highlighted project: title and description first, then the tech as small logo pills, then the buttons
+  function renderProject(p) {
+    return el("article", { class: "project rule-top" },
+      el("h3", {}, p.repo ? externalLink(p.repo, p.title) : p.title),
+      p.description ? el("p", {}, p.description) : null,
+      p.tech?.length ? el("ul", { class: "tech-pills", "aria-label": "Technologies" }, ...p.tech.map(techPill)) : null,
+      projectActions(p));
+  }
+
+  // Same logo + name as a Stack item, styled as a pill
+  function techPill(name) {
+    const item = stackItem(name);
+    item.className = "tech-pill";
+    return item;
   }
 
   // Compact row for the "Other projects" list: title on the left, description + tech on the right
@@ -178,16 +192,34 @@
     );
   }
 
+  // Collapsed by default behind a toggle row (title, count, preview of the names), so visitors who
+  // don't want the full list don't have to scroll past it. The list slides open on click.
   function renderOtherProjects(list) {
-    return [
-      el("div", { class: "other-head" },
-        el("p", { class: "quest-label" }, "Side quests"),
-        el("h3", {}, "Other projects")),
-      el("ul", { class: "side-quests" }, ...list.map(renderOtherProject)),
-    ];
+    const panelId = "other-projects-panel";
+    const action = el("span", { class: "other-action" }, "Show all");
+    const toggle = el("button", { type: "button", class: "other-toggle", "aria-expanded": "false", "aria-controls": panelId },
+      el("span", { class: "other-title" }, "Other projects"),
+      el("span", { class: "other-count" }, String(list.length)),
+      el("span", { class: "other-preview", "aria-hidden": "true" }, list.map((p) => p.title).join(", ")),
+      action, icon("chevron"));
+    const panel = el("div", { class: "other-panel", id: panelId },
+      el("div", {}, el("ul", { class: "side-quests" }, ...list.map(renderOtherProject))));
+    panel.inert = true; // collapsed rows can't be tabbed into
+
+    toggle.addEventListener("click", () => {
+      const open = toggle.getAttribute("aria-expanded") !== "true";
+      // Collapsing from further down the list: bring the toggle back into view first,
+      // so the page doesn't jump to whatever comes after the list
+      if (!open && toggle.getBoundingClientRect().top < 0) toggle.scrollIntoView({ block: "start" });
+      toggle.setAttribute("aria-expanded", String(open));
+      action.textContent = open ? "Show less" : "Show all";
+      panel.classList.toggle("open", open);
+      panel.inert = !open;
+    });
+    return [el("h3", { class: "other-head" }, toggle), panel];
   }
 
-  // Featured project: larger row with a purple glow, status badge in the header, highlighted stat on the right
+  // Featured project: a panel with the status badge in the header and the highlighted stat on the right
   function renderFeaturedProject(p) {
     const status = p.status
       ? el("span", { class: `featured-status${p.continued === false ? " off" : ""}` },
@@ -198,13 +230,13 @@
       p.stat?.label ? el("span", { class: "featured-label" }, p.stat.label) : null
     );
     return el("article", { class: "project featured" },
-      el("div", { class: "featured-main" }, ...projectContent(p, "Main quest", status)),
+      el("div", { class: "featured-main" }, ...projectContent(p, "Featured", status)),
       side.childElementCount ? side : null
     );
   }
 
   /* ---------- GitHub activity ---------- */
-  // Card under the projects: repos, stars, followers and contributions of the last 12 months, plus a
+  // Block under the projects: repos, stars, followers and contributions of the last 12 months, plus a
   // contribution graph. Data comes live from the GitHub API and github-contributions-api.jogruber.de
   // and is cached in the browser for a few hours (the GitHub API allows 60 requests per hour without a token).
   const GH_CACHE_KEY = "gh-activity-v1";
@@ -277,7 +309,7 @@
       svg.append(rect);
     });
 
-    // Hovering a day shows its count in the HUD line under the graph
+    // Hovering a day shows its count in the line under the graph
     svg.addEventListener("pointerover", (e) => {
       if (e.target.dataset?.info) readout.textContent = e.target.dataset.info;
     });
@@ -302,14 +334,14 @@
     const [starsRow, starsValue] = stat("Stars");
     const [followersRow, followersValue] = stat("Followers");
     const graph = el("div", { class: "gh-graph", role: "img", "aria-label": "GitHub contribution graph of the last 12 months" });
-    const readout = el("p", { class: "gh-readout" }, "Loading save data…");
+    const readout = el("p", { class: "gh-readout" }, "Loading…");
     const legend = el("div", { class: "gh-legend", "aria-hidden": "true" },
       "Less", ...[0, 1, 2, 3, 4].map((lv) => el("span", { class: `lv${lv}` })), "More");
 
     box.className = "gh-card";
     box.append(
       el("div", { class: "gh-head rule-head" },
-        el("p", { class: "quest-label" }, "Activity log · last 12 months"),
+        el("p", { class: "quest-label" }, "GitHub activity · last 12 months"),
         el("a", { class: "gh-link", href: profile.github, target: "_blank", rel: "noopener" }, `github.com/${user} ↗`)
       ),
       el("dl", { class: "gh-stats" }, contribRow, reposRow, starsRow, followersRow),
@@ -362,7 +394,7 @@
         el("p", { class: "paper-meta" }, meta),
         p.grade
           ? el("p", { class: "grade" },
-              el("span", { class: "grade-label" }, "Score"),
+              el("span", { class: "grade-label" }, "Grade"),
               el("span", { class: "grade-value" }, p.grade))
           : null
       ),
@@ -463,7 +495,7 @@
     const items = g.items || [];
     return el("div", { class: "stack-group" },
       el("div", { class: "stack-label rule-head" }, iconBox, el("h3", {}, g.group),
-        el("span", { class: "stack-count", "aria-label": `${items.length} items` }, `×${items.length}`)),
+        el("span", { class: "stack-count", "aria-label": `${items.length} items` }, String(items.length))),
       el("ul", { class: "stack-items" }, ...items.map(stackItem))
     );
   }
@@ -489,7 +521,6 @@
       el("div", { class: "about-head rule-head" },
         iconBox,
         el("div", {},
-          c.wide ? el("p", { class: "quest-label" }, "Side quest") : null,
           el("h3", {}, c.title))
       ),
       el("p", {}, c.text),
@@ -550,146 +581,19 @@
       el("div", { class: "edu-body" },
         el("div", { class: "edu-top" },
           el("p", { class: "edu-date" }, e.date || ""),
-          el("span", { class: `edu-badge${current ? "" : " done"}` }, current ? "In progress" : "Completed ✓")
+          el("span", { class: `edu-badge${current ? "" : " done"}` }, current ? "Current" : "Completed")
         ),
         el("h3", {}, e.title),
         e.place ? el("p", { class: "edu-place" }, e.place) : null,
-        current ? el("div", { class: "edu-progress", "aria-hidden": "true" }) : null,
         e.description ? el("p", { class: "edu-text" }, e.description) : null,
         e.focus?.length ? techLine(e.focus) : null
       )
     );
   }
 
-  /* ---------- game touches ---------- */
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  function trophyIcon() {
-    const trophy = el("span", { class: "achievement-icon", "aria-hidden": "true" });
-    // Static, trusted markup (Lucide trophy)
-    trophy.innerHTML = svg('<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>');
-    return trophy;
-  }
-
-  // "Achievement unlocked" toast in the hero, shown shortly after the page loads
-  function renderAchievement() {
-    const box = $("#achievement");
-    if (!box) return;
-    if (!profile.achievement) {
-      box.remove();
-      return;
-    }
-    box.append(trophyIcon(),
-      el("div", {}, el("p", { class: "achievement-label" }, "Achievement unlocked"), el("p", {}, profile.achievement)));
-    setTimeout(() => {
-      box.hidden = false;
-      requestAnimationFrame(() => box.classList.add("show"));
-    }, reducedMotion ? 0 : 900);
-  }
-
-  /* ---------- achievements ---------- */
-  // Unlocked while exploring the page and saved in the browser ("Game saved" in the footer).
-  // Each new one pops up as a toast in the bottom right; the footer lists them.
-  const ACHIEVEMENTS = [
-    { id: "start", title: "First steps", text: "Pressed start" },
-    { id: "explorer", title: "Explorer", text: "Visited every level" },
-    { id: "bookworm", title: "Bookworm", text: "Opened a paper" },
-    { id: "multiplayer", title: "Multiplayer", text: "Copied a contact to party up" },
-    { id: "levelselect", title: "Level select", text: "Jumped to a level with the number keys" },
-    { id: "cheater", title: "Cheat code", text: "Entered the Konami code. The anticheat saw that." },
-  ];
-  const SAVE_KEY = "achievements";
-  const unlocked = new Set(loadAchievements());
-
-  // Storage can be blocked (private mode etc.); then achievements just last for this visit
-  function loadAchievements() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
-      return Array.isArray(saved) ? saved : [];
-    } catch {
-      return [];
-    }
-  }
-  function saveAchievements() {
-    try {
-      localStorage.setItem(SAVE_KEY, JSON.stringify([...unlocked]));
-    } catch {
-      /* not saved, still works for this visit */
-    }
-  }
-
-  function unlock(id) {
-    const achievement = ACHIEVEMENTS.find((a) => a.id === id);
-    if (!achievement || unlocked.has(id)) return;
-    unlocked.add(id);
-    saveAchievements();
-    renderTrophies();
-    toastQueue.push(achievement);
-    if (!toastShowing) nextToast();
-  }
-
-  // One toast at a time, each for a few seconds
-  const toastQueue = [];
-  let toastShowing = false;
-  function nextToast() {
-    const achievement = toastQueue.shift();
-    toastShowing = Boolean(achievement);
-    if (!achievement) return;
-    const toast = el("div", { class: "achievement toast", role: "status" }, trophyIcon(),
-      el("div", {},
-        el("p", { class: "achievement-label" }, `Achievement unlocked · ${achievement.title}`),
-        el("p", {}, achievement.text)));
-    document.body.append(toast);
-    requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add("show")));
-    setTimeout(() => {
-      toast.classList.remove("show");
-      setTimeout(() => {
-        toast.remove();
-        nextToast();
-      }, reducedMotion ? 0 : 400);
-    }, 3500);
-  }
-
-  // Footer: "x/6 achievements", opens a list (locked ones stay a mystery)
-  function renderTrophies() {
-    const box = $("#trophies");
-    if (!box) return;
-    $("summary", box).textContent = `${unlocked.size}/${ACHIEVEMENTS.length} achievements`;
-    $("ul", box).replaceChildren(...ACHIEVEMENTS.map((a) => {
-      const got = unlocked.has(a.id);
-      return el("li", got ? { class: "got" } : {},
-        el("span", { class: "trophy-mark", "aria-hidden": "true" }, got ? "✓" : "?"),
-        el("span", {}, got ? a.title : "???"));
-    }));
-  }
-
-  // The list opens while the mouse is over it; touch and keyboard still toggle it on tap/Enter
-  function initTrophyHover() {
-    const box = $("#trophies");
-    if (!box) return;
-    box.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") box.open = true; });
-    box.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") box.open = false; });
-    $("summary", box).addEventListener("click", (e) => { if (e.pointerType === "mouse") e.preventDefault(); });
-  }
-
-  // "Explorer": every section seen (at least a quarter of it on screen); "First steps": Press start
-  function initProgress() {
-    $(".btn-start")?.addEventListener("click", () => unlock("start"));
-    const sections = [...document.querySelectorAll("main section[id]")];
-    if (!("IntersectionObserver" in window) || !sections.length) return;
-    const seen = new Set();
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        seen.add(entry.target.id);
-        observer.unobserve(entry.target);
-      }
-      if (seen.size === sections.length) unlock("explorer");
-    }, { threshold: 0.25 });
-    sections.forEach((section) => observer.observe(section));
-  }
-
-  /* ---------- keyboard: level select (1–6) and the Konami code ---------- */
+  /* ---------- keyboard: 1–6 jump to a section, plus a hidden Konami code easter egg ---------- */
   const KONAMI = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
 
   function initKeys(voxel) {
@@ -705,25 +609,23 @@
       else progress = 0;
       if (progress === KONAMI.length) {
         progress = 0;
-        unlock("cheater");
         voxel?.celebrate();
         return;
       }
 
-      // 1–6: jump to that level (section), like the numbers in the "Lvl" labels
+      // 1–6: jump to that section, like the numbers above the section titles
       const level = Number(e.key);
       if (!Number.isInteger(level) || level < 1 || level > levels.length) return;
       const target = $(levels[level - 1].hash);
       if (!target) return;
       e.preventDefault();
       target.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
-      unlock("levelselect");
     });
   }
 
   // Thin bar under the top bar that fills up as you scroll
-  function initXpBar() {
-    const fill = $("#xp-fill");
+  function initScrollProgress() {
+    const fill = $("#progress-fill");
     if (!fill) return;
     let queued = false;
     const update = () => {
@@ -738,7 +640,7 @@
     update();
   }
 
-  // Section headings "scan in" once when they come into view
+  // Section headings fade in once when they come into view
   function initReveal() {
     if (reducedMotion || !("IntersectionObserver" in window)) return;
     const heads = document.querySelectorAll(".section-head");
@@ -747,8 +649,6 @@
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
         entry.target.classList.add("in");
-        // Drop the clip once the scan-in is done, so nothing inside (e.g. the cube figure) gets cut off
-        entry.target.addEventListener("animationend", () => entry.target.classList.add("done"), { once: true });
         observer.unobserve(entry.target);
       }
     }, { rootMargin: "0px 0px -10% 0px" });
@@ -1127,7 +1027,6 @@
   const smallScreen = window.matchMedia("(max-width: 720px)");
 
   function openPdf(src, title) {
-    unlock("bookworm");
     // Mobile browsers often can't render embedded PDFs, so use their own viewer instead.
     if (smallScreen.matches || !dialog?.showModal) {
       window.open(src, "_blank", "noopener");
@@ -1178,14 +1077,35 @@
   fillList($("#education-list"), education, "Nothing here yet.", renderEducation);
   setText("#contact-text", contact.text);
   $("#year").textContent = new Date().getFullYear();
-  renderAchievement();
-  initXpBar();
+  initScrollProgress();
   initReveal();
-  const voxel = initVoxel();
-  renderTrophies();
-  initTrophyHover();
-  initProgress();
-  initKeys(voxel);
+  initKeys(initVoxel());
+
+  /* ---------- mobile menu ---------- */
+  // Below 820px the section links live in a dropdown under the top bar. It closes when a link is
+  // picked, on a tap outside, on Escape, and when the screen gets wide enough for the inline nav.
+  function initMenu() {
+    const topbar = $(".topbar");
+    const toggle = $("#menu-toggle");
+    const nav = $("#nav");
+    if (!topbar || !toggle || !nav) return;
+    const isOpen = () => topbar.classList.contains("menu-open");
+    const setOpen = (open) => {
+      topbar.classList.toggle("menu-open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    };
+    toggle.addEventListener("click", () => setOpen(!isOpen()));
+    nav.addEventListener("click", (e) => { if (e.target.closest("a")) setOpen(false); });
+    document.addEventListener("click", (e) => { if (isOpen() && !topbar.contains(e.target)) setOpen(false); });
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape" || !isOpen()) return;
+      setOpen(false);
+      toggle.focus();
+    });
+    window.matchMedia("(min-width: 821px)").addEventListener("change", (e) => { if (e.matches) setOpen(false); });
+  }
+  initMenu();
 
   /* ---------- highlight the current section in the top bar ---------- */
   const navLinks = [...document.querySelectorAll("#nav a")];

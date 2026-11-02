@@ -12,16 +12,15 @@
   <meta name="twitter:card" content="summary">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&family=Silkscreen&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/devicon@2.16.0/devicon.min.css">
-  <link rel="stylesheet" href="styles.css?v=29">
+  <link rel="stylesheet" href="styles.css?v=33">
 </head>
 <body>
   <!-- All text content is rendered from data.js by script.js -->
   <header class="topbar">
     <div class="topbar-inner">
-      <!-- Status badge from PROFILE.status (links to the Contact section) -->
-      <a href="#contact" class="status-badge status-top" id="status-top"></a>
+      <a href="#top" class="brand" aria-label="Back to top"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name" id="brand-name"></span></a>
       <nav aria-label="Sections" id="nav">
         <a href="#projects">Projects</a>
         <a href="#research">Scientific work</a>
@@ -30,6 +29,10 @@
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
       </nav>
+      <!-- Small screens: the section links fold into a dropdown behind this button (script.js) -->
+      <button type="button" class="menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="nav" aria-label="Open menu">
+        <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
       <ul class="topbar-socials">
         <li><a class="chip chip-sm" data-profile="github" target="_blank" rel="noopener">GitHub</a></li>
         <li><a class="chip chip-sm" data-profile="linkedin" target="_blank" rel="noopener">LinkedIn</a></li>
@@ -37,13 +40,12 @@
       </ul>
     </div>
     <!-- Fills up as you scroll down the page -->
-    <div class="xp-bar" aria-hidden="true"><span id="xp-fill"></span></div>
+    <div class="scroll-progress" aria-hidden="true"><span id="progress-fill"></span></div>
   </header>
 
   <main id="top">
     <noscript>
       <div class="wrap noscript">
-        <p class="lvl">Player 01</p>
         <p>Pharell Jay Jeyakumar, Software Engineering student. This page needs JavaScript to load its content;
           you can also find my work on <a href="https://github.com/PharellJay">GitHub</a>.</p>
       </div>
@@ -51,14 +53,15 @@
     <section class="hero">
       <div class="wrap hero-inner">
         <div class="hero-main">
-          <p class="lvl">Player 01</p>
+          <!-- Status badge from PROFILE.status (links to the Contact section) -->
+          <a href="#contact" class="status-badge"></a>
           <h1 id="name"></h1>
           <p class="tagline" id="tagline"></p>
-          <!-- Stat strip: PROFILE.location, PROFILE.languages (and PROFILE.status on small screens) -->
+          <!-- PROFILE.location, PROFILE.languages -->
           <dl class="stats" id="hero-stats"></dl>
           <p class="intro" id="intro"></p>
           <div class="cta-row">
-            <a class="btn btn-primary btn-start" href="#projects"><span aria-hidden="true">▶</span> Press start</a>
+            <a class="btn btn-primary btn-start" href="#projects">View projects <span aria-hidden="true">↓</span></a>
             <!-- Links come from PROFILE in data.js; icons are added by script.js -->
             <ul class="chips">
               <li><a class="chip" data-profile="github" target="_blank" rel="noopener">GitHub</a></li>
@@ -67,11 +70,9 @@
               <li><a class="chip" data-profile="cv" target="_blank" rel="noopener">CV</a></li>
             </ul>
           </div>
-          <!-- "Achievement unlocked" toast from PROFILE.achievement -->
-          <div class="achievement" id="achievement" role="status" hidden></div>
         </div>
         <!-- Photo from PROFILE.photo (hidden if empty) -->
-        <figure class="hero-photo hud" id="hero-photo"></figure>
+        <figure class="hero-photo" id="hero-photo"></figure>
         <!-- Spot for the cube companion (script.js), used when there is no photo; data-cycle = shapes it rotates through -->
         <div class="voxel-slot" data-shape="controller" data-cycle="invader code heart" aria-hidden="true">
           <!-- Cube companion: script.js moves it into the .voxel-slot of the section you're in -->
@@ -82,9 +83,9 @@
 
     <section class="section" id="projects">
       <div class="wrap section-inner">
-        <div class="section-head"><p class="lvl">Lvl 01 · Quests</p><h2>Projects</h2><p class="section-meta" id="projects-meta"></p><div class="voxel-slot" data-shape="computer" aria-hidden="true"></div></div>
+        <div class="section-head"><p class="lvl">01</p><h2>Projects</h2><p class="section-meta" id="projects-meta"></p><div class="voxel-slot" data-shape="computer" aria-hidden="true"></div></div>
         <div class="projects-body">
-          <!-- PROJECTS entry with featured: true as a big card, highlight: true as cards below it, the rest as a compact list -->
+          <!-- PROJECTS entry with featured: true as a big panel, highlight: true as cards below it, the rest as a compact list -->
           <div id="projects-featured"></div>
           <div class="project-grid" id="projects-list"></div>
           <div class="other-projects" id="projects-other"></div>
@@ -96,39 +97,38 @@
 
     <section class="section" id="research">
       <div class="wrap section-inner">
-        <div class="section-head"><p class="lvl">Lvl 02 · Lore</p><h2>Scientific work</h2><p class="section-meta" id="papers-meta"></p><div class="voxel-slot" data-shape="paper" aria-hidden="true"></div></div>
+        <div class="section-head"><p class="lvl">02</p><h2>Scientific work</h2><p class="section-meta" id="papers-meta"></p><div class="voxel-slot" data-shape="paper" aria-hidden="true"></div></div>
         <div class="stack-list" id="papers-list"></div>
       </div>
     </section>
 
     <section class="section" id="stack">
       <div class="wrap section-inner">
-        <div class="section-head"><p class="lvl">Lvl 03 · Loadout</p><h2>Stack</h2><div class="voxel-slot" data-shape="toolbox" aria-hidden="true"></div></div>
+        <div class="section-head"><p class="lvl">03</p><h2>Stack</h2><div class="voxel-slot" data-shape="toolbox" aria-hidden="true"></div></div>
         <div class="loadout" id="stack-list"></div>
       </div>
     </section>
 
     <section class="section" id="education">
       <div class="wrap section-inner">
-        <div class="section-head"><p class="lvl">Lvl 04 · Skill tree</p><h2>Education</h2><div class="voxel-slot" data-shape="cap" aria-hidden="true"></div></div>
+        <div class="section-head"><p class="lvl">04</p><h2>Education</h2><div class="voxel-slot" data-shape="cap" aria-hidden="true"></div></div>
         <div class="stack-list" id="education-list"></div>
       </div>
     </section>
 
     <section class="section" id="about">
       <div class="wrap section-inner">
-        <div class="section-head"><p class="lvl">Lvl 05 · Player bio</p><h2>About</h2><div class="voxel-slot" data-shape="player" aria-hidden="true"></div></div>
+        <div class="section-head"><p class="lvl">05</p><h2>About</h2><div class="voxel-slot" data-shape="player" aria-hidden="true"></div></div>
         <div class="about-text" id="about-body"></div>
       </div>
     </section>
 
     <section class="section contact" id="contact">
       <div class="wrap section-inner">
-        <div class="section-head"><p class="lvl">Lvl 06 · Multiplayer</p><h2>Contact</h2><div class="voxel-slot" data-shape="envelope" aria-hidden="true"></div></div>
-        <!-- Final level: status badge (PROFILE.status), CONTACT.text as the headline, links -->
+        <div class="section-head"><p class="lvl">06</p><h2>Contact</h2><div class="voxel-slot" data-shape="envelope" aria-hidden="true"></div></div>
+        <!-- Status badge (PROFILE.status), CONTACT.text as the headline, links -->
         <div class="contact-panel">
-          <p class="quest-label">Final level</p>
-          <span class="status-badge contact-status"></span>
+          <span class="status-badge"></span>
           <p class="contact-text" id="contact-text"></p>
           <ul class="chips rule-top">
             <li><a class="chip" data-profile="email" data-show-value>Email</a></li>
@@ -143,15 +143,10 @@
 
   <footer class="footer">
     <div class="wrap footer-inner">
-      <p><span class="saved">✓ Game saved</span> © <span id="year"></span> <span id="footer-name"></span></p>
-      <div class="footer-hud">
-        <p class="level-hint">Press 1–6 for level select</p>
-        <!-- Achievements unlocked while exploring (script.js) -->
-        <details class="trophies" id="trophies"><summary></summary><ul></ul></details>
-      </div>
+      <p>© <span id="year"></span> <span id="footer-name"></span></p>
       <div class="footer-links">
         <a href="imprint.html">Imprint</a>
-        <a href="#top"><span aria-hidden="true">▲</span> Back to top</a>
+        <a href="#top">Back to top <span aria-hidden="true">↑</span></a>
       </div>
     </div>
   </footer>
@@ -169,7 +164,7 @@
   </dialog>
 
   <!-- Bump the ?v= numbers after editing a file so browsers load the new version instead of a cached one -->
-  <script src="data.js?v=28"></script>
-  <script src="script.js?v=27"></script>
+  <script src="data.js?v=29"></script>
+  <script src="script.js?v=31"></script>
 </body>
 </html>

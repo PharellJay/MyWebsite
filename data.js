@@ -10,11 +10,10 @@
  *   name, tagline   shown at the top of the page
  *   intro           short sentence under the header
  *   location, languages   small line under the tagline ("" to hide)
- *   status          badge at the top left of the navigation bar, e.g. what you're looking for ("" to hide)
- *   achievement     "Achievement unlocked" pop-up at the top of the page ("" to hide)
+ *   status          badge above your name and in Contact, e.g. what you're looking for ("" to hide)
  *   photo           e.g. "assets/photo.jpg", shown next to your name ("" to hide)
  *   github, linkedin, email   used at the top and in the Contact section
- *   githubStats     true = "Activity log" card under the projects with live GitHub stats
+ *   githubStats     true = "GitHub activity" block under the projects with live GitHub stats
  *                   and a contribution graph for the github account above (false to hide)
  *   cv              path to your CV PDF, e.g. "papers/cv.pdf"; adds a "CV" button at the top and in Contact ("" to hide)
  */
@@ -25,7 +24,6 @@ const PROFILE = {
   location: "Heilbronn, Germany",
   languages: "German, English",
   status: "Open to internships & working student roles",
-  achievement: "16,000+ players protected by my anticheat",
   photo: "",
   github: "https://github.com/PharellJay",
   githubStats: true,
@@ -41,12 +39,12 @@ const PROFILE = {
  *   tech         list of technologies
  *   repo         link to the GitHub repository (the title links there)
  *   demo         optional link to a live version ("" to hide)
- *   featured     true = the big "main quest" card above the others (use it for one project)
- *   highlight    true = shown as a large card under the main quest; projects without it are listed
+ *   featured     true = the big "Featured" panel above the others (use it for one project)
+ *   highlight    true = shown as a large row under the featured one; projects without it are listed
  *                compactly under "Other projects"
- *   stat         featured card only: highlighted number, e.g. { value: "16,000+", label: "registered players" }
- *   status       featured card only: small badge text, e.g. "Live" or "Discontinued"
- *   continued    featured card only: false = the status badge is grey (archived), otherwise green
+ *   stat         featured project only: highlighted number, e.g. { value: "16,000+", label: "registered players" }
+ *   status       featured project only: small badge text, e.g. "Live" or "Discontinued"
+ *   continued    featured project only: false = the status badge is grey (archived), otherwise green
  */
 const PROJECTS = [
   {
@@ -69,17 +67,18 @@ const PROJECTS = [
     highlight: true,
   },
   {
-    title: "Decentralised VPN",
-    description: "A peer-to-peer VPN with no central server. Traffic is routed through two encrypted hops (a relay, then another peer's exit), so no single peer sees both who you are and where you're going. To use the network you also lend your own IP as an exit. A terminal dashboard handles connecting, latency-based exit selection and a kill switch that blocks traffic instead of leaking it when the tunnel drops.",
-    tech: ["Rust", "libp2p", "Noise Protocol", "Tokio", "Ratatui"],
-    repo: "https://github.com/PharellJay/DecentralisedVPN",
-    demo: "",
-  },
-  {
     title: "ChessML",
     description: "A chess engine that learns purely by playing against itself, AlphaZero-style, sized to train on a CPU-only machine. A residual policy/value network guides Monte Carlo tree search, and a local web interface lets you control training, watch losses and live self-play games, and play against any checkpoint.",
     tech: ["Python", "PyTorch", "FastAPI", "JavaScript"],
     repo: "https://github.com/PharellJay/ChessML",
+    demo: "",
+    highlight: true,
+  },
+  {
+    title: "Decentralised VPN",
+    description: "A peer-to-peer VPN with no central server. Traffic is routed through two encrypted hops (a relay, then another peer's exit), so no single peer sees both who you are and where you're going. To use the network you also lend your own IP as an exit. A terminal dashboard handles connecting, latency-based exit selection and a kill switch that blocks traffic instead of leaking it when the tunnel drops.",
+    tech: ["Rust", "libp2p", "Noise Protocol", "Tokio", "Ratatui"],
+    repo: "https://github.com/PharellJay/DecentralisedVPN",
     demo: "",
   },
   {
