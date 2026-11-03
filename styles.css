@@ -658,8 +658,12 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
     rotate(var(--jr, 0deg)) scale(var(--s, 1)) scale(var(--js, 1));
   transition: transform .6s cubic-bezier(.2, .9, .3, 1.2) var(--d, 0ms);
 }
-/* hover: every cube shifts a bit (away from the middle) and settles back on mouse leave */
-.voxel.shift .vox { --jx: var(--rx); --jy: var(--ry); --jr: var(--rr); transition-duration: .35s; transition-delay: 0s; }
+/* hover: the figure blows apart into its cubes (they fly out spinning and shrink a little, each on
+   its own path) and snaps back together, cube by cube, on mouse leave */
+.voxel.burst .vox {
+  --jx: var(--hx); --jy: var(--hy); --jr: var(--hr); --js: var(--hs);
+  transition: transform .6s cubic-bezier(.1, .75, .25, 1) calc(var(--d, 0ms) * .25);
+}
 .voxel.scatter .vox {
   --jx: var(--ex); --jy: var(--ey); --jr: var(--er); --js: .35;
   transition: transform .3s cubic-bezier(.5, 0, .9, .6);
@@ -884,5 +888,5 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   * { transition: none !important; animation: none !important; }
-  .voxel.shift .vox { --jx: 0px; --jy: 0px; --jr: 0deg; }
+  .voxel.burst .vox { --jx: 0px; --jy: 0px; --jr: 0deg; --js: 1; }
 }

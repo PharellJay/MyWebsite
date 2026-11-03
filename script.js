@@ -745,7 +745,7 @@
   /* ---------- cube companion ---------- */
   // A pixel figure made of small cubes. It sits in the .voxel-slot of the section you're in
   // (hero: controller, Projects: computer, ...); when you scroll on it fades out and fades back in
-  // at the next slot as that slot's shape. Hovering nudges the cubes apart a little.
+  // at the next slot as that slot's shape. Hovering blows it apart into its cubes (a tap on touch screens).
   const VOXEL_COLS = 20;
   const VOXEL_ROWS = 14;
   const VOXEL_PITCH = 12; // px per cube (11px cube + 1px gap), before scaling to the slot
@@ -909,8 +909,8 @@
     ],
   };
 
-  // Grid → list of cubes { x, y, color, rx, ry, rr, ex, ey, er }
-  // (rx/ry/rr: hover nudge away from the center; ex/ey/er: where it flies when the shape breaks apart)
+  // Grid → list of cubes { x, y, color, hx, hy, hr, hs, ex, ey, er }
+  // (hx/hy/hr/hs: where it flies when hovered; ex/ey/er: where it flies when the shape changes)
   function voxelCells(rows) {
     const cells = [];
     rows.forEach((row, r) => [...row].forEach((ch, c) => { if (ch !== ".") cells.push({ r, c, ch }); }));
@@ -922,11 +922,16 @@
     return cells.map(({ r, c, ch }) => {
       const dx = (c + offC - mid(VOXEL_COLS)) / mid(VOXEL_COLS);
       const dy = (r + offR - mid(VOXEL_ROWS)) / mid(VOXEL_ROWS);
-      const jitter = () => (Math.random() - 0.5) * 3;
       const burst = 30 + Math.random() * 40;
+      // Hover: away from the middle (cubes near the middle pick a random direction), outer cubes
+      // further, plus a little drop as if they fall while flying
+      const spread = Math.hypot(dx, dy);
+      const angle = (spread < 0.15 ? Math.random() * Math.PI * 2 : Math.atan2(dy, dx)) + (Math.random() - 0.5) * 1.1;
+      const dist = 30 + spread * 50 + Math.random() * 45;
       return {
         x: (c + offC) * VOXEL_PITCH, y: (r + offR) * VOXEL_PITCH, color: VOXEL_COLORS[ch],
-        rx: dx * 14 + jitter() * 2, ry: dy * 14 + jitter() * 2, rr: (Math.random() - 0.5) * 60,
+        hx: Math.cos(angle) * dist, hy: Math.sin(angle) * dist * 0.8 + 8 + Math.random() * 18,
+        hr: (Math.random() - 0.5) * 540, hs: 0.45 + Math.random() * 0.4,
         ex: (dx + Math.random() - 0.5) * burst, ey: (dy + Math.random() - 0.5) * burst, er: (Math.random() - 0.5) * 240,
       };
     });
@@ -963,13 +968,14 @@
       shape = name;
       const cells = shapes[name];
       cubes.forEach((cube, i) => {
-        const cell = cells[i] || { x: (VOXEL_COLS / 2) * VOXEL_PITCH, y: (VOXEL_ROWS / 2) * VOXEL_PITCH, rx: 0, ry: 0, rr: 0, ex: 0, ey: 0, er: 0 };
+        const cell = cells[i] || { x: (VOXEL_COLS / 2) * VOXEL_PITCH, y: (VOXEL_ROWS / 2) * VOXEL_PITCH, hx: 0, hy: 0, hr: 0, hs: 1, ex: 0, ey: 0, er: 0 };
         const s = cube.style;
         s.setProperty("--x", `${cell.x}px`);
         s.setProperty("--y", `${cell.y}px`);
-        s.setProperty("--rx", `${cell.rx.toFixed(1)}px`);
-        s.setProperty("--ry", `${cell.ry.toFixed(1)}px`);
-        s.setProperty("--rr", `${cell.rr.toFixed(1)}deg`);
+        s.setProperty("--hx", `${cell.hx.toFixed(1)}px`);
+        s.setProperty("--hy", `${cell.hy.toFixed(1)}px`);
+        s.setProperty("--hr", `${cell.hr.toFixed(0)}deg`);
+        s.setProperty("--hs", cell.hs.toFixed(2));
         s.setProperty("--ex", `${cell.ex.toFixed(1)}px`);
         s.setProperty("--ey", `${cell.ey.toFixed(1)}px`);
         s.setProperty("--er", `${cell.er.toFixed(1)}deg`);
@@ -1029,7 +1035,7 @@
       apply();
       mount(); // moves to the new slot while invisible
       void box.offsetWidth; // apply the jump before the cube transitions come back
-      box.classList.remove("instant", "fading", "scatter");
+      box.classList.remove("instant", "fading", "scatter", "burst"); // arrives in one piece
       busy = false;
     }
 
@@ -1043,7 +1049,7 @@
       if (names.length < 2 || reducedMotion) return;
       let index = 0;
       cycleTimer = setInterval(() => {
-        if (busy || celebrating || offscreen || document.hidden || box.classList.contains("shift") || performance.now() - lastScroll < 600) return;
+        if (busy || celebrating || offscreen || document.hidden || box.classList.contains("burst") || performance.now() - lastScroll < 600) return;
         index = (index + 1) % names.length;
         transition(() => setShape(names[index]));
       }, 4000);
@@ -1102,9 +1108,17 @@
       }), 3000);
     }
 
-    // Mouse only: on touch screens a tap would leave the cubes stuck in the shifted state
-    box.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") box.classList.add("shift"); });
-    box.addEventListener("pointerleave", () => box.classList.remove("shift"));
+    // Mouse: blown apart while hovered, back together on leave.
+    // Touch (no hover): a tap blows it apart and it comes back together by itself.
+    let tapTimer = 0;
+    box.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse" && !busy) box.classList.add("burst"); });
+    box.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") box.classList.remove("burst"); });
+    box.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "mouse" || busy) return;
+      clearTimeout(tapTimer);
+      box.classList.add("burst");
+      tapTimer = setTimeout(() => box.classList.remove("burst"), 1100);
+    });
 
     // The hero cycle pauses while the figure is off screen (on phones it stays in the hero the whole
     // time, so it would otherwise keep animating while you read further down)
