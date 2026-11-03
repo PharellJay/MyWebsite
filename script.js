@@ -927,11 +927,11 @@
       // further, plus a little drop as if they fall while flying
       const spread = Math.hypot(dx, dy);
       const angle = (spread < 0.15 ? Math.random() * Math.PI * 2 : Math.atan2(dy, dx)) + (Math.random() - 0.5) * 1.1;
-      const dist = 30 + spread * 50 + Math.random() * 45;
+      const dist = 12 + spread * 22 + Math.random() * 16;
       return {
         x: (c + offC) * VOXEL_PITCH, y: (r + offR) * VOXEL_PITCH, color: VOXEL_COLORS[ch],
-        hx: Math.cos(angle) * dist, hy: Math.sin(angle) * dist * 0.8 + 8 + Math.random() * 18,
-        hr: (Math.random() - 0.5) * 540, hs: 0.45 + Math.random() * 0.4,
+        hx: Math.cos(angle) * dist, hy: Math.sin(angle) * dist * 0.8 + 4 + Math.random() * 6,
+        hr: (Math.random() - 0.5) * 300, hs: 0.6 + Math.random() * 0.3,
         ex: (dx + Math.random() - 0.5) * burst, ey: (dy + Math.random() - 0.5) * burst, er: (Math.random() - 0.5) * 240,
       };
     });
