@@ -17,6 +17,10 @@
     return node;
   }
 
+  // Touch screens (no hover): cards aren't one big link there, so a tap meant to scroll or to read
+  // doesn't send the visitor off to GitHub; only the titles and buttons are links
+  const touchScreen = window.matchMedia("(hover: none)");
+
   const externalLink = (href, text) => el("a", { href, target: "_blank", rel: "noopener" }, text);
   const emptyMessage = (text) => el("p", { class: "empty" }, text);
 
@@ -195,9 +199,12 @@
       projectLinks(p),
     ];
     $("#details-body").replaceChildren(...parts.filter(Boolean));
+    detailsDialog.style.transform = "";
     detailsDialog.showModal();
     $("#details-body").scrollTop = 0;
     document.body.classList.add("no-scroll");
+    // A history entry, so the phone's back button / back swipe closes the window instead of leaving the page
+    history.pushState({ details: true }, "");
   }
 
   if (detailsDialog) {
@@ -205,7 +212,39 @@
     detailsDialog.addEventListener("click", (e) => {
       if (e.target === detailsDialog) detailsDialog.close();
     });
-    detailsDialog.addEventListener("close", () => document.body.classList.remove("no-scroll"));
+    detailsDialog.addEventListener("close", () => {
+      document.body.classList.remove("no-scroll");
+      if (history.state?.details) history.back(); // closed with the button: drop the extra history entry
+    });
+    window.addEventListener("popstate", () => { if (detailsDialog.open) detailsDialog.close(); });
+    initSheetDrag(detailsDialog, $(".details-header"));
+  }
+
+  // Phones show the details window as a bottom sheet: dragging its header down closes it
+  function initSheetDrag(sheet, handle) {
+    const phone = window.matchMedia("(max-width: 720px)");
+    let startY = null, dy = 0;
+    handle.addEventListener("pointerdown", (e) => {
+      if (!phone.matches || e.target.closest("button")) return;
+      startY = e.clientY;
+      dy = 0;
+      sheet.classList.add("dragging");
+      handle.setPointerCapture(e.pointerId);
+    });
+    handle.addEventListener("pointermove", (e) => {
+      if (startY === null) return;
+      dy = Math.max(0, e.clientY - startY);
+      sheet.style.transform = `translateY(${dy}px)`;
+    });
+    const end = () => {
+      if (startY === null) return;
+      startY = null;
+      sheet.classList.remove("dragging");
+      if (dy > 90) sheet.close();
+      else sheet.style.transform = "";
+    };
+    handle.addEventListener("pointerup", end);
+    handle.addEventListener("pointercancel", end);
   }
 
   // Featured project content: label + status badge and tech over a hairline, then title, description
@@ -217,6 +256,8 @@
         p.tech?.length ? el("ul", { class: "project-tech" }, ...p.tech.map(stackItem)) : null),
       el("h3", {}, p.repo ? externalLink(p.repo, p.title) : p.title),
       p.description ? el("p", {}, p.description) : null,
+      // Phones: the tech moves out of the crowded header into pills under the description (CSS)
+      p.tech?.length ? el("ul", { class: "tech-pills featured-pills", "aria-label": "Technologies" }, ...p.tech.map(techPill)) : null,
       projectActions(p),
     ];
   }
@@ -461,10 +502,11 @@
     );
 
     // Clicking anywhere on the card does the same as "Read paper"
-    // (except on the buttons themselves, or when the visitor is selecting text)
+    // (except on the buttons themselves, when the visitor is selecting text, and on touch screens,
+    // where a tap on the text would otherwise open the PDF in a new tab)
     if (p.pdf) {
       card.addEventListener("click", (e) => {
-        if (e.target.closest("a, button")) return;
+        if (touchScreen.matches || e.target.closest("a, button")) return;
         if (window.getSelection()?.toString()) return;
         openPdf(p.pdf, p.title);
       });
@@ -1006,14 +1048,14 @@
     // Slots with data-cycle (the hero) rotate through their shapes every 4 seconds, paused while
     // hovered, while the tab is in the background and while you scroll (so it doesn't start a
     // change right before a section switch)
-    let cycleTimer = 0, lastScroll = 0;
+    let cycleTimer = 0, lastScroll = 0, offscreen = false;
     function startCycle(slot) {
       clearInterval(cycleTimer);
       const names = slot ? [slot.dataset.shape, ...(slot.dataset.cycle || "").split(/\s+/).filter((n) => shapes[n])] : [];
       if (names.length < 2 || reducedMotion) return;
       let index = 0;
       cycleTimer = setInterval(() => {
-        if (busy || celebrating || document.hidden || box.classList.contains("shift") || performance.now() - lastScroll < 600) return;
+        if (busy || celebrating || offscreen || document.hidden || box.classList.contains("shift") || performance.now() - lastScroll < 600) return;
         index = (index + 1) % names.length;
         transition(() => setShape(names[index]));
       }, 4000);
@@ -1072,8 +1114,15 @@
       }), 3000);
     }
 
-    box.addEventListener("mouseenter", () => box.classList.add("shift"));
-    box.addEventListener("mouseleave", () => box.classList.remove("shift"));
+    // Mouse only: on touch screens a tap would leave the cubes stuck in the shifted state
+    box.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") box.classList.add("shift"); });
+    box.addEventListener("pointerleave", () => box.classList.remove("shift"));
+
+    // The hero cycle pauses while the figure is off screen (on phones it stays in the hero the whole
+    // time, so it would otherwise keep animating while you read further down)
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(([entry]) => { offscreen = !entry.isIntersecting; }).observe(box);
+    }
     update();
     return { celebrate };
   }
@@ -1153,6 +1202,9 @@
       toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
     };
     toggle.addEventListener("click", () => setOpen(!isOpen()));
+    // The dimmed backdrop under the open menu belongs to the top bar (::after), so a tap on it lands
+    // here and only closes the menu, instead of also hitting a link behind it
+    topbar.addEventListener("click", (e) => { if (e.target === topbar && isOpen()) setOpen(false); });
     nav.addEventListener("click", (e) => { if (e.target.closest("a")) setOpen(false); });
     document.addEventListener("click", (e) => { if (isOpen() && !topbar.contains(e.target)) setOpen(false); });
     document.addEventListener("keydown", (e) => {
