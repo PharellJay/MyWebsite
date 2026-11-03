@@ -256,7 +256,7 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 
 /* highlighted projects: tech as small pills under the description; the logos turn to their
    brand colors while the project is hovered */
-.tech-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.tech-pills { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; } /* above the title link, so each logo has its own hover */
 .tech-pill {
   display: inline-flex; align-items: center; gap: 7px;
   height: 28px; padding: 0 11px 0 9px;
@@ -354,32 +354,63 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 /* Buttons sit above the card-wide title link so they stay clickable on their own */
 .project-actions { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
 
-/* GitHub activity under the projects: stat row + contribution graph */
-.gh-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 16px; }
-.gh-link { font: .8rem/1.4 var(--mono); color: var(--muted); transition: color .15s; }
-.gh-link:hover { color: var(--accent-hover); }
-.gh-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 24px; margin-top: 22px; }
-.gh-stat dt { font: 500 .7rem/1.4 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
-.gh-stat dd { margin-top: 6px; font: 600 1.625rem/1 var(--font); letter-spacing: -0.02em; color: var(--text); }
-.gh-stat-main dd { color: var(--xp); }
-.gh-graph {
-  margin-top: 22px; overflow-x: auto;
-  scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent;
+/* GitHub profile card under the projects: avatar + name, stats, language bar; the whole card is a link */
+.gh-card {
+  display: block; padding: 24px 28px 26px;
+  background: radial-gradient(420px 200px at 100% 0%, rgb(var(--accent-rgb) / 0.07), transparent 70%), var(--surface);
+  border: 1px solid var(--line); border-radius: 12px;
+  transition: border-color .2s, background-color .2s;
 }
-.gh-graph:empty { min-height: 110px; background: repeating-linear-gradient(90deg, var(--line) 0 11px, transparent 11px 14px); opacity: .35; }
-.gh-graph svg { display: block; width: 100%; min-width: 640px; height: auto; }
-.gh-month { font: 9px var(--mono); fill: var(--muted); }
-/* intensity levels: empty square → full purple */
-.gh-day { fill: var(--line); transition: stroke .1s; }
-.gh-card .lv1 { fill: rgb(var(--accent-rgb) / 0.3); background: rgb(var(--accent-rgb) / 0.3); }
-.gh-card .lv2 { fill: rgb(var(--accent-rgb) / 0.55); background: rgb(var(--accent-rgb) / 0.55); }
-.gh-card .lv3 { fill: rgb(var(--accent-rgb) / 0.8); background: rgb(var(--accent-rgb) / 0.8); }
-.gh-card .lv4 { fill: var(--accent-hover); background: var(--accent-hover); }
-.gh-day:hover { stroke: var(--text); stroke-width: 1.5; }
-.gh-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 20px; margin-top: 14px; }
-.gh-readout { font: .8rem/1.5 var(--mono); color: var(--text-2); }
-.gh-legend { display: flex; align-items: center; gap: 4px; font: .7rem/1 var(--mono); color: var(--muted); }
-.gh-legend span { width: 11px; height: 11px; background: var(--line); }
+.gh-card:hover { border-color: var(--line-strong); }
+.gh-id { display: flex; align-items: center; gap: 16px; }
+.gh-avatar-wrap { position: relative; flex: none; width: 56px; height: 56px; border-radius: 10px; background: var(--line); }
+.gh-avatar { display: block; width: 100%; height: 100%; border-radius: 10px; object-fit: cover; }
+/* small GitHub mark in the corner of the avatar */
+.gh-badge {
+  position: absolute; right: -6px; bottom: -6px;
+  display: grid; place-items: center; width: 24px; height: 24px;
+  border: 1px solid var(--line-strong); border-radius: 7px;
+  background: var(--bg); color: var(--text);
+}
+.gh-badge .icon, .gh-badge svg { display: block; width: 13px; height: 13px; }
+.gh-who { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.gh-name { font: 600 1.125rem/1.25 var(--font); letter-spacing: -0.015em; transition: color .15s; }
+.gh-handle { font: .8rem/1.4 var(--mono); color: var(--muted); }
+.gh-card:hover .gh-name { color: var(--accent-hover); }
+.gh-cta {
+  display: inline-flex; align-items: center; gap: 8px; margin-left: auto; flex: none;
+  height: 34px; padding: 0 14px;
+  border: 1px solid var(--line-strong); border-radius: var(--radius);
+  font: 500 .8125rem/1 var(--font); color: var(--text-2);
+  transition: color .15s, border-color .15s, background-color .15s;
+}
+.gh-arrow { transition: transform .15s; }
+.gh-card:hover .gh-cta { color: var(--text); border-color: #43434c; background: var(--surface-hover); }
+.gh-card:hover .gh-arrow { transform: translate(2px, -2px); }
+
+.gh-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 24px;
+  margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line);
+}
+.gh-stat dt { font: 500 .7rem/1.4 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.gh-stat dd { margin-top: 6px; font: 600 1.375rem/1.1 var(--font); letter-spacing: -0.02em; color: var(--text); }
+.gh-stat:nth-child(2) dd { color: var(--xp); }
+/* loading: values fade in once the live data is there */
+.gh-card:not(.is-live) .gh-stat dd { color: var(--line-strong); }
+
+.gh-langs { margin-top: 22px; }
+/* language split as a row of square-cornered blocks with a 2px gap, in the pixel style of the page */
+.gh-bar { display: flex; gap: 2px; height: 8px; margin-top: 10px; }
+.gh-bar span { flex: 1 1 0; min-width: 4px; background: var(--lang); transform-origin: left; animation: gh-grow .7s cubic-bezier(.2, .8, .2, 1) backwards; }
+.gh-bar span:nth-child(2) { animation-delay: .06s; }
+.gh-bar span:nth-child(3) { animation-delay: .12s; }
+.gh-bar span:nth-child(4) { animation-delay: .18s; }
+.gh-bar span:nth-child(5) { animation-delay: .24s; }
+@keyframes gh-grow { from { transform: scaleX(0); } }
+.gh-legend { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 12px; font-size: .85rem; color: var(--text-2); }
+.gh-legend li { display: inline-flex; align-items: center; gap: 8px; }
+.gh-swatch { width: 8px; height: 8px; background: var(--lang); }
+.gh-pct { font: .75rem/1 var(--mono); color: var(--muted); }
 
 /* ---------- papers ---------- */
 .stack-list { display: grid; gap: 16px; }
@@ -447,6 +478,15 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 .stack-item:hover { color: var(--text); transform: translateX(4px); }
 .stack-item:hover .stack-logo { color: var(--accent); }
 .stack-item:hover .stack-logo i, .stack-item:hover .stack-logo .logo { color: var(--brand); }
+/* hover: the logo shatters into square shards that burst out and snap back (script.js);
+   each shard is a copy of the logo clipped to one grid cell, laid over the hidden original */
+.stack-logo { position: relative; }
+.stack-logo.shattering > :not(.shard) { visibility: hidden; }
+.shard {
+  position: absolute; inset: 0;
+  display: flex; justify-content: center; align-items: center; gap: 2px;
+  pointer-events: none; will-change: transform;
+}
 
 /* ---------- education ---------- */
 /* timeline: round nodes on a vertical line */
@@ -745,11 +785,15 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
   .other-toggle { padding: 14px; }
   .other-preview { display: none; }
 
-  /* GitHub activity */
-  .gh-head { flex-direction: column; gap: 6px; }
-  .gh-stats { grid-template-columns: repeat(2, 1fr); }
-  .gh-stat dd { font-size: 1.35rem; }
-  .gh-graph { margin-right: -20px; padding-right: 20px; }
+  /* GitHub card: the "View profile" button becomes just the arrow, stats in two columns */
+  .gh-card { padding: 20px 18px 22px; }
+  .gh-id { gap: 14px; }
+  .gh-avatar-wrap { width: 48px; height: 48px; }
+  .gh-name { font-size: 1.05rem; }
+  .gh-cta { width: 34px; padding: 0; justify-content: center; }
+  .gh-cta-text { display: none; }
+  .gh-stats { grid-template-columns: repeat(2, 1fr); gap: 18px 16px; }
+  .gh-stat dd { font-size: 1.25rem; }
 
   /* papers: buttons share the row */
   .paper h3 { font-size: 1.25rem; }
@@ -807,7 +851,10 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
   .btn, .chip, .other-toggle, .status-badge { transition: transform .1s, background-color .1s, border-color .1s; }
   .btn:active, .chip:active, .other-toggle:active, a.status-badge:active { transform: scale(.97); background-color: var(--surface-hover); }
   .btn-primary:active, .contact .chip[data-profile="email"]:active { background-color: var(--accent-hover); }
-  .project h3 a:active, .side-quest h3 a:active, .about-link:active, .gh-link:active { color: var(--accent-hover); }
+  .project h3 a:active, .side-quest h3 a:active, .about-link:active { color: var(--accent-hover); }
+  .gh-card:hover { border-color: var(--line); }
+  .gh-card:hover .gh-name { color: inherit; }
+  .gh-card:active { border-color: var(--line-strong); background-color: var(--surface-hover); }
 }
 
 @media (prefers-reduced-motion: reduce) {

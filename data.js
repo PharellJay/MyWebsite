@@ -13,8 +13,8 @@
  *   status          badge above your name and in Contact, e.g. what you're looking for ("" to hide)
  *   photo           e.g. "assets/photo.jpg", shown next to your name ("" to hide)
  *   github, linkedin, email   used at the top and in the Contact section
- *   githubStats     true = "GitHub activity" block under the projects with live GitHub stats
- *                   and a contribution graph for the github account above (false to hide)
+ *   githubStats     true = GitHub profile card under the projects (avatar, name, live stats and
+ *                   languages for the github account above; links to the profile) (false to hide)
  *   cv              path to your CV PDF, e.g. "papers/cv.pdf"; adds a "CV" button at the top and in Contact ("" to hide)
  */
 const PROFILE = {
@@ -149,7 +149,8 @@ const PROJECTS = [
     highlights: [
       "Content and logic fully separated: data.js holds the text, script.js renders every section",
       "A cube companion made of small voxels that follows you through the sections and morphs into a new shape for each one",
-      "Live GitHub stats and a contribution graph, cached in the browser to stay within the API's rate limit",
+      "Tech logos that shatter into pixel shards on hover and snap back together in their brand color",
+      "A live GitHub profile card with stats and a language breakdown, cached in the browser to stay within the API's rate limit",
       "Responsive down to small phones, with a fold-out menu, touch-sized buttons and reduced-motion support",
       "Built-in PDF viewer for papers and detail windows for projects, using the native <dialog> element",
     ],

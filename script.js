@@ -333,21 +333,17 @@
     );
   }
 
-  /* ---------- GitHub activity ---------- */
-  // Block under the projects: repos, stars, followers and contributions of the last 12 months, plus a
-  // contribution graph. Data comes live from the GitHub API and github-contributions-api.jogruber.de
+  /* ---------- GitHub profile card ---------- */
+  // Compact card under the projects: avatar, name and a few stats, the whole card links to the profile.
+  // Data comes live from the GitHub API (+ github-contributions-api.jogruber.de for the yearly count)
   // and is cached in the browser for a few hours (the GitHub API allows 60 requests per hour without a token).
-  const GH_CACHE_KEY = "gh-activity-v1";
+  const GH_CACHE_KEY = "gh-profile-v2";
   const GH_CACHE_MS = 6 * 60 * 60 * 1000;
-  const SVG_NS = "http://www.w3.org/2000/svg";
+  // Colors for the language bar: the Stack logo colors where there is one, else GitHub's own
+  const LANG_COLORS = { Rust: "#dea584", TypeScript: "#3178c6", Go: "#00add8", Shell: "#89e051", Kotlin: "#a97bff", "C#": "#178600" };
+  const langColor = (name) => STACK_ICONS[name]?.colors?.[0] || LANG_COLORS[name] || "var(--muted)";
 
-  function svgEl(tag, attrs = {}) {
-    const node = document.createElementNS(SVG_NS, tag);
-    for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
-    return node;
-  }
-
-  async function fetchGithubStats(user) {
+  async function fetchGithubProfile(user) {
     try {
       const cached = JSON.parse(localStorage.getItem(GH_CACHE_KEY));
       if (cached?.user === user && Date.now() - cached.ts < GH_CACHE_MS) return cached.data;
@@ -356,17 +352,28 @@
     const json = (res) => (res.ok ? res.json() : null);
     const [userData, repos, contrib] = await Promise.all([
       fetch(`https://api.github.com/users/${user}`).then(json).catch(() => null),
-      fetch(`https://api.github.com/users/${user}/repos?per_page=100`).then(json).catch(() => null),
+      fetch(`https://api.github.com/users/${user}/repos?per_page=100&sort=pushed`).then(json).catch(() => null),
       fetch(`https://github-contributions-api.jogruber.de/v4/${user}?y=last`).then(json).catch(() => null),
     ]);
-    if (!userData && !contrib) return null;
+    if (!userData && !repos && !contrib) return null;
+
+    // Languages: share of (own, non-fork) repositories per main language
+    const own = Array.isArray(repos) ? repos.filter((r) => !r.fork) : [];
+    const langCount = {};
+    for (const r of own) if (r.language) langCount[r.language] = (langCount[r.language] || 0) + 1;
+    const langTotal = Object.values(langCount).reduce((a, b) => a + b, 0);
+    const languages = Object.entries(langCount)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, n]) => ({ name, share: n / langTotal }));
+    const lastPush = own.map((r) => r.pushed_at).filter(Boolean).sort().pop() || null;
 
     const data = {
-      repos: userData?.public_repos ?? null,
-      followers: userData?.followers ?? null,
-      stars: Array.isArray(repos) ? repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0) : null,
+      name: userData?.name || null,
+      repos: userData?.public_repos ?? (own.length || null),
+      since: userData?.created_at ? new Date(userData.created_at).getFullYear() : null,
       contributions: contrib?.total?.lastYear ?? null,
-      days: contrib?.contributions ?? null,
+      lastPush,
+      languages,
     };
     try {
       localStorage.setItem(GH_CACHE_KEY, JSON.stringify({ user, ts: Date.now(), data }));
@@ -374,105 +381,86 @@
     return data;
   }
 
-  const formatDay = (date) =>
-    new Date(`${date}T00:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-
-  // One square per day, weeks as columns (like on GitHub); month names above the first week of each month
-  function contributionGraph(days, readout, idleText) {
-    const cell = 11, gap = 3, step = cell + gap, top = 16;
-    const offset = new Date(`${days[0].date}T00:00:00`).getDay();
-    const weeks = Math.ceil((offset + days.length) / 7);
-    const svg = svgEl("svg", { viewBox: `0 0 ${weeks * step - gap} ${top + 7 * step - gap}`, "aria-hidden": "true" });
-
-    let lastMonth = null, lastLabelWeek = -Infinity;
-    days.forEach((day, i) => {
-      const slot = offset + i;
-      const week = Math.floor(slot / 7);
-      const date = new Date(`${day.date}T00:00:00`);
-      // Label each month at the first week column it shows up in (skipped if it would overlap a label)
-      if ((i === 0 || slot % 7 === 0) && date.getMonth() !== lastMonth) {
-        lastMonth = date.getMonth();
-        if (week - lastLabelWeek >= 3 && week < weeks - 2) {
-          const label = svgEl("text", { x: week * step, y: 9, class: "gh-month" });
-          label.textContent = date.toLocaleDateString("en-US", { month: "short" });
-          svg.append(label);
-          lastLabelWeek = week;
-        }
-      }
-      const rect = svgEl("rect", {
-        x: week * step, y: top + (slot % 7) * step, width: cell, height: cell,
-        class: `gh-day lv${Math.min(4, Math.max(0, day.level || 0))}`,
-      });
-      rect.dataset.info = `${count(day.count, "contribution")} on ${formatDay(day.date)}`;
-      svg.append(rect);
-    });
-
-    // Hovering a day shows its count in the line under the graph
-    svg.addEventListener("pointerover", (e) => {
-      if (e.target.dataset?.info) readout.textContent = e.target.dataset.info;
-    });
-    svg.addEventListener("pointerleave", () => { readout.textContent = idleText; });
-    return svg;
+  // "today", "yesterday", "3 days ago", "2 weeks ago", ...
+  function timeAgo(iso) {
+    const days = Math.round((Date.now() - new Date(iso)) / 86400000);
+    const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+    if (days < 7) return rtf.format(-days, "day");
+    if (days < 60) return rtf.format(-Math.round(days / 7), "week");
+    if (days < 730) return rtf.format(-Math.round(days / 30), "month");
+    return rtf.format(-Math.round(days / 365), "year");
   }
 
-  function renderGithubActivity() {
-    const box = $("#github-activity");
+  function renderGithubCard() {
+    const box = $("#github-card");
     const user = profile.github?.match(/github\.com\/([^/?#]+)/)?.[1];
     if (!box || !user || profile.githubStats === false) {
       box?.remove();
       return;
     }
 
-    const stat = (label, cls = "") => {
+    const stat = (label) => {
       const value = el("dd", {}, "—");
-      return [el("div", { class: `gh-stat ${cls}` }, el("dt", {}, label), value), value];
+      return [el("div", { class: "gh-stat" }, el("dt", {}, label), value), value];
     };
-    const [contribRow, contribValue] = stat("Contributions", "gh-stat-main");
-    const [reposRow, reposValue] = stat("Repos");
-    const [starsRow, starsValue] = stat("Stars");
-    const [followersRow, followersValue] = stat("Followers");
-    const graph = el("div", { class: "gh-graph", role: "img", "aria-label": "GitHub contribution graph of the last 12 months" });
-    const readout = el("p", { class: "gh-readout" }, "Loading…");
-    const legend = el("div", { class: "gh-legend", "aria-hidden": "true" },
-      "Less", ...[0, 1, 2, 3, 4].map((lv) => el("span", { class: `lv${lv}` })), "More");
+    const [reposRow, reposValue] = stat("Public repos");
+    const [contribRow, contribValue] = stat("Contributions");
+    const [sinceRow, sinceValue] = stat("On GitHub since");
+    const [pushRow, pushValue] = stat("Last push");
+    contribRow.title = "Last 12 months";
 
-    box.className = "gh-card";
-    box.append(
-      el("div", { class: "gh-head rule-head" },
-        el("p", { class: "quest-label" }, "GitHub activity · last 12 months"),
-        el("a", { class: "gh-link", href: profile.github, target: "_blank", rel: "noopener" }, `github.com/${user} ↗`)
-      ),
-      el("dl", { class: "gh-stats" }, contribRow, reposRow, starsRow, followersRow),
-      graph,
-      el("div", { class: "gh-foot" }, readout, legend)
+    // The avatar is loaded straight from github.com, so it shows even when the API is rate-limited
+    const avatar = el("img", { class: "gh-avatar", src: `https://github.com/${user}.png?size=160`, alt: "", width: "56", height: "56", loading: "lazy" });
+    avatar.addEventListener("error", () => avatar.remove());
+    const name = el("span", { class: "gh-name" }, profile.name || user);
+    const langs = el("div", { class: "gh-langs" });
+
+    const card = el("a", { class: "gh-card", href: profile.github, target: "_blank", rel: "noopener", "aria-label": `GitHub profile of ${profile.name || user} (@${user})` },
+      el("div", { class: "gh-id" },
+        el("span", { class: "gh-avatar-wrap" }, avatar, el("span", { class: "gh-badge" }, icon("github"))),
+        el("span", { class: "gh-who" }, name, el("span", { class: "gh-handle" }, `@${user}`)),
+        el("span", { class: "gh-cta" }, el("span", { class: "gh-cta-text" }, "View profile"), el("span", { class: "gh-arrow", "aria-hidden": "true" }, "↗"))),
+      el("dl", { class: "gh-stats" }, reposRow, contribRow, sinceRow, pushRow),
+      langs
     );
+    box.replaceWith(card);
 
-    fetchGithubStats(user).then((data) => {
+    fetchGithubProfile(user).then((data) => {
       if (!data) {
-        readout.textContent = "Couldn't load live stats right now.";
-        graph.remove();
-        legend.remove();
+        card.querySelector(".gh-stats").remove();
+        langs.remove();
         return;
       }
-      const show = (node, n) => { if (n != null) node.textContent = n.toLocaleString("en-US"); };
-      show(contribValue, data.contributions);
-      show(reposValue, data.repos);
-      show(starsValue, data.stars);
-      show(followersValue, data.followers);
-      if (!data.days?.length) {
-        readout.textContent = "Contribution graph unavailable right now.";
-        graph.remove();
-        legend.remove();
+      if (data.name) name.textContent = data.name;
+      const show = (node, value) => { if (value != null) node.textContent = value; };
+      show(reposValue, data.repos?.toLocaleString("en-US"));
+      show(contribValue, data.contributions?.toLocaleString("en-US"));
+      show(sinceValue, data.since);
+      show(pushValue, data.lastPush ? timeAgo(data.lastPush) : null);
+      [[reposRow, data.repos], [contribRow, data.contributions], [sinceRow, data.since], [pushRow, data.lastPush]]
+        .forEach(([row, value]) => { if (value == null) row.remove(); });
+
+      // Language split: a pixel bar (one block per ~5%) plus a legend of the top four
+      if (!data.languages?.length) {
+        langs.remove();
         return;
       }
-      const activeDays = data.days.filter((d) => d.count > 0).length;
-      const action = matchMedia("(hover: none)").matches ? "tap" : "hover";
-      const idleText = `${count(activeDays, "active day")} · ${action} a square for details`;
-      readout.textContent = idleText;
-      graph.append(contributionGraph(data.days, readout, idleText));
-      // Narrow screens: start at the most recent weeks (after the graph has been laid out)
-      requestAnimationFrame(() => { graph.scrollLeft = graph.scrollWidth; });
-      box.classList.add("is-live");
+      const top = data.languages.slice(0, 4);
+      const rest = 1 - top.reduce((sum, l) => sum + l.share, 0);
+      const parts = rest > 0.001 ? [...top, { name: "Other", share: rest, other: true }] : top;
+      const bar = el("div", { class: "gh-bar", "aria-hidden": "true" }, ...parts.map((l) => {
+        const seg = el("span");
+        seg.style.flexGrow = l.share;
+        seg.style.setProperty("--lang", l.other ? "var(--line-strong)" : langColor(l.name));
+        return seg;
+      }));
+      const legend = el("ul", { class: "gh-legend", "aria-label": "Languages across my repositories" }, ...parts.map((l) => {
+        const swatch = el("span", { class: "gh-swatch", "aria-hidden": "true" });
+        swatch.style.setProperty("--lang", l.other ? "var(--line-strong)" : langColor(l.name));
+        return el("li", {}, swatch, l.name, el("span", { class: "gh-pct" }, `${Math.round(l.share * 100)}%`));
+      }));
+      langs.append(el("p", { class: "quest-label" }, "Languages"), bar, legend);
+      card.classList.add("is-live");
     });
   }
 
@@ -585,6 +573,65 @@
     const logo = el("span", { class: `stack-logo${icon ? "" : " none"}`, "aria-hidden": "true" });
     if (icon) fillStackLogo(logo, icon);
     return el("li", { class: "stack-item" }, logo, el("span", {}, name));
+  }
+
+  // Hovering a logo (Stack items, tech pills): it breaks into small square shards like the cube
+  // companion, they burst outwards and then snap back together in the brand color.
+  // Each shard is a copy of the logo clipped to one cell of a grid, so it works the same for the
+  // Devicon font glyphs and the inline SVGs, without having to rasterize anything.
+  const SHARD_PX = 3; // shard size in px
+  function shatterLogo(logo) {
+    if (logo.classList.contains("shattering") || logo.classList.contains("none") || !logo.firstElementChild) return;
+    const { width, height } = logo.getBoundingClientRect();
+    if (!width || !height) return;
+    const cols = Math.max(3, Math.round(width / SHARD_PX));
+    const rows = Math.max(3, Math.round(height / SHARD_PX));
+    const markup = [...logo.children].map((n) => n.outerHTML).join("");
+    const shards = [];
+    logo.classList.add("shattering");
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const shard = el("span", { class: "shard", "aria-hidden": "true" });
+        shard.innerHTML = markup; // copy of the logo's own trusted markup
+        const top = (r / rows) * 100, left = (c / cols) * 100;
+        const bottom = 100 - ((r + 1) / rows) * 100, right = 100 - ((c + 1) / cols) * 100;
+        // hairline overlap so no seams show between the shards while they're together
+        shard.style.clipPath = `inset(${Math.max(0, top - 0.5)}% ${Math.max(0, right - 0.5)}% ${Math.max(0, bottom - 0.5)}% ${Math.max(0, left - 0.5)}%)`;
+        shards.push(shard);
+
+        // Fly away from the middle of the logo (a bit further for outer shards), slightly upwards,
+        // spin, then fall back into place with a small overshoot
+        const dx = (c + 0.5) / cols - 0.5, dy = (r + 0.5) / rows - 0.5;
+        const angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.9;
+        const dist = 10 + Math.hypot(dx, dy) * 26 + Math.random() * 14;
+        const x = Math.cos(angle) * dist, y = Math.sin(angle) * dist - 6;
+        const spin = (Math.random() - 0.5) * 320;
+        const scale = 0.55 + Math.random() * 0.4;
+        shard.animate([
+          { transform: "none", opacity: 1, easing: "cubic-bezier(.15, .7, .3, 1)" },
+          { offset: 0.42, transform: `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${spin.toFixed(0)}deg) scale(${scale.toFixed(2)})`, opacity: 0.85, easing: "cubic-bezier(.5, 0, .3, 1.35)" },
+          { transform: "none", opacity: 1 },
+        ], { duration: 820 + Math.random() * 160, delay: Math.random() * 60, fill: "backwards" });
+      }
+    }
+    logo.append(...shards);
+    // Longest shard: 60ms delay + 980ms; a timer also cleans up when the animations get throttled
+    setTimeout(() => {
+      shards.forEach((s) => s.remove());
+      logo.classList.remove("shattering");
+    }, 1060);
+  }
+
+  function initLogoShatter() {
+    if (reducedMotion || !Element.prototype.animate) return;
+    document.addEventListener("pointerover", (e) => {
+      if (e.pointerType !== "mouse") return; // touch: a tap would only flash it, the logos are colored there anyway
+      const item = e.target.closest?.(".stack-item, .tech-pill");
+      if (!item || item.contains(e.relatedTarget)) return;
+      const logo = item.querySelector(".stack-logo");
+      if (logo) shatterLogo(logo);
+    });
   }
 
   // One column per group: label (icon, name, item count) above a plain list of items
@@ -1172,7 +1219,7 @@
   else fillList($("#projects-list"), highlightProjects, "Nothing here yet.", renderProject);
   if (sideProjects.length) $("#projects-other").append(...renderOtherProjects(sideProjects));
   else $("#projects-other").remove();
-  renderGithubActivity();
+  renderGithubCard();
   fillList($("#papers-list"), papers, "Nothing here yet.", renderPaper);
   renderAbout();
   renderHeroPhoto();
@@ -1185,6 +1232,7 @@
   $("#year").textContent = new Date().getFullYear();
   initScrollProgress();
   initReveal();
+  initLogoShatter();
   initKeys(initVoxel());
 
   /* ---------- mobile menu ---------- */
