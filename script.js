@@ -923,15 +923,14 @@
       const dx = (c + offC - mid(VOXEL_COLS)) / mid(VOXEL_COLS);
       const dy = (r + offR - mid(VOXEL_ROWS)) / mid(VOXEL_ROWS);
       const burst = 30 + Math.random() * 40;
-      // Hover: away from the middle (cubes near the middle pick a random direction), outer cubes
-      // further, plus a little drop as if they fall while flying
-      const spread = Math.hypot(dx, dy);
-      const angle = (spread < 0.15 ? Math.random() * Math.PI * 2 : Math.atan2(dy, dx)) + (Math.random() - 0.5) * 1.1;
-      const dist = 12 + spread * 22 + Math.random() * 16;
+      // Hover: every cube flies in its own random direction (so neighbours cross and the outline is
+      // lost), with only a slight push away from the middle and a small drop as if falling
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 16 + Math.random() * 30;
       return {
         x: (c + offC) * VOXEL_PITCH, y: (r + offR) * VOXEL_PITCH, color: VOXEL_COLORS[ch],
-        hx: Math.cos(angle) * dist, hy: Math.sin(angle) * dist * 0.8 + 4 + Math.random() * 6,
-        hr: (Math.random() - 0.5) * 300, hs: 0.6 + Math.random() * 0.3,
+        hx: Math.cos(angle) * dist + dx * 14, hy: Math.sin(angle) * dist + dy * 10 + 6,
+        hr: (Math.random() - 0.5) * 360, hs: 0.5 + Math.random() * 0.4,
         ex: (dx + Math.random() - 0.5) * burst, ey: (dy + Math.random() - 0.5) * burst, er: (Math.random() - 0.5) * 240,
       };
     });
