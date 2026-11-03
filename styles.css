@@ -478,14 +478,38 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 .stack-item:hover { color: var(--text); transform: translateX(4px); }
 .stack-item:hover .stack-logo { color: var(--accent); }
 .stack-item:hover .stack-logo i, .stack-item:hover .stack-logo .logo { color: var(--brand); }
-/* hover: the logo shatters into square shards that burst out and snap back (script.js);
-   each shard is a copy of the logo clipped to one grid cell, laid over the hidden original */
+/* hover (mouse only): the logo hops with a little squash, like a game sprite, and eight pixels
+   in its brand color burst out in a star and fade. The pixels are box-shadows of an invisible
+   2px square; scaling the square up pushes them apart. */
 .stack-logo { position: relative; }
-.stack-logo.shattering > :not(.shard) { visibility: hidden; }
-.shard {
-  position: absolute; inset: 0;
-  display: flex; justify-content: center; align-items: center; gap: 2px;
-  pointer-events: none; will-change: transform;
+.stack-logo:not(.none)::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 2px; height: 2px; margin: -1px 0 0 -1px;
+  --px: var(--brand, var(--accent));
+  box-shadow:
+    -6px -6px 0 var(--px), 6px -6px 0 var(--px), -6px 6px 0 var(--px), 6px 6px 0 var(--px),
+    0 -8px 0 var(--px), 8px 0 0 var(--px), 0 8px 0 var(--px), -8px 0 0 var(--px);
+  opacity: 0; pointer-events: none;
+}
+@media (hover: hover) {
+  .stack-item:hover .stack-logo:not(.none), .tech-pill:hover .stack-logo:not(.none) {
+    animation: logo-hop .55s cubic-bezier(.3, .7, .4, 1);
+  }
+  .stack-item:hover .stack-logo:not(.none)::after, .tech-pill:hover .stack-logo:not(.none)::after {
+    animation: logo-burst .5s steps(5, end) .05s;
+  }
+}
+@keyframes logo-hop {
+  0%   { transform: none; }
+  25%  { transform: translateY(-5px) scale(1.15); }
+  50%  { transform: translateY(0) scale(1.18, .86); }
+  70%  { transform: translateY(-1.5px) scale(.96, 1.05); }
+  100% { transform: none; }
+}
+@keyframes logo-burst {
+  0%   { opacity: 1; transform: scale(.8); }
+  60%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(2.4); }
 }
 
 /* ---------- education ---------- */

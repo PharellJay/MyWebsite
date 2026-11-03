@@ -575,65 +575,6 @@
     return el("li", { class: "stack-item" }, logo, el("span", {}, name));
   }
 
-  // Hovering a logo (Stack items, tech pills): it breaks into small square shards like the cube
-  // companion, they burst outwards and then snap back together in the brand color.
-  // Each shard is a copy of the logo clipped to one cell of a grid, so it works the same for the
-  // Devicon font glyphs and the inline SVGs, without having to rasterize anything.
-  const SHARD_PX = 3; // shard size in px
-  function shatterLogo(logo) {
-    if (logo.classList.contains("shattering") || logo.classList.contains("none") || !logo.firstElementChild) return;
-    const { width, height } = logo.getBoundingClientRect();
-    if (!width || !height) return;
-    const cols = Math.max(3, Math.round(width / SHARD_PX));
-    const rows = Math.max(3, Math.round(height / SHARD_PX));
-    const markup = [...logo.children].map((n) => n.outerHTML).join("");
-    const shards = [];
-    logo.classList.add("shattering");
-
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const shard = el("span", { class: "shard", "aria-hidden": "true" });
-        shard.innerHTML = markup; // copy of the logo's own trusted markup
-        const top = (r / rows) * 100, left = (c / cols) * 100;
-        const bottom = 100 - ((r + 1) / rows) * 100, right = 100 - ((c + 1) / cols) * 100;
-        // hairline overlap so no seams show between the shards while they're together
-        shard.style.clipPath = `inset(${Math.max(0, top - 0.5)}% ${Math.max(0, right - 0.5)}% ${Math.max(0, bottom - 0.5)}% ${Math.max(0, left - 0.5)}%)`;
-        shards.push(shard);
-
-        // Fly away from the middle of the logo (a bit further for outer shards), slightly upwards,
-        // spin, then fall back into place with a small overshoot
-        const dx = (c + 0.5) / cols - 0.5, dy = (r + 0.5) / rows - 0.5;
-        const angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.9;
-        const dist = 10 + Math.hypot(dx, dy) * 26 + Math.random() * 14;
-        const x = Math.cos(angle) * dist, y = Math.sin(angle) * dist - 6;
-        const spin = (Math.random() - 0.5) * 320;
-        const scale = 0.55 + Math.random() * 0.4;
-        shard.animate([
-          { transform: "none", opacity: 1, easing: "cubic-bezier(.15, .7, .3, 1)" },
-          { offset: 0.42, transform: `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${spin.toFixed(0)}deg) scale(${scale.toFixed(2)})`, opacity: 0.85, easing: "cubic-bezier(.5, 0, .3, 1.35)" },
-          { transform: "none", opacity: 1 },
-        ], { duration: 820 + Math.random() * 160, delay: Math.random() * 60, fill: "backwards" });
-      }
-    }
-    logo.append(...shards);
-    // Longest shard: 60ms delay + 980ms; a timer also cleans up when the animations get throttled
-    setTimeout(() => {
-      shards.forEach((s) => s.remove());
-      logo.classList.remove("shattering");
-    }, 1060);
-  }
-
-  function initLogoShatter() {
-    if (reducedMotion || !Element.prototype.animate) return;
-    document.addEventListener("pointerover", (e) => {
-      if (e.pointerType !== "mouse") return; // touch: a tap would only flash it, the logos are colored there anyway
-      const item = e.target.closest?.(".stack-item, .tech-pill");
-      if (!item || item.contains(e.relatedTarget)) return;
-      const logo = item.querySelector(".stack-logo");
-      if (logo) shatterLogo(logo);
-    });
-  }
-
   // One column per group: label (icon, name, item count) above a plain list of items
   function renderStackGroup(g) {
     const iconBox = el("span", { class: "stack-group-icon", "aria-hidden": "true" });
@@ -1232,7 +1173,6 @@
   $("#year").textContent = new Date().getFullYear();
   initScrollProgress();
   initReveal();
-  initLogoShatter();
   initKeys(initVoxel());
 
   /* ---------- mobile menu ---------- */

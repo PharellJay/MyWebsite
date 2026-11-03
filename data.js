@@ -149,7 +149,7 @@ const PROJECTS = [
     highlights: [
       "Content and logic fully separated: data.js holds the text, script.js renders every section",
       "A cube companion made of small voxels that follows you through the sections and morphs into a new shape for each one",
-      "Tech logos that shatter into pixel shards on hover and snap back together in their brand color",
+      "Tech logos that hop and give off a little pixel burst in their brand color on hover",
       "A live GitHub profile card with stats and a language breakdown, cached in the browser to stay within the API's rate limit",
       "Responsive down to small phones, with a fold-out menu, touch-sized buttons and reduced-motion support",
       "Built-in PDF viewer for papers and detail windows for projects, using the native <dialog> element",
