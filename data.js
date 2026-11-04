@@ -68,10 +68,11 @@ const PROJECTS = [
     tech: ["Lua", "SQL", "JavaScript", "HTML"],
     repo: "https://github.com/PharellJay/RedMAnticheat",
     demo: "",
-    featured: true,
+    /*featured: true,*/
     stat: { value: "16,000+", label: "protected players" },
     status: "Archived",
     continued: false,
+    highlight: true,
   },
   {
     title: "Lua Obfuscator",
