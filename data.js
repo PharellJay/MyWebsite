@@ -51,7 +51,7 @@ const PROFILE = {
 const PROJECTS = [
   {
     title: "RedM Anticheat",
-    description: "A server-side driven anticheat for RedM (Red Dead Redemption 2 multiplayer) with 25+ detection modules, hardware-token bans and protected client code.",
+    description: "Over 16000 Players have been protected by this server-side driven anticheat for RedM (Red Dead Redemption 2 multiplayer) with 25+ detection modules, hardware-token bans and protected client code.",
     details: [
       "Deadeye Anticheat protected some of the biggest RedM community servers, with more than 16,000 players. " +
         "Detection runs on the server wherever possible, so a modified client can't simply switch it off.",
