@@ -457,13 +457,31 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 .about-link:hover { color: var(--text); }
 
 /* ---------- stack ---------- */
-/* open columns: group label with an underline, then a plain logo + name list */
-.loadout { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 44px 40px; }
-.stack-label { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; } /* + .rule-head underline */
+/* one row per group: label on the left, the technologies as logo pills on the right, rows split by
+   hairlines (with the short accent segment used across the page) */
+.stack-row {
+  position: relative;
+  display: grid; grid-template-columns: 190px 1fr; gap: 14px 32px; align-items: start;
+  padding: 22px 0; border-top: 1px solid var(--line);
+}
+.stack-row:last-child { border-bottom: 1px solid var(--line); }
+.stack-row::before { content: ""; position: absolute; left: 0; top: -1px; width: 24px; height: 1px; background: var(--accent); }
+.stack-label { display: flex; align-items: center; gap: 10px; min-height: 36px; }
 .stack-group-icon { display: grid; place-items: center; color: var(--accent-hover); }
 .stack-group-icon svg { width: 16px; height: 16px; }
-.stack-label h3 { font: 600 .9rem/1.2 var(--font); }
-.stack-count { margin-left: auto; font: .75rem/1 var(--mono); color: var(--muted); }
+.stack-label h3 { font: 600 .95rem/1.3 var(--font); }
+.stack-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+/* the project tech pill, a size up; logos always in their brand colors */
+.stack-pill {
+  height: 36px; padding: 0 14px 0 12px; gap: 9px; font-size: .875rem;
+  transition: border-color .15s, background-color .15s, color .15s;
+}
+.stack-pill .stack-logo { font-size: 1.05rem; color: var(--text-2); }
+.stack-pill .stack-logo svg { width: 16px; height: 16px; }
+.stack-pill .stack-logo i, .stack-pill .stack-logo .logo { color: var(--brand); }
+.stack-pill:hover { border-color: #43434c; background: var(--surface-hover); color: var(--text); }
+
+/* logo + name items, used for the tech in the project rows */
 .stack-item {
   display: flex; align-items: center; gap: 12px; padding: 6px 0;
   color: var(--text-2); font-size: .95rem; line-height: 1.3;
@@ -542,6 +560,7 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
   color: var(--accent-hover); background: rgb(var(--accent-rgb) / 0.12);
 }
 .edu-badge.done { color: var(--text-2); background: rgb(255 255 255 / 0.06); }
+.edu-grade { margin-left: auto; }
 .edu h3 { font: 600 1.25rem/1.25 var(--font); letter-spacing: -0.015em; }
 .edu-place { margin-top: 4px; color: var(--text-2); font-size: .95rem; }
 .edu-text { margin-top: 12px; color: var(--muted); font-size: .95rem; max-width: 640px; }
@@ -799,17 +818,9 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
   .details-body h2 { font-size: 1.4rem; }
   .details-body .project-actions .btn { flex: 1; justify-content: center; }
 
-  /* stack: one group per row, items as wrapping pills instead of two long columns */
-  .loadout { grid-template-columns: 1fr; gap: 28px; }
-  .stack-items { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-  .stack-item {
-    gap: 8px; height: 34px; padding: 0 12px 0 10px;
-    border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface);
-    font-size: .875rem;
-  }
-  .stack-logo { width: auto; font-size: 1rem; }
-  .stack-logo svg { width: 15px; height: 15px; }
-  .stack-logo.none { display: none; }
+  /* stack: label above the pills */
+  .stack-row { grid-template-columns: 1fr; gap: 12px; padding: 20px 0; }
+  .stack-label { min-height: 0; }
   .other-toggle { padding: 14px; }
   .other-preview { display: none; }
 

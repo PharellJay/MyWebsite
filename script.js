@@ -575,15 +575,19 @@
     return el("li", { class: "stack-item" }, logo, el("span", {}, name));
   }
 
-  // One column per group: label (icon, name, item count) above a plain list of items
+  // One row per group: label (icon + name) on the left, the technologies as logo pills on the right
   function renderStackGroup(g) {
     const iconBox = el("span", { class: "stack-group-icon", "aria-hidden": "true" });
+    // Static, trusted markup from STACK_GROUP_ICONS (never user data)
     iconBox.innerHTML = STACK_GROUP_ICONS[g.icon] || "";
-    const items = g.items || [];
-    return el("div", { class: "stack-group" },
-      el("div", { class: "stack-label rule-head" }, iconBox, el("h3", {}, g.group),
-        el("span", { class: "stack-count", "aria-label": `${items.length} items` }, String(items.length))),
-      el("ul", { class: "stack-items" }, ...items.map(stackItem))
+    const pills = (g.items || []).map((name) => {
+      const pill = techPill(name);
+      pill.classList.add("stack-pill");
+      return pill;
+    });
+    return el("div", { class: "stack-row" },
+      el("div", { class: "stack-label" }, iconBox, el("h3", {}, g.group)),
+      el("ul", { class: "stack-pills", "aria-label": g.group }, ...pills)
     );
   }
 
@@ -668,7 +672,13 @@
       el("div", { class: "edu-body" },
         el("div", { class: "edu-top" },
           el("p", { class: "edu-date" }, e.date || ""),
-          el("span", { class: `edu-badge${current ? "" : " done"}` }, current ? "Current" : "Completed")
+          el("span", { class: `edu-badge${current ? "" : " done"}` }, current ? "Current" : "Completed"),
+          // Optional final grade, styled like the grade of a paper
+          e.grade
+            ? el("p", { class: "grade edu-grade" },
+                el("span", { class: "grade-label" }, "Grade"),
+                el("span", { class: "grade-value" }, e.grade))
+            : null
         ),
         el("h3", {}, e.title),
         e.place ? el("p", { class: "edu-place" }, e.place) : null,
@@ -1181,6 +1191,8 @@
   if (projects.length) setText("#projects-meta", count(projects.length, "project"));
   if (papers.length) setText("#papers-meta", count(papers.length, "paper"));
   fillList($("#stack-list"), stack, "Nothing here yet.", renderStackGroup);
+  const techCount = stack.reduce((n, g) => n + (g.items?.length || 0), 0);
+  if (techCount) setText("#stack-meta", techCount === 1 ? "1 technology" : `${techCount} technologies`);
   fillList($("#education-list"), education, "Nothing here yet.", renderEducation);
   setText("#contact-text", contact.text);
   $("#year").textContent = new Date().getFullYear();

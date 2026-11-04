@@ -300,7 +300,7 @@ const ABOUT = {
  * TECH_STACK — one row per group, in this order.
  *   group   row title
  *   icon    "code", "web", "tools", "game" or "concepts"
- *   items   technologies, shown as a logo + name list; logos are mapped in script.js (STACK_ICONS)
+ *   items   technologies, shown as logo pills; logos are mapped in script.js (STACK_ICONS)
  */
 const TECH_STACK = [
   { group: "Languages", icon: "code", items: ["Java", "Python", "Lua", "C", "C++", "JavaScript", "SQL"] },
@@ -315,6 +315,7 @@ const TECH_STACK = [
  *   date, title, place, description ("" to hide the description)
  *   icon     "university", "school" or "projects" (game controller, for self-driven work)
  *   focus    list of subjects / topics, shown as tags
+ *   grade    optional final grade, e.g. "1,2" (leave it out or "" to hide)
  *   A date containing "present" marks the entry as current.
  */
 const EDUCATION = [
@@ -332,7 +333,7 @@ const EDUCATION = [
     place: "RedM (Red Dead Redemption 2 multiplayer)",
     icon: "projects",
     description: "Two years between school and university spent building real things: I ran some of the biggest RedM community servers and " +
-      "developed an anticheat from scratch .",
+      "developed an anticheat from scratch.",
     focus: ["Lua", "Game Security", "Server Administration", "Game Design", "Team Lead"],
   },
   {
@@ -340,6 +341,7 @@ const EDUCATION = [
     title: "Abitur",
     place: "Leibniz Gymnasium Dormagen",
     icon: "school",
+    grade: "1,2",
     description: "Where I discovered my passion for philosophy and wrote my Facharbeit on whether AI could ever be like a human.",
     focus: ["Mathematics", "Computer Science"],
   },

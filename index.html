@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/devicon@2.16.0/devicon.min.css">
-  <link rel="stylesheet" href="styles.css?v=38">
+  <link rel="stylesheet" href="styles.css?v=40">
 </head>
 <body>
   <!-- All text content is rendered from data.js by script.js -->
@@ -104,8 +104,9 @@
 
     <section class="section" id="stack">
       <div class="wrap section-inner">
-        <div class="section-head"><p class="lvl">03</p><h2>Stack</h2><div class="voxel-slot" data-shape="toolbox" aria-hidden="true"></div></div>
-        <div class="loadout" id="stack-list"></div>
+        <div class="section-head"><p class="lvl">03</p><h2>Stack</h2><p class="section-meta" id="stack-meta"></p><div class="voxel-slot" data-shape="toolbox" aria-hidden="true"></div></div>
+        <!-- TECH_STACK, one row per group (script.js) -->
+        <div class="stack-rows" id="stack-list"></div>
       </div>
     </section>
 
@@ -173,7 +174,7 @@
   </dialog>
 
   <!-- Bump the ?v= numbers after editing a file so browsers load the new version instead of a cached one -->
-  <script src="data.js?v=32"></script>
-  <script src="script.js?v=38"></script>
+  <script src="data.js?v=34"></script>
+  <script src="script.js?v=40"></script>
 </body>
 </html>
