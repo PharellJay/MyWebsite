@@ -346,6 +346,15 @@ const EDUCATION = [
     description: "Where I discovered my passion for philosophy and wrote my Facharbeit on whether AI could ever be like a human.",
     focus: ["Mathematics", "Computer Science"],
   },
+  {
+    date: "2023",
+    title: "Deutsche SchülerAkademie",
+    place: "Europäisches Gymnasium Waldenburg",
+    icon: "school",
+    description: "Nominated by my school as one of its top students and then selected for this national academy for gifted students. " +
+      "I spent 16 days in the course \"Philosophy: Art or Science?\", learning to work scientifically alongside equally curious peers.",
+    focus: ["Philosophy", "Academic Work"],
+  },
 ];
 
 /*
