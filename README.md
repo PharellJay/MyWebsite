@@ -1,5 +1,7 @@
 # MyWebsite
 
+**Live at [pharelljay.me](https://pharelljay.me)**
+
 My personal portfolio website, built from scratch with plain **HTML, CSS and JavaScript**. No frameworks, no build step, no dependencies to install.
 
 It shows my projects, scientific work, tech stack, education and contact links in a clean dark design with a light retro touch: a pixel-cube companion follows you through the page and changes its shape for each section.
@@ -19,7 +21,8 @@ It shows my projects, scientific work, tech stack, education and contact links i
 - **Built-in PDF viewer**: papers open in a dialog on desktop and in the browser's own viewer on mobile.
 - **Copy-to-clipboard email**: the email address in the Contact section is copied with a click.
 - **Responsive and accessible**: works on phones, supports keyboard use and respects `prefers-reduced-motion`.
-- **Link previews**: Open Graph tags for nice previews on LinkedIn, WhatsApp and others.
+- **Link previews**: Open Graph tags and a preview image for nice previews on LinkedIn, WhatsApp and others.
+- **Search-friendly**: structured data (schema.org `Person`), a canonical URL, a sitemap and the main text directly in the HTML.
 
 ## Project structure
 
@@ -29,6 +32,10 @@ MyWebsite/
 ├── data.js      # All content: profile, projects, papers, about, stack, education, contact
 ├── script.js    # Renders data.js into the page, plus all interactions and animations
 ├── styles.css   # All styling
+├── imprint.html # Legal notice (Impressum)
+├── favicon.svg, favicon.ico, apple-touch-icon.png   # Pixel </> icon for browser tabs and home screens
+├── og-image.png # Link preview image (1200 × 630)
+├── sitemap.xml, robots.txt   # For search engines
 └── papers/      # PDFs of scientific works, linked from data.js
 ```
 

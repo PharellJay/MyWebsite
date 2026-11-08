@@ -71,18 +71,13 @@ a { color: inherit; text-decoration: none; }
   display: inline-flex; align-items: center; gap: 10px;
   font: 600 .95rem/1 var(--font); letter-spacing: -0.01em; white-space: nowrap;
 }
-/* 2 × 2 pixel mark, a small echo of the cube companion */
-.brand-mark {
-  flex: none; width: 14px; height: 14px;
-  background:
-    linear-gradient(var(--accent), var(--accent)) 0 0 / 6px 6px,
-    linear-gradient(var(--accent-hover), var(--accent-hover)) 8px 0 / 6px 6px,
-    linear-gradient(#4c2f8f, #4c2f8f) 0 8px / 6px 6px,
-    linear-gradient(var(--accent), var(--accent)) 8px 8px / 6px 6px;
-  background-repeat: no-repeat;
-  transition: transform .3s cubic-bezier(.2, .9, .3, 1.2);
-}
-.brand:hover .brand-mark { transform: rotate(90deg); }
+/* pixel </> mark (same as the favicon and the cube companion's "code" shape) */
+.brand-mark { flex: none; width: 24px; height: 16px; overflow: visible; }
+.brand-mark .bm-l, .brand-mark .bm-r { fill: var(--xp); transition: transform .3s cubic-bezier(.2, .9, .3, 1.2); }
+.brand-mark .bm-s { fill: #059669; }
+/* hover: the brackets spread apart */
+.brand:hover .bm-l { transform: translateX(-1.5px); }
+.brand:hover .bm-r { transform: translateX(1.5px); }
 .topbar nav { grid-column: 2; }
 .topbar-socials, .topbar-end { grid-column: 3; justify-self: end; display: flex; gap: 6px; }
 .chip-sm { height: 32px; }
@@ -881,7 +876,7 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
   .project.featured:hover { border-color: var(--line); }
   .stack-item:hover { color: var(--text-2); }
   .stack-item:hover .stack-logo { color: var(--muted); }
-  .brand:hover .brand-mark { transform: none; }
+  .brand:hover .bm-l, .brand:hover .bm-r { transform: none; }
 
   /* without hover the logos would never light up, so they always show their brand colors */
   .stack-logo i, .stack-logo .logo { color: var(--brand); }

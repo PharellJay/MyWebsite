@@ -3,24 +3,73 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pharell Jay Jeyakumar</title>
+  <title>Pharell Jay Jeyakumar · Software Engineering Student</title>
   <meta name="description" content="Pharell Jay Jeyakumar, Software Engineering student at Hochschule Heilbronn. Projects and scientific work.">
+  <meta name="author" content="Pharell Jay Jeyakumar">
+  <!-- The one official address of this page, so search engines don't treat variants (www, index.html, ?v=) as separate pages -->
+  <link rel="canonical" href="https://pharelljay.me/">
   <!-- Link previews (LinkedIn, WhatsApp, ...) -->
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pharelljay.me/">
+  <meta property="og:site_name" content="Pharell Jay Jeyakumar">
+  <meta property="og:locale" content="en_US">
   <meta property="og:title" content="Pharell Jay Jeyakumar · Software Engineering student">
   <meta property="og:description" content="Software Engineering student at Hochschule Heilbronn, open to internships & working student roles. Projects and scientific work.">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="https://pharelljay.me/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Pharell Jay Jeyakumar, Software Engineering student">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- Structured data for search engines: who this page is about and where else that person is found (sameAs).
+       Keep it in sync with PROFILE in data.js. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://pharelljay.me/#website",
+        "url": "https://pharelljay.me/",
+        "name": "Pharell Jay Jeyakumar",
+        "inLanguage": "en",
+        "about": { "@id": "https://pharelljay.me/#person" }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://pharelljay.me/#person",
+        "name": "Pharell Jay Jeyakumar",
+        "url": "https://pharelljay.me/",
+        "jobTitle": "Software Engineering Student",
+        "description": "Software Engineering student at Hochschule Heilbronn.",
+        "email": "mailto:contact@pharelljay.me",
+        "address": { "@type": "PostalAddress", "addressLocality": "Heilbronn", "addressCountry": "DE" },
+        "affiliation": { "@type": "CollegeOrUniversity", "name": "Hochschule Heilbronn", "url": "https://www.hs-heilbronn.de/" },
+        "knowsLanguage": ["de", "en"],
+        "knowsAbout": ["Software Engineering", "Game Security", "Performance Optimization", "Philosophy"],
+        "sameAs": [
+          "https://github.com/PharellJay",
+          "https://www.linkedin.com/in/pharell-jay-jeyakumar/"
+        ]
+      }
+    ]
+  }
+  </script>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#09090b">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/devicon@2.16.0/devicon.min.css">
-  <link rel="stylesheet" href="styles.css?v=40">
+  <link rel="stylesheet" href="styles.css?v=41">
 </head>
 <body>
-  <!-- All text content is rendered from data.js by script.js -->
+  <!-- All text content is rendered from data.js by script.js. The name, tagline and intro are also written
+       into the HTML below (keep them in sync with PROFILE) so search engines see them without JavaScript. -->
   <header class="topbar">
     <div class="topbar-inner">
-      <a href="#top" class="brand" aria-label="Back to top"><span class="brand-mark" aria-hidden="true"></span><span class="brand-name" id="brand-name"></span></a>
+      <a href="#top" class="brand" aria-label="Back to top"><svg class="brand-mark" viewBox="0 0 18 12" shape-rendering="crispEdges" aria-hidden="true"><path class="bm-l" d="M3 2h1v1h-1zM4 2h1v1h-1zM2 3h1v1h-1zM3 3h1v1h-1zM1 4h1v1h-1zM2 4h1v1h-1zM0 5h1v1h-1zM1 5h1v1h-1zM0 6h1v1h-1zM1 6h1v1h-1zM1 7h1v1h-1zM2 7h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1zM3 9h1v1h-1zM4 9h1v1h-1z"/><path class="bm-s" d="M10 0h1v1h-1zM11 0h1v1h-1zM10 1h1v1h-1zM11 1h1v1h-1zM9 2h1v1h-1zM10 2h1v1h-1zM9 3h1v1h-1zM10 3h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM8 5h1v1h-1zM9 5h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM7 7h1v1h-1zM8 7h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM6 9h1v1h-1zM7 9h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM5 11h1v1h-1zM6 11h1v1h-1z"/><path class="bm-r" d="M13 2h1v1h-1zM14 2h1v1h-1zM14 3h1v1h-1zM15 3h1v1h-1zM15 4h1v1h-1zM16 4h1v1h-1zM16 5h1v1h-1zM17 5h1v1h-1zM16 6h1v1h-1zM17 6h1v1h-1zM15 7h1v1h-1zM16 7h1v1h-1zM14 8h1v1h-1zM15 8h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1z"/></svg><span class="brand-name" id="brand-name">Pharell Jay Jeyakumar</span></a>
       <nav aria-label="Sections" id="nav">
         <a href="#projects">Projects</a>
         <a href="#research">Scientific work</a>
@@ -55,11 +104,11 @@
         <div class="hero-main">
           <!-- Status badge from PROFILE.status (links to the Contact section) -->
           <a href="#contact" class="status-badge"></a>
-          <h1 id="name"></h1>
-          <p class="tagline" id="tagline"></p>
+          <h1 id="name">Pharell Jay Jeyakumar</h1>
+          <p class="tagline" id="tagline">Software Engineering student at Hochschule Heilbronn</p>
           <!-- PROFILE.location, PROFILE.languages -->
           <dl class="stats" id="hero-stats"></dl>
-          <p class="intro" id="intro"></p>
+          <p class="intro" id="intro">I build tools that solve real problems, from an anticheat protecting large game servers to small apps for everyday learning. Here you'll find my projects and papers.</p>
           <div class="cta-row">
             <a class="btn btn-primary btn-start" href="#projects">View projects <span aria-hidden="true">↓</span></a>
             <!-- Links come from PROFILE in data.js; icons are added by script.js -->
@@ -144,7 +193,7 @@
 
   <footer class="footer">
     <div class="wrap footer-inner">
-      <p>© <span id="year"></span> <span id="footer-name"></span></p>
+      <p>© <span id="year"></span> <span id="footer-name">Pharell Jay Jeyakumar</span></p>
       <div class="footer-links">
         <a href="imprint.html">Imprint</a>
         <a href="#top">Back to top <span aria-hidden="true">↑</span></a>
