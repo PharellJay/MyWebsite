@@ -336,17 +336,21 @@
   /* ---------- GitHub profile card ---------- */
   // Compact card under the projects: avatar, name and a few stats, the whole card links to the profile.
   // Data comes live from the GitHub API (+ github-contributions-api.jogruber.de for the yearly count)
-  // and is cached in the browser for an hour (the GitHub API allows 60 requests per hour without a token).
-  const GH_CACHE_KEY = "gh-profile-v3";
-  const GH_CACHE_MS = 60 * 60 * 1000;
+  // and is cached in the browser for a few minutes so new repos show up quickly while staying well within
+  // the GitHub API's limit of 60 requests per hour without a token. An older cache entry is only used as a
+  // fallback when the API can't be reached (e.g. rate-limited).
+  const GH_CACHE_KEY = "gh-profile-v4";
+  const GH_CACHE_MS = 5 * 60 * 1000;
   // Colors for the language bar: the Stack logo colors where there is one, else GitHub's own
   const LANG_COLORS = { Rust: "#dea584", TypeScript: "#3178c6", Go: "#00add8", Shell: "#89e051", Kotlin: "#a97bff", "C#": "#178600" };
   const langColor = (name) => STACK_ICONS[name]?.colors?.[0] || LANG_COLORS[name] || "var(--muted)";
 
   async function fetchGithubProfile(user) {
+    let cached = null;
     try {
-      const cached = JSON.parse(localStorage.getItem(GH_CACHE_KEY));
-      if (cached?.user === user && Date.now() - cached.ts < GH_CACHE_MS) return cached.data;
+      cached = JSON.parse(localStorage.getItem(GH_CACHE_KEY));
+      if (cached?.user !== user) cached = null;
+      if (cached && Date.now() - cached.ts < GH_CACHE_MS) return cached.data;
     } catch { /* storage blocked or empty */ }
 
     const json = (res) => (res.ok ? res.json() : null);
@@ -355,7 +359,7 @@
       fetch(`https://api.github.com/users/${user}/repos?per_page=100&sort=pushed`).then(json).catch(() => null),
       fetch(`https://github-contributions-api.jogruber.de/v4/${user}?y=last`).then(json).catch(() => null),
     ]);
-    if (!userData && !repos && !contrib) return null;
+    if (!userData && !repos && !contrib) return cached?.data ?? null;
 
     // Languages: share of (own, non-fork) repositories per main language
     const own = Array.isArray(repos) ? repos.filter((r) => !r.fork) : [];
@@ -369,7 +373,8 @@
 
     const data = {
       name: userData?.name || null,
-      repos: userData?.public_repos ?? (own.length || null),
+      // The repo list updates right away, the profile's public_repos counter can lag behind after a new repo
+      repos: Math.max(userData?.public_repos ?? 0, Array.isArray(repos) ? repos.length : 0) || null,
       since: userData?.created_at ? new Date(userData.created_at).getFullYear() : null,
       contributions: contrib?.total?.lastYear ?? null,
       lastPush,
