@@ -754,7 +754,7 @@
 
   /* ---------- cube companion ---------- */
   // A pixel figure made of small cubes. It sits in the .voxel-slot of the section you're in
-  // (hero: controller, Projects: computer, ...); when you scroll on it fades out and fades back in
+  // (hero: code, Projects: computer, ...); when you scroll on it fades out and fades back in
   // at the next slot as that slot's shape. Hovering blows it apart into its cubes (a tap on touch screens).
   const VOXEL_COLS = 20;
   const VOXEL_ROWS = 14;
@@ -888,6 +888,51 @@
       "....gg.ee.....gg....",
       "......ee............",
       "......ee............",
+    ],
+    braces: [
+      "..ccc..........ccc..",
+      ".cc..............cc.",
+      ".cc..............cc.",
+      ".cc..............cc.",
+      ".cc..............cc.",
+      "cc...ww..ww..ww...cc",
+      "cc...ww..ww..ww...cc",
+      ".cc..............cc.",
+      ".cc..............cc.",
+      ".cc..............cc.",
+      ".cc..............cc.",
+      "..ccc..........ccc..",
+    ],
+    chip: [
+      "...m.m.m.m.m...",
+      "..ddddddddddd..",
+      "mmdaaaaaaaaadmm",
+      "..dwaaaaaaaad..",
+      "mmdaalllllaadmm",
+      "..daalggglaad..",
+      "mmdaalggglaadmm",
+      "..daalggglaad..",
+      "mmdaalllllaadmm",
+      "..daaaaaaaaad..",
+      "mmdaaaaaaaaadmm",
+      "..ddddddddddd..",
+      "...m.m.m.m.m...",
+    ],
+    database: [
+      "....llllllll....",
+      ".llllllllllllll.",
+      "aallllllllllllaa",
+      "aaaallllllllaaaa",
+      "aaaaaaaaaaaaaaga",
+      "aaaaaaaaaaaaaaaa",
+      "dddaaaaaaaaaaddd",
+      "aaaddddddddddaaa",
+      "aaaaaaaaaaaaaaga",
+      "aaaaaaaaaaaaaaaa",
+      "dddaaaaaaaaaaddd",
+      "aaaddddddddddaaa",
+      ".aaaaaaaaaaaaaa.",
+      "....aaaaaaaa....",
     ],
     heart: [
       "...rrrr....rrrr.....",

@@ -119,6 +119,27 @@ const PROJECTS = [
     highlight: true,
   },
   {
+    title: "Game Boy Emulator",
+    description: "An original Game Boy (DMG) emulator written from scratch in Rust: load a .gb ROM and play it with video, sound, remappable controls, battery saves and save states.",
+    details: [
+      "The emulator core (CPU, picture and audio units, timer and cartridge mappers) is a standalone Rust crate with no dependencies and no windowing, audio or file I/O. " +
+        "A separate desktop frontend adds the window, sound output, settings and save files.",
+      "Accuracy is checked against well-known community test ROMs: the CPU and timing suites pass completely, and the rendering test matches its reference image pixel for pixel.",
+    ],
+    highlights: [
+      "Full Sharp LR35902 CPU passing all of Blargg's cpu_instrs, instr_timing and mem_timing tests",
+      "Pixel-exact rendering on dmg-acid2 and a four-channel APU passing most of Blargg's dmg_sound tests",
+      "Cartridge support for ROM only, MBC1, MBC3 with real-time clock and MBC5, covering most of the Game Boy library",
+      "Battery saves in the common BGB/VBA-M format, so saves from other emulators work, plus one save-state slot per game",
+      "egui settings menu for volume, window scale and remappable controls; audio via cpal",
+      "Workspace split into a dependency-free core and a desktop app, checked with clippy and rustfmt",
+    ],
+    tech: ["Rust", "egui", "cpal"],
+    repo: "https://github.com/PharellJay/GBEmulator",
+    demo: "",
+    highlight: true,
+  },
+  {
     title: "Decentralised VPN",
     description: "A peer-to-peer VPN with no central server: traffic is routed through two encrypted hops and leaves the internet from another peer's IP.",
     details: [
