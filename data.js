@@ -199,6 +199,25 @@ const PROJECTS = [
     demo: "",
   },
   {
+    title: "Gitcheck",
+    description: "A small command-line tool that finds every git repository inside a folder and shows the status of each one at a glance.",
+    details: [
+      "Point it at a folder and it finds every git repository inside, at any depth, then prints one line per clean repo and the full status for any that need attention. " +
+        "It's a quick way to spot uncommitted work or unpushed commits across all your projects at once.",
+      "Every repo is fetched first, in parallel, so ahead/behind is up to date. Fetching never touches your files or branches.",
+    ],
+    highlights: [
+      "Finds repos at any depth, including repos nested inside other repos; skips .git and node_modules to stay fast",
+      "Color-coded output: green for clean and in sync, yellow for uncommitted changes or ahead of/behind the remote",
+      "Parallel fetch before checking, with failed fetches (e.g. ones needing a password) flagged in red instead of shown as in sync",
+      "Offline mode with -n/--no-fetch for an instant check against the last fetch",
+      "One-line installer into ~/.local/bin, with a custom install location and uninstall option; works on Linux and macOS",
+    ],
+    tech: ["Bash", "Git"],
+    repo: "https://github.com/PharellJay/Gitcheck",
+    demo: "",
+  },
+  {
     title: "Language Practice Tool",
     description: "Practise the everyday sentences and words you actually need, in any language pair, with read-aloud and spaced repetition.",
     details: [
