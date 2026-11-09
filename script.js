@@ -336,9 +336,9 @@
   /* ---------- GitHub profile card ---------- */
   // Compact card under the projects: avatar, name and a few stats, the whole card links to the profile.
   // Data comes live from the GitHub API (+ github-contributions-api.jogruber.de for the yearly count)
-  // and is cached in the browser for a few hours (the GitHub API allows 60 requests per hour without a token).
-  const GH_CACHE_KEY = "gh-profile-v2";
-  const GH_CACHE_MS = 6 * 60 * 60 * 1000;
+  // and is cached in the browser for an hour (the GitHub API allows 60 requests per hour without a token).
+  const GH_CACHE_KEY = "gh-profile-v3";
+  const GH_CACHE_MS = 60 * 60 * 1000;
   // Colors for the language bar: the Stack logo colors where there is one, else GitHub's own
   const LANG_COLORS = { Rust: "#dea584", TypeScript: "#3178c6", Go: "#00add8", Shell: "#89e051", Kotlin: "#a97bff", "C#": "#178600" };
   const langColor = (name) => STACK_ICONS[name]?.colors?.[0] || LANG_COLORS[name] || "var(--muted)";
