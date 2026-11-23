@@ -145,18 +145,21 @@ const PROJECTS = [
     details: [
       "Peers find each other through a distributed hash table, without any central server. Your traffic first goes to a relay, then to another peer's exit, " +
         "so the relay knows who you are but not where you're going, and the exit sees the destination but not you.",
-      "The network works on a \"lend to use\" principle: you can only route traffic through it while your own machine lends its IP as an exit for others. " +
-        "It installs as a Debian/Ubuntu package with a background service, a terminal dashboard and a desktop app.",
+      "The network works on a \"lend to use\" principle: you can only route traffic through it while your own machine lends its IP as an exit for others, " +
+        "and once you've agreed to that, it lends automatically after every restart. " +
+        "It installs as two Debian/Ubuntu packages: a background service that does the networking, and a desktop app with a tray icon to control it, no terminal or sudo needed.",
     ],
     highlights: [
-      "Two-hop circuits with a Noise handshake against the exit's signed key; the relay only ever forwards encrypted bytes",
+      "Two-hop circuits with an end-to-end Noise handshake against the exit's signed key; the relay only ever forwards encrypted bytes",
       "Serverless discovery via Kademlia DHT and mDNS, NAT traversal with AutoNAT, hole punching and relays (libp2p)",
-      "Kill switch: once connected, traffic is blocked instead of leaked when the tunnel drops; IPv6 blocked, DNS forced through the tunnel",
-      "Exit choice at random or by latency, measured through encrypted test circuits so exits never see your IP",
-      "systemd service controlled over a permission-checked Unix socket, used by the CLI, the Ratatui dashboard and a Tauri tray app",
+      "Kill switch: once connected, traffic is blocked instead of leaked when the tunnel drops; IPv6 blocked, DNS forced through the tunnel, no inbound connections from the exit",
+      "Exit choice at random or by max ping, measured through encrypted test circuits so exits never see your IP; dedicated exits are preferred over other users'",
+      "Exits refuse traffic to private networks and SMTP, with per-session rate limits",
+      "systemd service controlled over a permission-checked Unix socket by a Tauri desktop app with a tray icon",
       "Packets padded to size buckets against fingerprinting; routes and firewall rules are restored even after a crash",
+      "Tested end to end with real TUN devices, routes and NAT in throwaway network namespaces",
     ],
-    tech: ["Rust", "libp2p", "Tokio", "Noise Protocol", "Ratatui", "Tauri"],
+    tech: ["Rust", "libp2p", "Tokio", "Noise Protocol", "Tauri", "nftables"],
     repo: "https://github.com/PharellJay/DecentralisedVPN",
     demo: "",
   },
