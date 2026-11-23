@@ -199,6 +199,27 @@ const PROJECTS = [
     demo: "",
   },
   {
+    title: "NotebookLM Discord Bot",
+    description: "A Discord bot that lets everyone on a server ask questions of shared Google NotebookLM notebooks, add sources and build up notes together.",
+    details: [
+      "Link a channel to a notebook and anyone in it can ask with /ask or just mention the bot. The answer is posted in the channel with numbered citations, " +
+        "so the whole group sees it and can follow up. Each channel and thread keeps its own conversation, so side questions don't get mixed into the main one.",
+      "NotebookLM has no official API for asking questions, so the bot uses the unofficial notebooklm-py library, logged in as a dedicated Google account. " +
+        "All NotebookLM access goes through a single module, which turns its errors into friendly messages.",
+    ],
+    highlights: [
+      "Answers with numbered citations and a Sources button that shows the cited passages only to whoever clicks it",
+      "Follow-up questions remember the conversation per channel or thread, even across restarts; questions in one channel run in order, different channels in parallel",
+      "Save answers as shared notes, and add web pages, YouTube videos, files or pasted text as sources right from Discord",
+      "Studio support: generate Audio and Video Overviews, slide decks, quizzes, mind maps and more, then post them as files in the channel",
+      "Anyone can ask, only managers can link notebooks or change sources; per-user cooldowns keep the shared NotebookLM limits in check",
+      "Notebook and source names autocomplete, and long answers are split across several messages to fit Discord's limits",
+    ],
+    tech: ["Python", "discord.py", "NotebookLM"],
+    repo: "https://github.com/PharellJay/NotebookLMDiscordBot",
+    demo: "",
+  },
+  {
     title: "Gitcheck",
     description: "A small command-line tool that finds every git repository inside a folder and shows the status of each one at a glance.",
     details: [
