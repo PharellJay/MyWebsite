@@ -33,6 +33,7 @@ MyWebsite/
 ├── script.js    # Renders data.js into the page, plus all interactions and animations
 ├── styles.css   # All styling
 ├── imprint.html # Legal notice (Impressum)
+├── privacy.html # Privacy policy (Datenschutzerklärung)
 ├── favicon.svg, favicon.ico, apple-touch-icon.png   # Pixel </> icon for browser tabs and home screens
 ├── og-image.png # Link preview image (1200 × 630)
 ├── sitemap.xml, robots.txt   # For search engines
