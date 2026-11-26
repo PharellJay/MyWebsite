@@ -62,7 +62,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/devicon@2.16.0/devicon.min.css">
-  <link rel="stylesheet" href="styles.css?v=41">
+  <link rel="stylesheet" href="styles.css?v=47">
 </head>
 <body>
   <!-- All text content is rendered from data.js by script.js. The name, tagline and intro are also written
@@ -134,10 +134,9 @@
       <div class="wrap section-inner">
         <div class="section-head"><p class="lvl">01</p><h2>Projects</h2><p class="section-meta" id="projects-meta"></p><div class="voxel-slot" data-shape="computer" aria-hidden="true"></div></div>
         <div class="projects-body">
-          <!-- PROJECTS entry with featured: true as a big panel, highlight: true as cards below it, the rest as a compact list -->
-          <div id="projects-featured"></div>
-          <div class="project-grid" id="projects-list"></div>
-          <div class="other-projects" id="projects-other"></div>
+          <!-- PROJECTS with highlight: true rotate in the spotlight carousel; below it every project as a card, filterable by topic -->
+          <div id="projects-spotlight"></div>
+          <div id="projects-all"></div>
           <!-- GitHub profile card (avatar, name, live stats) for the PROFILE.github account (script.js) -->
           <div id="github-card"></div>
         </div>
@@ -224,7 +223,7 @@
   </dialog>
 
   <!-- Bump the ?v= numbers after editing a file so browsers load the new version instead of a cached one -->
-  <script src="data.js?v=34"></script>
-  <script src="script.js?v=40"></script>
+  <script src="data.js?v=39"></script>
+  <script src="script.js?v=46"></script>
 </body>
 </html>

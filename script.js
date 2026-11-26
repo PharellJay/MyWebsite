@@ -37,6 +37,14 @@
   const stack = typeof TECH_STACK !== "undefined" ? TECH_STACK : [];
   const education = typeof EDUCATION !== "undefined" ? EDUCATION : [];
   const contact = typeof CONTACT !== "undefined" ? CONTACT : {};
+  const categories = typeof PROJECT_CATEGORIES !== "undefined" ? PROJECT_CATEGORIES : [];
+  const caseStudies = typeof CASE_STUDIES !== "undefined" ? CASE_STUDIES : {};
+
+  // Pages in a subfolder (projects/…) set data-root="../" on <body>, so paths from data.js (relative to the
+  // site root) still point to the right files there
+  const root = document.body.dataset.root || "";
+  const asset = (path) => (/^([a-z]+:|\/|#)/i.test(path) ? path : root + path);
+  const pad = (n) => String(n).padStart(2, "0");
 
   function fillList(container, items, emptyText, render) {
     if (!container) return;
@@ -150,11 +158,25 @@
 
   /* ---------- projects ---------- */
   // "View project" / "Live demo" links (null if the project has neither)
+  // Projects with a case study: the live version first (highlighted), then the case study and the code
   function projectLinks(p) {
     const actions = el("div", { class: "project-actions" });
+    if (p.caseStudy) {
+      if (p.demo) actions.append(el("a", { href: p.demo, target: "_blank", rel: "noopener", class: "btn btn-primary" }, "Play live"));
+      actions.append(el("a", { href: asset(p.caseStudy), class: `btn${p.demo ? "" : " btn-primary"}` }, "Read case study"));
+      // The code as a GitHub icon button, so the three buttons fit in one row
+      if (p.repo) actions.append(el("a", { href: p.repo, target: "_blank", rel: "noopener", class: "chip chip-icon", "aria-label": "View code on GitHub", title: "View code on GitHub" }, icon("github")));
+      return actions;
+    }
     if (p.repo) actions.append(el("a", { href: p.repo, target: "_blank", rel: "noopener", class: "btn btn-primary" }, "View project"));
     if (p.demo) actions.append(el("a", { href: p.demo, target: "_blank", rel: "noopener", class: "btn" }, "Live demo"));
     return actions.childElementCount ? actions : null;
+  }
+
+  // Project title: links to the case study if there is one, else to the repository
+  function projectTitle(p) {
+    if (p.caseStudy) return el("a", { href: asset(p.caseStudy), class: "internal" }, p.title);
+    return p.repo ? externalLink(p.repo, p.title) : p.title;
   }
 
   // Project links plus a "Details" button that opens the details window
@@ -247,30 +269,6 @@
     handle.addEventListener("pointercancel", end);
   }
 
-  // Featured project content: label + status badge and tech over a hairline, then title, description
-  // and buttons. Tech uses the logo + name items from the Stack section.
-  function projectContent(p, label, extra) {
-    return [
-      el("div", { class: "project-head rule-head" },
-        el("div", { class: "project-label" }, el("p", { class: "quest-label" }, label), extra),
-        p.tech?.length ? el("ul", { class: "project-tech" }, ...p.tech.map(stackItem)) : null),
-      el("h3", {}, p.repo ? externalLink(p.repo, p.title) : p.title),
-      p.description ? el("p", {}, p.description) : null,
-      // Phones: the tech moves out of the crowded header into pills under the description (CSS)
-      p.tech?.length ? el("ul", { class: "tech-pills featured-pills", "aria-label": "Technologies" }, ...p.tech.map(techPill)) : null,
-      projectActions(p),
-    ];
-  }
-
-  // Highlighted project: title and description first, then the tech as small logo pills, then the buttons
-  function renderProject(p) {
-    return el("article", { class: "project rule-top" },
-      el("h3", {}, p.repo ? externalLink(p.repo, p.title) : p.title),
-      p.description ? el("p", {}, p.description) : null,
-      p.tech?.length ? el("ul", { class: "tech-pills", "aria-label": "Technologies" }, ...p.tech.map(techPill)) : null,
-      projectActions(p));
-  }
-
   // Same logo + name as a Stack item, styled as a pill
   function techPill(name) {
     const item = stackItem(name);
@@ -278,59 +276,267 @@
     return item;
   }
 
-  // Compact row for the "Other projects" list: title on the left, description + tech in the middle,
-  // "Details" button on the right
-  function renderOtherProject(p) {
-    return el("li", { class: "side-quest" },
-      el("h3", {}, p.repo ? externalLink(p.repo, p.title) : p.title),
-      el("div", {},
-        p.description ? el("p", {}, p.description) : null,
-        p.tech?.length ? techLine(p.tech) : null),
-      hasDetails(p) ? detailsButton(p, "btn btn-sm side-details") : null
-    );
-  }
-
-  // Collapsed by default behind a toggle row (title, count, preview of the names), so visitors who
-  // don't want the full list don't have to scroll past it. The list slides open on click.
-  function renderOtherProjects(list) {
-    const panelId = "other-projects-panel";
-    const action = el("span", { class: "other-action" }, "Show all");
-    const toggle = el("button", { type: "button", class: "other-toggle", "aria-expanded": "false", "aria-controls": panelId },
-      el("span", { class: "other-title" }, "Other projects"),
-      el("span", { class: "other-count" }, String(list.length)),
-      el("span", { class: "other-preview", "aria-hidden": "true" }, list.map((p) => p.title).join(", ")),
+  // Content collapsed behind a toggle row (title, optional count and preview text), so visitors who
+  // don't want it don't have to scroll past it. The panel slides open on click.
+  // Used for long tables on case-study pages.
+  function collapsible({ id, title, count, preview, labels = ["Show", "Hide"], content }) {
+    const action = el("span", { class: "other-action" }, labels[0]);
+    const toggle = el("button", { type: "button", class: "other-toggle", "aria-expanded": "false", "aria-controls": id },
+      el("span", { class: "other-title" }, title),
+      count != null ? el("span", { class: "other-count" }, String(count)) : null,
+      preview ? el("span", { class: "other-preview", "aria-hidden": "true" }, preview) : el("span", { class: "other-preview" }),
       action, icon("chevron"));
-    const panel = el("div", { class: "other-panel", id: panelId },
-      el("div", {}, el("ul", { class: "side-quests" }, ...list.map(renderOtherProject))));
-    panel.inert = true; // collapsed rows can't be tabbed into
+    const panel = el("div", { class: "other-panel", id }, el("div", {}, content));
+    panel.inert = true; // collapsed content can't be tabbed into
 
     toggle.addEventListener("click", () => {
       const open = toggle.getAttribute("aria-expanded") !== "true";
-      // Collapsing from further down the list: bring the toggle back into view first,
-      // so the page doesn't jump to whatever comes after the list
+      // Collapsing from further down: bring the toggle back into view first,
+      // so the page doesn't jump to whatever comes after the panel
       if (!open && toggle.getBoundingClientRect().top < 0) toggle.scrollIntoView({ block: "start" });
       toggle.setAttribute("aria-expanded", String(open));
-      action.textContent = open ? "Show less" : "Show all";
+      action.textContent = open ? labels[1] : labels[0];
       panel.classList.toggle("open", open);
       panel.inert = !open;
     });
     return [el("h3", { class: "other-head" }, toggle), panel];
   }
 
-  // Featured project: a panel with the status badge in the header and the highlighted stat on the right
-  function renderFeaturedProject(p) {
-    const status = p.status
-      ? el("span", { class: `featured-status${p.continued === false ? " off" : ""}` },
-          el("span", { class: "dot", "aria-hidden": "true" }), p.status)
-      : null;
-    const side = el("div", { class: "featured-side" },
-      p.stat ? el("span", { class: "featured-value" }, p.stat.value) : null,
-      p.stat?.label ? el("span", { class: "featured-label" }, p.stat.label) : null
-    );
-    return el("article", { class: "project featured" },
-      el("div", { class: "featured-main" }, ...projectContent(p, "Featured", status)),
-      side.childElementCount ? side : null
-    );
+  // Small status badge: green with a pulsing dot (live / active), grey when continued: false (archived)
+  function statusBadge(p) {
+    if (!p.status) return null;
+    return el("span", { class: `featured-status${p.continued === false ? " off" : ""}` },
+      el("span", { class: "dot", "aria-hidden": "true" }), p.status);
+  }
+
+  /* ---------- project pictures (spotlight slides) ---------- */
+  // Lua colouring for code cards: comments, strings, numbers, true/false, keywords and table keys
+  const LUA_KEYWORDS = new Set(["and", "break", "do", "else", "elseif", "end", "for", "function", "if", "in",
+    "local", "nil", "not", "or", "repeat", "return", "then", "until", "while"]);
+  function highlightLua(line) {
+    const out = [];
+    const re = /(--.*)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|\b(true|false|nil)\b|\b(\d[\d.]*)\b|\b([A-Za-z_]\w*)\b/g;
+    let last = 0;
+    for (const m of line.matchAll(re)) {
+      if (m.index > last) out.push(line.slice(last, m.index));
+      const text = m[0];
+      let cls = null;
+      if (m[1]) cls = "tok-comment";
+      else if (m[2]) cls = "tok-string";
+      else if (m[3]) cls = "tok-bool";
+      else if (m[4]) cls = "tok-number";
+      else if (LUA_KEYWORDS.has(text)) cls = "tok-keyword";
+      else if (/^\s*=(?!=)/.test(line.slice(m.index + text.length))) cls = "tok-key";
+      out.push(cls ? el("span", { class: cls }, text) : text);
+      last = m.index + text.length;
+    }
+    out.push(line.slice(last));
+    return out;
+  }
+
+  // Window bar with three dots and a label (address or file name)
+  const visualBar = (label) => el("div", { class: "visual-bar", "aria-hidden": "true" },
+    el("span", { class: "visual-dots" }), label ? el("span", { class: "visual-label" }, label) : null);
+
+  // The picture of a project, from its "visual" field: a screenshot in a browser frame, an emulator screen
+  // with sharp pixels, or real code in an editor window
+  function projectVisual(p) {
+    const v = p.visual;
+    if (!v) return null;
+    if (v.type === "code") {
+      const lines = v.code.replace(/\n+$/, "").split("\n");
+      const code = el("code", {}, ...lines.flatMap((line, i) =>
+        [el("span", { class: "code-line" }, ...highlightLua(line)), i < lines.length - 1 ? "\n" : null]));
+      const pre = el("pre", { "aria-label": v.alt || `Code from ${v.file}` }, code);
+      pre.style.setProperty("--first-line", (v.firstLine || 1) - 1);
+      return el("figure", { class: "visual visual-code" }, visualBar(v.file), pre);
+    }
+    const img = el("img", { src: asset(v.src), alt: v.alt || "", decoding: "async" });
+    if (v.width) img.width = v.width;
+    if (v.height) img.height = v.height;
+    if (v.type === "screen") {
+      return el("figure", { class: "visual visual-screen" },
+        el("div", { class: "screen-bezel" }, img),
+        v.caption ? el("figcaption", {}, v.caption) : null);
+    }
+    return el("figure", { class: "visual visual-browser" }, visualBar(v.label), el("div", { class: "visual-img" }, img));
+  }
+
+  /* ---------- spotlight carousel ---------- */
+  // The highlight: true projects, one slide each (picture left, text right). It moves on by itself every few
+  // seconds (the active dot fills up meanwhile) and pauses while hovered, focused, touched or off screen.
+  // Swipe sideways, use the arrows or dots, or the arrow keys to switch by hand. With reduced motion there
+  // is no autoplay (the fill animation is switched off, and its end is what moves the carousel on).
+  function renderSlide(p, i, total) {
+    return el("article", { class: "slide", role: "group", "aria-roledescription": "slide", "aria-label": `${i + 1} of ${total}: ${p.title}` },
+      el("div", { class: "slide-visual" }, projectVisual(p)),
+      el("div", { class: "slide-body" },
+        el("div", { class: "slide-tags" },
+          p.category ? el("span", { class: "quest-label" }, p.category) : null,
+          statusBadge(p),
+          p.badge ? el("span", { class: "badge-chip" }, p.badge) : null),
+        el("h3", { class: "slide-title" }, projectTitle(p)),
+        p.description ? el("p", { class: "slide-text" }, p.description) : null,
+        p.stat
+          ? el("p", { class: "slide-stat" },
+              el("span", { class: "slide-stat-value" }, p.stat.value),
+              el("span", { class: "slide-stat-label" }, p.stat.label))
+          : null,
+        p.tech?.length ? el("ul", { class: "tech-pills", "aria-label": "Technologies" }, ...p.tech.map(techPill)) : null,
+        projectActions(p)));
+  }
+
+  function renderSpotlight(list) {
+    const track = el("div", { class: "spot-track", tabindex: "0", "aria-label": "Spotlight projects (arrow keys switch)" },
+      ...list.map((p, i) => renderSlide(p, i, list.length)));
+    const slides = [...track.children];
+    const counter = el("span", { class: "spot-count", "aria-hidden": "true" });
+    const arrow = (dir, label) => {
+      const b = el("button", { type: "button", class: `chip chip-icon spot-arrow ${dir}`, "aria-label": label }, icon("chevron"));
+      b.addEventListener("click", () => go(current + (dir === "prev" ? -1 : 1)));
+      return b;
+    };
+    const dots = list.map((p, i) => {
+      const dot = el("button", { type: "button", class: "spot-dot", "aria-label": `Show ${p.title}` }, el("span", { class: "spot-dot-fill" }));
+      dot.addEventListener("click", () => go(i));
+      return dot;
+    });
+    const box = el("div", { class: "spotlight", role: "region", "aria-roledescription": "carousel", "aria-label": "Spotlight projects" },
+      el("div", { class: "spot-head" }, el("p", { class: "quest-label" }, "Spotlight"), counter),
+      track,
+      el("div", { class: "spot-controls" }, arrow("prev", "Previous project"), el("div", { class: "spot-dots" }, ...dots), arrow("next", "Next project")));
+
+    let current = -1;
+    function setCurrent(n) {
+      if (n === current) return;
+      current = n;
+      counter.textContent = `${pad(n + 1)} / ${pad(slides.length)}`;
+      slides.forEach((s, i) => { s.inert = i !== n; }); // hidden slides can't be tabbed into
+      dots.forEach((d, i) => {
+        d.classList.remove("active");
+        if (i === n) d.setAttribute("aria-current", "true");
+        else d.removeAttribute("aria-current");
+      });
+      void dots[n].offsetWidth; // restart the fill animation
+      dots[n].classList.add("active");
+    }
+    function go(i, smooth = true) {
+      const n = (i + slides.length) % slides.length;
+      track.scrollTo({ left: n * track.clientWidth, behavior: smooth && !reducedMotion ? "smooth" : "auto" });
+      setCurrent(n);
+    }
+
+    // Swiping: once the track stops moving, the slide in view becomes the current one
+    let settle;
+    track.addEventListener("scroll", () => {
+      clearTimeout(settle);
+      settle = setTimeout(() => setCurrent(Math.round(track.scrollLeft / track.clientWidth)), 120);
+    }, { passive: true });
+    track.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      e.preventDefault();
+      go(current + (e.key === "ArrowLeft" ? -1 : 1));
+    });
+    window.addEventListener("resize", () => { track.scrollLeft = current * track.clientWidth; });
+
+    // Autoplay: the active dot's fill animation is the timer
+    dots.forEach((d) => d.addEventListener("animationend", () => go(current + 1)));
+    const pauses = new Set();
+    const pause = (reason, on) => {
+      if (on) pauses.add(reason);
+      else pauses.delete(reason);
+      box.classList.toggle("paused", pauses.size > 0);
+    };
+    box.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") pause("hover", true); });
+    box.addEventListener("pointerleave", () => pause("hover", false));
+    box.addEventListener("focusin", () => pause("focus", true));
+    box.addEventListener("focusout", (e) => { if (!box.contains(e.relatedTarget)) pause("focus", false); });
+    track.addEventListener("touchstart", () => pause("touch", true), { passive: true });
+    track.addEventListener("touchend", () => pause("touch", false));
+    document.addEventListener("visibilitychange", () => pause("hidden", document.hidden));
+    if ("IntersectionObserver" in window) {
+      pause("offscreen", true);
+      new IntersectionObserver(([entry]) => pause("offscreen", !entry.isIntersecting), { threshold: 0.5 }).observe(track);
+    }
+    setCurrent(0);
+    return box;
+  }
+
+  /* ---------- all projects: filter chips + cards ---------- */
+  // Every project as a card (spotlight ones included, marked with a star), filtered by topic.
+  // The card links to the case study or repository; "Details" opens the details window.
+  function renderProjectCard(p) {
+    const actions = [
+      hasDetails(p) ? detailsButton(p, "btn btn-sm") : null,
+      p.caseStudy ? el("a", { href: asset(p.caseStudy), class: "btn btn-sm" }, "Case study →") : null,
+    ].filter(Boolean);
+    const card = el("article", { class: "pcard" },
+      el("div", { class: "pcard-top" },
+        el("span", { class: "quest-label" }, p.category || "Other"),
+        p.highlight ? el("span", { class: "pcard-flag star", title: "Also in the spotlight above" }, "★") : null,
+        p.tag ? el("span", { class: "pcard-flag" }, p.tag) : null),
+      el("h3", {}, projectTitle(p)),
+      p.description ? el("p", { class: "pcard-text" }, p.description) : null,
+      p.tech?.length ? techLine(p.tech) : null,
+      actions.length ? el("div", { class: "pcard-actions" }, ...actions) : null);
+    card.dataset.category = p.category || "Other";
+    return card;
+  }
+
+  // Only the first few cards show until "Show all" is pressed (per filter; a filter with that many or fewer
+  // projects shows them all)
+  const CARDS_SHOWN = 6;
+
+  function renderAllProjects(list) {
+    // Topics in the order of PROJECT_CATEGORIES, unknown ones after them, "Other" for projects without one
+    const counts = new Map(categories.map((c) => [c, 0]));
+    for (const p of list) {
+      const key = p.category || "Other";
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    // Projects that aren't in the spotlight come first, so the first cards under it aren't the same ones again
+    const ordered = [...list.filter((p) => !p.highlight), ...list.filter((p) => p.highlight)];
+    const cards = ordered.map(renderProjectCard);
+    const grid = el("div", { class: "pgrid", id: "project-grid" }, ...cards);
+    const status = el("p", { class: "visually-hidden", "aria-live": "polite" });
+    const moreLabel = el("span", {});
+    const more = el("button", { type: "button", class: "btn more-toggle", "aria-expanded": "false", "aria-controls": "project-grid" }, moreLabel, icon("chevron"));
+    const filters = [["All", list.length], ...[...counts].filter(([, n]) => n)];
+    let active = "All";
+    let expanded = false;
+
+    function apply() {
+      const matching = cards.filter((c) => active === "All" || c.dataset.category === active);
+      cards.forEach((c) => { c.hidden = true; });
+      matching.forEach((c, i) => { c.hidden = !expanded && i >= CARDS_SHOWN; });
+      const hiddenCount = matching.length - CARDS_SHOWN;
+      more.hidden = hiddenCount <= 0;
+      more.setAttribute("aria-expanded", String(expanded));
+      moreLabel.textContent = expanded ? "Show less" : `Show all ${matching.length} projects`;
+      chips.forEach((c, i) => c.setAttribute("aria-pressed", String(filters[i][0] === active)));
+      const shown = matching.filter((c) => !c.hidden).length;
+      status.textContent = `${count(shown, "project")} shown`;
+    }
+
+    const chips = filters.map(([name, n]) => {
+      const chip = el("button", { type: "button", class: "filter-chip", "aria-pressed": "false", "aria-controls": "project-grid" },
+        el("span", {}, name), el("span", { class: "filter-count" }, String(n)));
+      chip.addEventListener("click", () => { active = name; apply(); });
+      return chip;
+    });
+    more.addEventListener("click", () => {
+      expanded = !expanded;
+      // Collapsing from further down: bring the grid back into view, so the page doesn't jump past it
+      if (!expanded && grid.getBoundingClientRect().top < 0) grid.scrollIntoView({ block: "start" });
+      apply();
+    });
+    apply();
+    return el("div", { class: "all-projects" },
+      el("h3", { class: "quest-label all-head" }, "All projects by topic"),
+      el("div", { class: "filter-chips", role: "group", "aria-label": "Filter projects by topic" }, ...chips),
+      status,
+      grid,
+      more);
   }
 
   /* ---------- GitHub profile card ---------- */
@@ -1261,33 +1467,201 @@
     });
   }
 
+  /* ---------- case-study pages (projects/*.html) ---------- */
+  // The page only has the frame (top bar, hero fields, footer); everything else comes from CASE_STUDIES.
+  // Each phase is a section like the ones on the home page: sticky heading with the cube companion on the
+  // left, content on the right. The phases also fill the top-bar navigation (keys 1–7 jump there).
+
+  // Big numbers with a small label underneath
+  const statGrid = (items) => el("dl", { class: "cs-stats" },
+    ...items.map((s) => el("div", { class: "cs-stat" }, el("dt", {}, s.label), el("dd", {}, s.value))));
+
+  // Image that opens its PDF: in the PDF viewer on large screens, in the browser's own viewer on phones
+  function pdfFigure(src, pdf, alt, title, className) {
+    const link = el("a", { class: className, href: asset(pdf), target: "_blank", rel: "noopener" },
+      el("img", { src: asset(src), alt, loading: "lazy" }),
+      el("span", { class: "cs-open" }, "Open PDF ↗"));
+    link.addEventListener("click", (e) => {
+      if (smallScreen.matches || !dialog?.showModal) return;
+      e.preventDefault();
+      openPdf(asset(pdf), title || alt);
+    });
+    return link;
+  }
+
+  function csTable(b) {
+    return el("div", { class: "cs-table-wrap" }, el("table", { class: "cs-table" },
+      el("thead", {}, el("tr", {}, ...b.head.map((h) => el("th", { scope: "col" }, h)))),
+      // data-label: phones show each row as a small card with the column name above each value (CSS)
+      el("tbody", {}, ...b.rows.map((row) => el("tr", {}, ...row.map((cell, i) => el("td", { "data-label": b.head[i] || "" }, cell)))))));
+  }
+
+  const CS_BLOCKS = {
+    text: (b) => b.paragraphs.map((t) => el("p", { class: "cs-text" }, t)),
+    stats: (b) => [statGrid(b.items)],
+    cards: (b) => [el("ul", { class: "cs-cards" }, ...b.items.map((c) =>
+      el("li", { class: `cs-card${c.badge ? " marked" : ""}` },
+        el("div", { class: "cs-card-top" },
+          el("span", { class: "cs-tag" }, c.tag),
+          c.badge ? el("span", { class: "featured-status" }, el("span", { class: "dot", "aria-hidden": "true" }), c.badge) : null),
+        el("h4", {}, c.title),
+        el("p", {}, c.text))))],
+    quote: (b) => [el("blockquote", { class: "cs-quote" },
+      b.label ? el("p", { class: "quest-label" }, b.label) : null,
+      el("p", {}, b.text))],
+    list: (b) => [
+      b.intro ? el("p", { class: "cs-text" }, b.intro) : null,
+      el("ol", { class: "cs-list" }, ...b.items.map((t) => el("li", {}, t)))],
+    flow: (b) => [el("ol", { class: "cs-flow" }, ...b.items.map((t, i) =>
+      el("li", {}, el("span", { class: "cs-flow-n" }, pad(i + 1)), t)))],
+    steps: (b) => [el("ol", { class: "cs-steps" }, ...b.items.map((s, i) =>
+      el("li", { class: "cs-step" },
+        el("span", { class: "cs-step-n", "aria-hidden": "true" }, pad(i + 1)),
+        el("div", {}, el("h4", {}, s.title), el("p", {}, s.text)))))],
+    figure: (b) => [
+      pdfFigure(b.src, b.pdf, b.alt, b.title, "cs-figure"),
+      b.caption ? el("p", { class: "cs-caption" }, b.caption) : null],
+    gallery: (b) => [
+      el("div", { class: "cs-gallery" }, ...b.items.map((it) => pdfFigure(it.src, b.pdf, it.alt, b.title, "cs-figure cs-page"))),
+      b.caption ? el("p", { class: "cs-caption" }, b.caption) : null],
+    table: (b) => [csTable(b)],
+  };
+
+  function renderBlock(b, id) {
+    // Long tables (collapsed: true) sit behind the same toggle as the project folders
+    if (b.type === "table" && b.collapsed) {
+      return el("div", { class: "cs-block" },
+        ...collapsible({ id, title: b.title, count: b.rows.length, content: csTable(b) }));
+    }
+    const render = CS_BLOCKS[b.type];
+    if (!render) return null;
+    return el("div", { class: `cs-block cs-block-${b.type}` },
+      b.title ? el("h3", { class: "quest-label cs-block-title" }, b.title) : null,
+      ...render(b));
+  }
+
+  // One section with the usual layout: heading on the left (number, name, date, progress dots, cube
+  // companion slot), content on the right
+  function csSection({ id, label, title, meta, shape, extraHead, className = "" }, ...body) {
+    return el("section", { class: `section cs-section ${className}`.trim(), id },
+      el("div", { class: "wrap section-inner" },
+        el("div", { class: "section-head" },
+          el("p", { class: "lvl" }, label),
+          el("h2", {}, title),
+          meta ? el("p", { class: "section-meta" }, meta) : null,
+          extraHead || null,
+          shape ? el("div", { class: "voxel-slot", "data-shape": shape, "aria-hidden": "true" }) : null),
+        el("div", { class: "cs-body" }, ...body)));
+  }
+
+  function renderPhase(ph, i, all) {
+    const upcoming = ph.status === "next";
+    // Where this phase sits in the process: done · current · still to come
+    const dots = el("ol", { class: "phase-dots", "aria-hidden": "true" },
+      ...all.map((p, j) => el("li", { class: j < i ? "done" : j === i ? "current" : "" })));
+    return csSection({
+      id: ph.id, label: `Phase ${pad(i + 1)}`, title: ph.name, meta: ph.when, shape: ph.shape,
+      extraHead: dots, className: upcoming ? "is-next" : "",
+    },
+    upcoming ? el("span", { class: "featured-status off cs-upcoming" }, el("span", { class: "dot", "aria-hidden": "true" }), "Not done yet") : null,
+    ph.lead ? el("p", { class: "cs-lead" }, ph.lead) : null,
+    ...(ph.blocks || []).map((b, j) => renderBlock(b, `${ph.id}-${j + 1}`)));
+  }
+
+  function renderCaseStudy(cs) {
+    const main = $("#case-study");
+    if (!cs) {
+      main.append(el("div", { class: "wrap noscript" }, emptyMessage("This case study doesn't exist (yet).")));
+      return;
+    }
+    const phases = cs.phases || [];
+
+    // Hero
+    setText("#cs-label", cs.label);
+    setText("#cs-title", cs.title);
+    setText("#cs-pitch", cs.pitch);
+    setText("#cs-intro", cs.intro);
+    const facts = $("#cs-facts");
+    if (cs.facts?.length) facts.append(...cs.facts.flatMap(([label, value]) => [el("dt", {}, label), el("dd", {}, value)]));
+    else facts.remove();
+    const actions = $("#cs-actions");
+    if (cs.live) actions.append(el("a", { class: "btn btn-primary btn-start", href: cs.live, target: "_blank", rel: "noopener" }, "▶ Play live"));
+    if (cs.repo) actions.append(el("a", { class: "chip", href: cs.repo, target: "_blank", rel: "noopener" }, icon("github"), el("span", {}, "View code")));
+
+    // Screenshot of the project in a small browser frame (address bar shows the live URL)
+    const shot = $("#cs-shot");
+    if (cs.screenshot) {
+      const img = el("img", { src: asset(cs.screenshot.src), alt: cs.screenshot.alt || "" });
+      if (cs.screenshot.width) img.width = cs.screenshot.width;
+      if (cs.screenshot.height) img.height = cs.screenshot.height;
+      const host = cs.live ? cs.live.replace(/^https?:\/\//, "").replace(/\/$/, "") : "";
+      shot.append(
+        el("div", { class: "case-shot-bar", "aria-hidden": "true" }, el("span", { class: "case-shot-dots" }), host ? el("span", { class: "case-shot-url" }, host) : null),
+        cs.live ? el("a", { href: cs.live, target: "_blank", rel: "noopener", "aria-label": `Play ${cs.title} live` }, img) : img);
+    } else shot.remove();
+
+    // Top-bar navigation: one link per phase, then decisions and outlook
+    const links = [...phases.map((p) => [p.id, p.name])];
+    if (cs.decisions?.length) links.push(["decisions", "Decisions"]);
+    if (cs.next?.length) links.push(["next", "Next"]);
+    $("#nav").append(...links.map(([id, name]) => el("a", { href: `#${id}` }, name)));
+
+    // Overview: the starting question, a few numbers, and the process as a row of stages
+    const stages = el("ol", { class: "cs-stages" }, ...phases.map((p, i) =>
+      el("li", { class: `cs-stage${p.status === "next" ? " next" : ""}` },
+        el("a", { href: `#${p.id}` },
+          el("span", { class: "cs-stage-n" }, pad(i + 1)),
+          el("span", { class: "cs-stage-name" }, p.name),
+          el("span", { class: "cs-stage-when" }, p.when || "")))));
+    main.append(csSection({ id: "overview", label: "Overview", title: "The challenge", shape: "gitbranch", className: "cs-overview" },
+      cs.challenge ? el("blockquote", { class: "cs-challenge" }, el("p", {}, cs.challenge)) : null,
+      cs.stats?.length ? statGrid(cs.stats) : null,
+      phases.length ? el("div", { class: "cs-block" }, el("h3", { class: "quest-label cs-block-title" }, "The process"), stages) : null));
+
+    main.append(...phases.map(renderPhase));
+
+    const noteCards = (items) => el("ul", { class: "cs-notes" }, ...items.map((d) =>
+      el("li", { class: "cs-note" }, el("h4", { class: "rule-head" }, d.title), el("p", {}, d.text))));
+    if (cs.decisions?.length) {
+      main.append(csSection({ id: "decisions", label: "Behind the build", title: "Key decisions", meta: `${cs.decisions.length} of many`, shape: "braces" },
+        noteCards(cs.decisions)));
+    }
+    if (cs.next?.length) {
+      const cta = el("div", { class: "cta-row" });
+      if (cs.live) cta.append(el("a", { class: "btn btn-primary btn-start", href: cs.live, target: "_blank", rel: "noopener" }, "▶ Play it yourself"));
+      cta.append(el("a", { class: "btn btn-start", href: `${root || "./"}#projects` }, "← All projects"));
+      main.append(csSection({ id: "next", label: "Outlook", title: "What's next", shape: "terminal", className: "cs-next" },
+        noteCards(cs.next), cta));
+    }
+  }
+
+  // Home page: highlight: true projects rotate in the spotlight carousel, below it every project as a card,
+  // filterable by topic
+  function renderHome() {
+    const spotlight = projects.filter((p) => p.highlight);
+    if (spotlight.length) $("#projects-spotlight").append(renderSpotlight(spotlight));
+    else $("#projects-spotlight").remove();
+    if (projects.length) $("#projects-all").append(renderAllProjects(projects));
+    else $("#projects-all").append(emptyMessage("Nothing here yet."));
+    renderGithubCard();
+    fillList($("#papers-list"), papers, "Nothing here yet.", renderPaper);
+    renderAbout();
+    renderHeroPhoto();
+    renderStatus();
+    if (projects.length) setText("#projects-meta", count(projects.length, "project"));
+    if (papers.length) setText("#papers-meta", count(papers.length, "paper"));
+    fillList($("#stack-list"), stack, "Nothing here yet.", renderStackGroup);
+    const techCount = stack.reduce((n, g) => n + (g.items?.length || 0), 0);
+    if (techCount) setText("#stack-meta", techCount === 1 ? "1 technology" : `${techCount} technologies`);
+    fillList($("#education-list"), education, "Nothing here yet.", renderEducation);
+    setText("#contact-text", contact.text);
+  }
+
   /* ---------- init ---------- */
   renderProfile();
-  // featured: big card · highlight: cards below it · the rest: compact "Other projects" list
-  // (if nothing is marked as highlight, every project gets a card)
-  const featuredProject = projects.find((p) => p.featured);
-  const restProjects = projects.filter((p) => p !== featuredProject);
-  const anyHighlight = restProjects.some((p) => p.highlight);
-  const highlightProjects = anyHighlight ? restProjects.filter((p) => p.highlight) : restProjects;
-  const sideProjects = anyHighlight ? restProjects.filter((p) => !p.highlight) : [];
-  if (featuredProject) $("#projects-featured").append(renderFeaturedProject(featuredProject));
-  else $("#projects-featured").remove();
-  if (featuredProject && !highlightProjects.length) $("#projects-list").remove();
-  else fillList($("#projects-list"), highlightProjects, "Nothing here yet.", renderProject);
-  if (sideProjects.length) $("#projects-other").append(...renderOtherProjects(sideProjects));
-  else $("#projects-other").remove();
-  renderGithubCard();
-  fillList($("#papers-list"), papers, "Nothing here yet.", renderPaper);
-  renderAbout();
-  renderHeroPhoto();
-  renderStatus();
-  if (projects.length) setText("#projects-meta", count(projects.length, "project"));
-  if (papers.length) setText("#papers-meta", count(papers.length, "paper"));
-  fillList($("#stack-list"), stack, "Nothing here yet.", renderStackGroup);
-  const techCount = stack.reduce((n, g) => n + (g.items?.length || 0), 0);
-  if (techCount) setText("#stack-meta", techCount === 1 ? "1 technology" : `${techCount} technologies`);
-  fillList($("#education-list"), education, "Nothing here yet.", renderEducation);
-  setText("#contact-text", contact.text);
+  const caseStudyKey = document.body.dataset.caseStudy;
+  if (caseStudyKey) renderCaseStudy(caseStudies[caseStudyKey]);
+  else renderHome();
   $("#year").textContent = new Date().getFullYear();
   initScrollProgress();
   initReveal();

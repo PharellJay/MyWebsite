@@ -41,16 +41,55 @@ const PROFILE = {
  *   tech         list of technologies
  *   repo         link to the GitHub repository (the title links there)
  *   demo         optional link to a live version ("" to hide)
- *   featured     true = the big "Featured" panel above the others (use it for one project)
- *   highlight    true = shown as a large row under the featured one; projects without it are listed
- *                compactly under "Other projects"
- *   stat         featured project only: highlighted number, e.g. { value: "16,000+", label: "registered players" }
- *   status       featured project only: small badge text, e.g. "Live" or "Discontinued"
- *   continued    featured project only: false = the status badge is grey (archived), otherwise green
+ *   highlight    true = in the spotlight carousel at the top (one slide each, with its picture); every project,
+ *                spotlight or not, is also listed as a card under "All projects by topic"
+ *   category     topic of the project, one of PROJECT_CATEGORIES below (the filter chips use it;
+ *                projects without one land in "Other")
+ *   caseStudy    optional link to a case-study page, e.g. "projects/npc-workshop.html" (its content lives in
+ *                CASE_STUDIES); the title and a "Read case study" button then lead there
+ *   visual       picture on the spotlight slide, one of:
+ *                  { type: "browser", src, width, height, label, alt }   screenshot in a browser frame (label = address bar)
+ *                  { type: "screen", src, width, height, caption, alt }  pixel-art screen, scaled up without blur
+ *                  { type: "code", file, firstLine, code, alt }          real code in an editor window (Lua colouring)
+ *   badge        spotlight only: extra label, e.g. "University project · HHN"
+ *   tag          short version of the badge for the cards, e.g. "HHN"
+ *   stat         spotlight only: highlighted number, e.g. { value: "16,000+", label: "registered players" }
+ *   status       spotlight only: small badge text, e.g. "Live" or "Archived"
+ *   continued    false = the status badge is grey (archived), otherwise green
  */
+
+// Order of the topic filters. A new topic? Add it here and use the exact same name as "category".
+const PROJECT_CATEGORIES = [
+  "Security & Networking",
+  "Games & Emulation",
+  "AI & Machine Learning",
+  "Bots & Automation",
+  "Learning & Productivity",
+  "Dev Tools & Web",
+];
+
 const PROJECTS = [
   {
+    title: "NPC Workshop",
+    category: "Games & Emulation",
+    description: "A browser game that teaches students logic gates: repair a game's broken NPCs by wiring sensors, gates and actions, no coding needed. Built through a full Design Thinking process, from interviews to a playable prototype.",
+    tech: ["JavaScript", "HTML", "CSS", "SVG"],
+    repo: "https://github.com/PharellJay/NPCWorkshop",
+    demo: "https://npcworkshop.pharelljay.me",
+    caseStudy: "projects/npc-workshop.html",
+    visual: {
+      type: "browser", src: "assets/npc-workshop/game-main-menu.webp", width: 1127, height: 796, label: "npcworkshop.pharelljay.me",
+      alt: "The NPC Workshop main menu: title and pitch, an AND gate lighting a lamp, the Wild West world map and the badges",
+    },
+    badge: "University project · HHN · team of 3",
+    tag: "HHN",
+    stat: { value: "7", label: "levels across 2 worlds" },
+    status: "Live",
+    highlight: true,
+  },
+  {
     title: "RedM Anticheat",
+    category: "Security & Networking",
     description: "Over 16000 Players have been protected by this server-side driven anticheat for RedM (Red Dead Redemption 2 multiplayer) with 25+ detection modules, hardware-token bans and protected client code.",
     details: [
       "Deadeye Anticheat protected some of the biggest RedM community servers, with more than 16,000 players. " +
@@ -68,7 +107,11 @@ const PROJECTS = [
     tech: ["Lua", "SQL", "JavaScript", "HTML"],
     repo: "https://github.com/PharellJay/RedMAnticheat",
     demo: "",
-    /*featured: true,*/
+    visual: {
+      type: "code", file: "config.lua", firstLine: 71,
+      alt: "Excerpt from config.lua: the list of detection modules, each switched on with true",
+      code: "--MODULES\n---------\nConfig.Modules = {\n    Discordrolecheck = true,\n    Antirapidfire = true,\n    AntiAI = true,\n    AntiInjection = true,\n    NuiBlocker = true,\n    AntiCrash = true,\n    AntiDevmode = true,\n    ForceReleaseChannel = false, --(ALPHA)\n    AntiSpawnweapons = true,\n    BlacklistWeapons = true,\n    BlacklistAmmo = true,\n    AntiPedhack = true,\n    AntiInvincible = true,\n    AntiExplosion = true,\n    AntiFreecam = true, --(ALPHA)\n    AntiInvisible = true,\n    CommandDetection = true,\n    AntiKillaura = true,\n    AntiMasskill = true,\n    EntityBlacklist = true,\n    AntiEntityspam = true,",
+    },
     stat: { value: "16,000+", label: "protected players" },
     status: "Archived",
     continued: false,
@@ -76,6 +119,7 @@ const PROJECTS = [
   },
   {
     title: "Lua Obfuscator",
+    category: "Security & Networking",
     description: "A Lua obfuscator written in pure Lua, built around a bytecode virtual machine that turns protected functions into encrypted, per-build randomised bytecode.",
     details: [
       "The obfuscator reads Lua with its own lexer and parser and compiles selected functions into a private instruction set, " +
@@ -93,11 +137,16 @@ const PROJECTS = [
     ],
     tech: ["Lua", "JavaScript"],
     repo: "https://github.com/PharellJay/LuaObfuscator",
+    visual: {
+      type: "browser", src: "assets/projects/lua-obfuscator-web.webp", width: 1145, height: 796, label: "Deadeye Obfuscator · web UI",
+      alt: "The obfuscator's web UI: preset and pass settings on the left, an example file obfuscated in the browser with its build log on the right",
+    },
     demo: "",
     highlight: true,
   },
   {
     title: "ChessML",
+    category: "AI & Machine Learning",
     description: "A chess engine that teaches itself by self-play, AlphaZero-style, sized to train on an ordinary CPU, with a live dashboard to watch and play against it.",
     details: [
       "ChessML only knows the rules of chess. A small residual policy/value network guides a Monte Carlo tree search, plays against itself and learns from the results: " +
@@ -115,11 +164,16 @@ const PROJECTS = [
     ],
     tech: ["Python", "PyTorch", "FastAPI", "JavaScript"],
     repo: "https://github.com/PharellJay/ChessML",
+    visual: {
+      type: "browser", src: "assets/projects/chessml-play.webp", width: 1360, height: 745, label: "ChessML · play",
+      alt: "ChessML's dashboard in play mode: a chess board on the left, the engine's candidate moves with visits and values on the right",
+    },
     demo: "",
     highlight: true,
   },
   {
     title: "Game Boy Emulator",
+    category: "Games & Emulation",
     description: "An original Game Boy (DMG) emulator written from scratch in Rust: load a .gb ROM and play it with video, sound, remappable controls, battery saves and save states.",
     details: [
       "The emulator core (CPU, picture and audio units, timer and cartridge mappers) is a standalone Rust crate with no dependencies and no windowing, audio or file I/O. " +
@@ -136,11 +190,17 @@ const PROJECTS = [
     ],
     tech: ["Rust", "egui", "cpal"],
     repo: "https://github.com/PharellJay/GBEmulator",
+    visual: {
+      type: "screen", src: "assets/projects/gb-emulator-tetris.png", width: 640, height: 576,
+      caption: "Tetris, running in the emulator",
+      alt: "A game of Tetris running in the emulator: a T piece falling onto a small stack, score 114, level 0",
+    },
     demo: "",
     highlight: true,
   },
   {
     title: "Decentralised VPN",
+    category: "Security & Networking",
     description: "A peer-to-peer VPN with no central server: traffic is routed through two encrypted hops and leaves the internet from another peer's IP.",
     details: [
       "Peers find each other through a distributed hash table, without any central server. Your traffic first goes to a relay, then to another peer's exit, " +
@@ -165,6 +225,7 @@ const PROJECTS = [
   },
   {
     title: "My Website",
+    category: "Dev Tools & Web",
     description: "This portfolio, built from scratch in plain HTML, CSS and JavaScript, with all content in a single data file.",
     details: [
       "No framework and no build step: everything you see is rendered by one script from a single data file, " +
@@ -185,6 +246,7 @@ const PROJECTS = [
   },
   {
     title: "Discord Music Bot",
+    category: "Bots & Automation",
     description: "A music bot for our Discord server: play songs from YouTube or Spotify and control the shared queue with slash commands or buttons.",
     details: [
       "Paste a YouTube or Spotify link, or just type the name of a song, and everyone in the voice channel can manage the queue together.",
@@ -203,6 +265,7 @@ const PROJECTS = [
   },
   {
     title: "NotebookLM Discord Bot",
+    category: "Bots & Automation",
     description: "A Discord bot that lets everyone on a server ask questions of shared Google NotebookLM notebooks, add sources and build up notes together.",
     details: [
       "Link a channel to a notebook and anyone in it can ask with /ask or just mention the bot. The answer is posted in the channel with numbered citations, " +
@@ -224,6 +287,7 @@ const PROJECTS = [
   },
   {
     title: "Gitcheck",
+    category: "Dev Tools & Web",
     description: "A small command-line tool that finds every git repository inside a folder and shows the status of each one at a glance.",
     details: [
       "Point it at a folder and it finds every git repository inside, at any depth, then prints one line per clean repo and the full status for any that need attention. " +
@@ -243,6 +307,7 @@ const PROJECTS = [
   },
   {
     title: "Language Practice Tool",
+    category: "Learning & Productivity",
     description: "Practise the everyday sentences and words you actually need, in any language pair, with read-aloud and spaced repetition.",
     details: [
       "Pick the language you speak and the one you want to learn. All content is written once in English and translated on demand by a self-hosted LibreTranslate server, " +
@@ -262,6 +327,7 @@ const PROJECTS = [
   },
   {
     title: "Flashcards",
+    category: "Learning & Productivity",
     description: "A keyboard-friendly flashcard app for the terminal, with nested folders and decks you can share as a short code.",
     details: [
       "Public flashcard apps tend to be full of paywalls and ads, so I built my own: organise cards in nested folders, study them and share whole folders with friends.",
@@ -280,6 +346,7 @@ const PROJECTS = [
   },
   {
     title: "Questlog",
+    category: "Learning & Productivity",
     description: "A to-do list disguised as an RPG quest journal in the terminal, with XP, levels and a JRPG-style dashboard.",
     details: [
       "Organise tasks into nested questlines with due dates and priorities, see today and the week ahead at a glance, and earn XP and levels for every quest you complete.",
@@ -297,6 +364,210 @@ const PROJECTS = [
     demo: "",
   },
 ];
+
+/*
+ * CASE_STUDIES — long-form project pages (e.g. projects/npc-workshop.html), keyed by the name the page
+ * asks for in <body data-case-study="...">. Paths to images and PDFs are relative to the site root.
+ *   title, label, pitch, intro       hero: small label, title, large opening sentence, a second sentence
+ *   facts        [label, value] pairs under the intro (role, course, timeframe, ...)
+ *   live, repo   links for the "Play live" and "View code" buttons
+ *   screenshot   { src, width, height, alt }: shown in a browser frame under the hero, links to "live"
+ *   stats        [{ value, label }] strip under the hero
+ *   challenge    the question the project started from
+ *   phases       one section per step of the process (also the top-bar navigation):
+ *                id, name, when (optional date), status ("next" = not done yet), shape (cube companion),
+ *                lead (one sentence), blocks (see below)
+ *   decisions    [{ title, text }]   ·   next   [{ title, text }]
+ * Block types inside a phase (each may have a "title"):
+ *   { type: "text", paragraphs: [...] }               { type: "stats", items: [{ value, label }] }
+ *   { type: "cards", items: [{ tag, title, text, badge }] }   badge = highlighted card with that label
+ *   { type: "quote", label, text }                    { type: "list", intro, items: [...] } (numbered)
+ *   { type: "flow", items: [...] }                    short steps in a row with arrows
+ *   { type: "steps", items: [{ title, text }] }       numbered iterations on a vertical line
+ *   { type: "figure", src, pdf, alt, caption }        image that opens its PDF
+ *   { type: "gallery", pdf, items: [{ src, alt }], caption }
+ *   { type: "table", head: [...], rows: [[...]], collapsed: true }  collapsed = behind a toggle
+ */
+const CASE_STUDIES = {
+  "npc-workshop": {
+    title: "NPC Workshop",
+    label: "Case study · Design Thinking",
+    pitch: "You've just started at a game studio, and the NPCs of its castle game are broken. Fix them by wiring sensors, logic gates and actions together, no coding needed.",
+    intro: "A browser game that teaches students aged 16 and up the basics of digital logic: signals 0/1 and the gates AND, OR and NOT. The test scene shows right away whether the NPC reacts correctly.",
+    facts: [
+      ["Role", "Developer of the digital prototype, part of a 3-person team"],
+      ["Course", "Design Thinking, Hochschule Heilbronn, winter term 2026/27"],
+      ["Timeframe", "Oct 2026 – Feb 2027"],
+      ["Built with", "Vanilla JavaScript · SVG · no build step"],
+    ],
+    live: "https://npcworkshop.pharelljay.me",
+    repo: "https://github.com/PharellJay/NPCWorkshop",
+    screenshot: {
+      src: "assets/npc-workshop/game-main-menu.webp", width: 1127, height: 796,
+      alt: "The NPC Workshop main menu: title and pitch, an AND gate lighting a lamp, the Wild West world map with level stations, and the badges “What have I learned?”",
+    },
+    stats: [
+      { value: "6", label: "student interviews" },
+      { value: "6", label: "key insights" },
+      { value: "7", label: "levels in 2 worlds" },
+      { value: "45–60", label: "minutes of play" },
+    ],
+    challenge: "How might we make computer science more exciting for students?",
+    phases: [
+      {
+        id: "empathize",
+        name: "Empathize",
+        when: "Oct 29 & Nov 10, 2026",
+        shape: "player",
+        lead: "We started by talking to the people the game is for.",
+        blocks: [
+          { type: "stats", items: [
+            { value: "6", label: "interviews" },
+            { value: "14–17", label: "years old" },
+            { value: "2", label: "school types" },
+          ] },
+          { type: "text", paragraphs: [
+            "Six interviews with students aged 14 to 17: from a vocational college with a business & IT track, and from a Year 9 class with the science & technology profile (NwT), among others at a Gymnasium.",
+            "The interview guide mixed open questions with rating scales on interest in computer science, previous experiences, self-confidence, ideas about IT jobs and gaming habits. All interviews were transcribed and anonymised; quotes from them stay private on purpose.",
+          ] },
+        ],
+      },
+      {
+        id: "define",
+        name: "Define",
+        shape: "paper",
+        lead: "From a pile of statements to one clear question: who exactly are we designing for?",
+        blocks: [
+          { type: "text", title: "Clustering", paragraphs: [
+            "From every interview we pulled out statements (observation) and the needs behind them (interpretation), then derived six traits: interest in computer science, wanting to understand how technology works, self-confidence, experiences of failure, the image of an IT job and social play. Three groups emerged:",
+          ] },
+          { type: "cards", items: [
+            { tag: "A", title: "Interested despite setbacks", text: "Curious and wants to understand how technology works, but held back by concrete failures, so computer science feels like “not for me”.", badge: "Our target group" },
+            { tag: "B", title: "Use-oriented", text: "Computer science is mainly a compulsory subject. Technology is there to be used, not understood." },
+            { tag: "C", title: "Interested and confident", text: "Computer science already fits, built on positive experiences." },
+          ] },
+          { type: "text", paragraphs: [
+            "Across all groups, almost everyone prefers playing in a team, and whoever keeps losing stops. We chose cluster A: the interest is there, but it is blocked by hurdles that a game can actually address.",
+          ] },
+          { type: "cards", title: "Key insights", items: [
+            { tag: "E1", title: "Basics before jargon", text: "The entry has to start with the basics; technical terms come after." },
+            { tag: "E2", title: "One mistake mustn't break everything", text: "So far, a single mistake feels like everything is wrong." },
+            { tag: "E3", title: "“You need talent for that”", text: "Whoever has failed explains it with a lack of talent and counts themselves out." },
+            { tag: "E4", title: "Curious about what's behind it", text: "For example, how NPCs in games react to situations. Understanding instead of memorising." },
+            { tag: "E5", title: "Puzzling together gives confidence", text: "Talking it through, and laughing about mistakes together." },
+            { tag: "E6", title: "Constant losing kills motivation", text: "It takes regular moments of success." },
+          ] },
+          { type: "figure", title: "Persona",
+            src: "assets/npc-workshop/persona-lena.png", pdf: "assets/npc-workshop/persona-lena.pdf",
+            alt: "Persona Lena, 16: profile, how her interest in computer science dropped with Arduino as the turning point, her attitude towards computer science, what holds her back and what drives her, her gaming habits and what the game has to do for her",
+            caption: "Lena, 16, “the curious one who got left behind”: fictional, condensed from several interviews. Quotes and personal details are paraphrased in this public version. Document in German." },
+          { type: "quote", label: "Point of view", text: "Lena wants to finally understand how the technology behind the things that make her curious works. But when she started, she was overwhelmed without the basics and with untranslated technical terms, every small mistake brought everything to a halt, and since then she believes you need talent for it." },
+          { type: "text", title: "Topic: digital logic", paragraphs: [
+            "Signals 0/1, the gates AND, OR and NOT, simple circuits. This is exactly where Lena dropped out: at its core, Arduino is about digital signals (button on/off, LED on/off). The topic ties into the science & technology class, can be taught entirely without programming and is small enough for a game.",
+          ] },
+          { type: "list", title: "Learning goals", intro: "After playing, Lena can …", items: [
+            "explain that digital circuits work with two states (0/1), and tell inputs (sensors) from outputs (actions)",
+            "predict the output of AND, OR and NOT and record it in a truth table",
+            "combine several gates into a circuit for an everyday rule",
+            "narrow down a faulty circuit step by step instead of starting over",
+          ] },
+          { type: "text", title: "Impact goal", paragraphs: [
+            "Lena sees mistakes as a normal part of solving a problem, and trusts herself again to work on circuits, for example on an Arduino.",
+          ] },
+          { type: "quote", label: "How might we", text: "How might we give Lena, who lost track when starting with Arduino, insights into digital logic through a game, so that she understands how logic gates turn input signals into an output, and trusts herself again to try out circuits on her own?" },
+        ],
+      },
+      {
+        id: "ideate",
+        name: "Ideate",
+        when: "Nov 19, 2026",
+        shape: "cloud",
+        lead: "Many rough ideas, fast, then narrowed down to one concept.",
+        blocks: [
+          { type: "text", paragraphs: [
+            "As our team method we researched and presented Quick Sketching: instead of writing ideas down, you sketch them roughly under time pressure (for example Crazy 8s: 8 ideas in 8 minutes), keep drawing on each other's sketches and rate them by dot voting.",
+          ] },
+          { type: "flow", title: "The ideation session", items: ["Collect ideas", "Cluster", "Dot voting", "3 favourites", "1 concept"] },
+          { type: "figure", title: "Result: the concept brief",
+            src: "assets/npc-workshop/konzept-steckbrief.png", pdf: "assets/npc-workshop/konzept-steckbrief.pdf",
+            alt: "Concept brief NPC Workshop: game name, persona and how-might-we question, learning goals, game idea, goal and characters, core game loop, mechanics, organisation, a sketch, and open questions and assumptions",
+            caption: "Game idea, core loop, mechanics, a sketch, and the open questions and assumptions to test. Document in German." },
+        ],
+      },
+      {
+        id: "prototype",
+        name: "Prototype",
+        when: "From Nov 25, 2026",
+        shape: "code",
+        lead: "The brief planned a paper prototype, with one team member playing “the computer”. We built a digital prototype in the browser instead: it was quicker to change, so it could go through many more iterations.",
+        blocks: [
+          { type: "steps", title: "Iterations", items: [
+            { title: "The first version wasn't intuitive", text: "The switches looked like the answer, although the test run checked every situation by itself. Next, players set and tested each situation one by one, so the truth table came from their own testing." },
+            { title: "Testing one by one was tedious", text: "Four test runs per circuit, and back to the start after every change. Now “Test run” plays through all situations in a row: the switches visibly follow along, the scene shows each situation and the checklist fills up line by line, so it's clear the result doesn't depend on the switch positions." },
+            { title: "Level 1 becomes a guided tutorial", text: "Bit, the mentor robot, helps right next to the control you need next." },
+            { title: "Gates get their real names", text: "Neutral names (“Block 1/2”) were confusing, so the gates are called AND, OR and NOT from the start." },
+            { title: "Around the core", text: "Mission briefs, a main menu, badges, a certificate, German and English, and a landscape layout for phones so you don't have to scroll." },
+          ] },
+          { type: "table", title: "From interview to game mechanic", head: ["Insight", "Requirement", "In the game"], rows: [
+            ["E1 Basics before jargon", "Start without prior knowledge", "Level 1 as a step-by-step tutorial; missions in everyday language; one new gate per level"],
+            ["E2 One mistake mustn't break everything", "Mistakes are harmless", "Unlimited test runs, no game over; the checklist shows exactly which situation is wrong; Bit gives a concrete hint"],
+            ["E3 “You need talent for that”", "Experience success step by step", "Rising difficulty; badges in first person (“I know: AND only gives 1 if …”); a certificate"],
+            ["E4 Curious about what's behind it", "Show the technology behind familiar things", "Repair the NPCs of a game; signals light up live on the wires and the lamp"],
+            ["E5 Puzzling together", "Teamwork and aha moments", "Made for 1–2 players per device; funny mishaps in the scenes (“False alarm?!”, “Zzz …”)"],
+            ["E6 Constant losing", "Win early", "Short, guided first levels; every correct situation turns green right away and gets praise; a badge for every level solved"],
+          ] },
+          { type: "table", title: "Where we deviated from the concept brief", collapsed: true, head: ["In the brief", "In the game", "Why"], rows: [
+            ["Paper prototype, a team member plays “the computer”", "Digital prototype in the browser", "Quicker to change digitally, so it could improve over more iterations"],
+            ["Bit names technical terms only after trying things out", "The gates are called AND, OR and NOT from the start", "Neutral names (“Block 1/2”) were confusing and too unfriendly while trying things out"],
+            ["A new gate per chapter", "A new gate per level; a chapter is a world with several levels", "Difficulty rises in smaller steps"],
+            ["NPC order: gate guard (AND), lantern (NOT), tower guard (OR), merchant", "The tower guard (OR) comes as level 2, before the lantern (NOT)", "OR has two inputs like AND; NOT is a new kind of part with a single input"],
+            ["NPCs of a castle game", "Chapter 1 castle, plus chapter 2 “Wild West” with three sensors", "Its own theme per chapter (confirmed by the team); three sensors are the next step in difficulty"],
+            ["Signal magnifier: check 0/1 on every wire", "No magnifier; every wire shows its signal live", "Since every signal is visible anyway, a separate tool would be redundant"],
+            ["Pair mode: one builds, one predicts", "No separate mode; made for 1–2 players per device", "Two people at one device works without a mode, they just talk it through"],
+          ] },
+          { type: "stats", title: "The prototype today", items: [
+            { value: "7", label: "levels in 2 worlds" },
+            { value: "9", label: "badges" },
+            { value: "26", label: "mishaps to collect" },
+            { value: "DE / EN", label: "languages" },
+          ] },
+        ],
+      },
+      {
+        id: "test",
+        name: "Test",
+        when: "Up next",
+        status: "next",
+        shape: "bug",
+        lead: "So far the prototype has only been tried internally. Next, we test it with students from the target group.",
+        blocks: [
+          { type: "text", paragraphs: [
+            "For this there is a six-page test guide: the learning goals and eight assumptions with success criteria (for example: is lit/dark understood as 1/0 without explanation?), the session flow with a moderation script, an observation sheet, a debrief with a transfer task, and the evaluation.",
+          ] },
+          { type: "gallery", title: "Test guide", pdf: "assets/npc-workshop/testleitfaden.pdf",
+            caption: "Three of the six pages. Click a page to open the full guide (German).",
+            items: [
+              { src: "assets/npc-workshop/testleitfaden-seite1.png", alt: "Test guide page 1: learning goals and assumptions with success criteria" },
+              { src: "assets/npc-workshop/testleitfaden-seite4.png", alt: "Test guide: observation sheet per participant" },
+              { src: "assets/npc-workshop/testleitfaden-seite5.png", alt: "Test guide: debrief with ratings and a transfer task" },
+            ] },
+        ],
+      },
+    ],
+    decisions: [
+      { title: "Web instead of Godot", text: "Vanilla JavaScript and SVG with no build step: runs on any device without installing anything, is easy to host on GitHub Pages and quick to change." },
+      { title: "One test run plays every situation", text: "Testing situations one by one was tedious and not self-explanatory. Checking live without a test run would have been too easy, since you could just wire at random." },
+      { title: "Tiered hints after two red test runs", text: "Three steps: rule, gate, solution. Only the solution costs the “All by myself” badge. Whoever gets stuck gets help instead of frustration, but tries alone first." },
+      { title: "Mistakes become collectibles", text: "Every red line in the checklist is a named mishap that goes into a gallery, so a mistake turns into something to find instead of a failure (E2)." },
+      { title: "A mission card instead of a letter", text: "Long texts put the target group off. The mission is now a chain of blocks that looks like the workbench: 31 instead of over 100 words in level 1." },
+      { title: "A world map instead of a level list", text: "An idea from the team: more playful than a list, and the landscape shows each world's theme at a glance." },
+    ],
+    next: [
+      { title: "Test with real players", text: "Students from the target group who don't know the game yet. The test guide is ready." },
+      { title: "More chapters and levels", text: "The world map already says “More soon”." },
+    ],
+  },
+};
 
 /*
  * PAPERS — scientific works (Facharbeit, seminar papers, theses, ...).

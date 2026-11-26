@@ -236,21 +236,7 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 .rule-top::before { top: -1px; }
 
 /* ---------- projects ---------- */
-.project-grid { display: grid; gap: 56px; }
-.project { position: relative; display: flex; flex-direction: column; }
-.project-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 24px; margin-bottom: 18px; }
-.project-label { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-/* tech sits above the card-wide title link so the logos keep their hover */
-.project-tech { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 4px 18px; }
-.project-tech .stack-item { padding: 0; font-size: .85rem; }
-.project h3 { font: 600 1.375rem/1.25 var(--font); letter-spacing: -0.02em; transition: color .15s; }
-.project:hover h3 { color: var(--accent-hover); }
-/* The title link covers the whole row */
-.project h3 a::after { content: ""; position: absolute; inset: 0; }
-.project > p, .featured-main > p { margin-top: 10px; max-width: 720px; color: var(--text-2); font-size: .95rem; }
-
-/* highlighted projects: tech as small pills under the description; the logos turn to their
-   brand colors while the project is hovered */
+/* tech as small logo pills; the logos turn to their brand colors while the slide is hovered */
 .tech-pills { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; } /* above the title link, so each logo has its own hover */
 .tech-pill {
   display: inline-flex; align-items: center; gap: 7px;
@@ -262,9 +248,9 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 .tech-pill .stack-logo { width: auto; font-size: .95rem; }
 .tech-pill .stack-logo svg { width: 14px; height: 14px; }
 .tech-pill .stack-logo.none { display: none; } /* no logo: just the name */
-.project:hover .tech-pill .stack-logo i, .project:hover .tech-pill .stack-logo .logo { color: var(--brand); }
+.slide:hover .tech-pill .stack-logo i, .slide:hover .tech-pill .stack-logo .logo { color: var(--brand); }
 
-/* "Other projects": a toggle row that opens a compact list, one row per project */
+/* collapsible: a toggle row that slides a panel open (long tables on case-study pages) */
 .other-toggle {
   display: flex; align-items: center; gap: 12px; width: 100%;
   padding: 14px 16px;
@@ -296,47 +282,10 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 .other-panel > div { min-height: 0; overflow: hidden; opacity: 0; transition: opacity .3s ease; }
 .other-panel.open { grid-template-rows: 1fr; }
 .other-panel.open > div { opacity: 1; }
-.side-quests { margin-top: 12px; border-top: 1px solid var(--line); }
-.side-quest {
-  position: relative;
-  display: grid; grid-template-columns: 200px 1fr auto; align-items: start; gap: 6px 28px;
-  padding: 18px 16px; border-bottom: 1px solid var(--line);
-  transition: background-color .2s;
-}
-/* accent bar on the left edge while hovered */
-.side-quest::before {
-  content: ""; position: absolute; left: 0; top: -1px; bottom: -1px; width: 2px;
-  background: var(--accent); transform: scaleY(0); transition: transform .2s;
-}
-.side-quest:hover { background: rgb(255 255 255 / 0.02); }
-.side-quest:hover::before { transform: scaleY(1); }
-.side-quest h3 { font: 600 1rem/1.4 var(--font); letter-spacing: -0.01em; transition: color .15s; }
-.side-quest h3::after { content: "↗"; display: inline-block; margin-left: 6px; color: var(--muted); transition: color .15s, transform .15s; }
-.side-quest h3 a::after { content: ""; position: absolute; inset: 0; } /* whole row is the link */
-.side-quest:hover h3 { color: var(--accent-hover); }
-.side-quest:hover h3::after { color: var(--accent-hover); transform: translate(2px, -2px); }
-.side-quest p { color: var(--text-2); font-size: .9rem; }
-.side-quest .tech-line { margin-top: 8px; }
-/* sits above the row-wide link so it opens the details instead of the repository */
-.side-details { position: relative; z-index: 2; align-self: center; }
 .tech-line { font: .75rem/1.5 var(--mono); color: var(--muted); }
 
-/* featured project: a panel with a faint accent glow in the corner */
 .projects-body { display: flex; flex-direction: column; gap: 56px; min-width: 0; }
-.project.featured {
-  display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: center;
-  padding: 32px;
-  background: radial-gradient(520px 240px at 0% 0%, rgb(var(--accent-rgb) / 0.09), transparent 70%), var(--surface);
-  border: 1px solid var(--line); border-radius: 12px;
-  transition: border-color .2s;
-}
-.project.featured:hover { border-color: var(--line-strong); }
-.featured-pills { display: none; } /* phones only: the tech as pills under the description */
-.featured-main { display: flex; flex-direction: column; }
-.project.featured h3 { font-size: 1.75rem; }
-.featured-side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; text-align: right; }
-.featured-value { font: 600 2.75rem/1 var(--font); letter-spacing: -0.03em; color: var(--text); }
-.featured-label { font: 500 .72rem/1.5 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+/* status badge (spotlight slides, case studies): green = live, grey = archived */
 .featured-status {
   display: inline-flex; align-items: center; gap: 7px; padding: 4px 10px;
   border-radius: 999px;
@@ -348,6 +297,159 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 .featured-status.off .dot { background: var(--muted); animation: none; }
 /* Buttons sit above the card-wide title link so they stay clickable on their own */
 .project-actions { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+/* the highlighted button has the same size on every project ("Play live" as wide as "View project") */
+.project-actions .btn-primary { min-width: 7.5rem; justify-content: center; }
+
+/* ---------- spotlight carousel ---------- */
+/* one slide per highlighted project: picture on the left, text on the right; slides sit side by side in a
+   scroll-snapping track, so a sideways swipe moves to the next one */
+.spotlight { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.spot-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.spot-count { font: 500 .75rem/1 var(--mono); letter-spacing: .08em; color: var(--muted); }
+.spot-track {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 100%;
+  overflow-x: auto; overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory; scrollbar-width: none;
+  border-radius: 16px;
+}
+.spot-track::-webkit-scrollbar { display: none; }
+.spot-track:focus-visible { outline-offset: 4px; }
+.slide {
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  scroll-snap-align: start; scroll-snap-stop: always;
+  border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+  background: var(--surface);
+}
+/* picture side: a faint pixel grid with an accent glow, the picture floats on it */
+.slide-visual {
+  display: grid; place-items: center; padding: 22px;
+  border-right: 1px solid var(--line);
+  background:
+    radial-gradient(380px 260px at 30% 15%, rgb(var(--accent-rgb) / 0.16), transparent 70%),
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px) -1px -1px / 24px 24px,
+    linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px) -1px -1px / 24px 24px,
+    var(--bg);
+}
+.slide-body { display: flex; flex-direction: column; min-width: 0; padding: 24px 26px; }
+.slide-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.badge-chip {
+  padding: 4px 10px; border-radius: 999px;
+  border: 1px solid rgb(var(--accent-rgb) / 0.4); background: rgb(var(--accent-rgb) / 0.1);
+  font: 500 .75rem/1.2 var(--font); color: var(--accent-hover);
+}
+.slide-title { margin-top: 14px; font: 600 1.75rem/1.15 var(--font); letter-spacing: -0.025em; }
+.slide-title a { transition: color .15s; }
+.slide-title a:hover { color: var(--accent-hover); }
+.slide-text { margin-top: 10px; font-size: .95rem; color: var(--text-2); }
+.slide-stat { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-top: 14px; }
+.slide-stat-value { font: 600 1.75rem/1 var(--font); letter-spacing: -0.03em; color: var(--text); }
+.slide-stat-label { font: 500 .72rem/1.4 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.slide .project-actions { margin-top: auto; padding-top: 20px; }
+.slide .tech-pills { margin-top: 14px; }
+
+/* arrows and dots under the track; the current dot stretches and fills up until the next slide */
+.spot-controls { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.spot-arrow.prev .icon { transform: rotate(90deg); }
+.spot-arrow.next .icon { transform: rotate(-90deg); }
+.spot-dots { display: flex; align-items: center; gap: 2px; }
+.spot-dot {
+  position: relative; width: 24px; height: 24px; padding: 0;
+  /* the transparent border is tap area; the visible dot is the 8px padding box */
+  border: 8px solid transparent; border-radius: 999px;
+  background: var(--line-strong); background-clip: padding-box;
+  overflow: hidden; cursor: pointer;
+  transition: width .3s ease, background-color .2s;
+}
+.spot-dot:hover { background-color: var(--muted); }
+.spot-dot.active { width: 52px; background-color: rgb(var(--accent-rgb) / 0.25); }
+.spot-dot-fill { position: absolute; inset: 0; border-radius: inherit; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+.spot-dot.active .spot-dot-fill { animation: spot-fill 7s linear forwards; }
+.spotlight.paused .spot-dot.active .spot-dot-fill { animation-play-state: paused; }
+@keyframes spot-fill { to { transform: scaleX(1); } }
+
+/* pictures: screenshot in a browser window, pixel screen, code in an editor window */
+.visual { width: 100%; margin: 0; }
+.visual-browser, .visual-code {
+  overflow: hidden;
+  border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface);
+  box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.85);
+}
+.visual-bar { display: flex; align-items: center; gap: 12px; height: 30px; padding: 0 12px; border-bottom: 1px solid var(--line); }
+.visual-dots { flex: none; width: 7px; height: 7px; margin-right: 22px; border-radius: 50%; background: var(--line-strong); box-shadow: 11px 0 var(--line-strong), 22px 0 var(--line-strong); }
+.visual-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: .7rem/1 var(--mono); color: var(--muted); }
+.visual-img img { display: block; width: 100%; height: auto; }
+.visual-screen { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.screen-bezel {
+  width: 100%; max-width: 340px; padding: 16px;
+  border: 1px solid var(--line-strong); border-radius: 12px 12px 36px 12px; background: #1b1b21;
+  box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.85);
+}
+.screen-bezel img { display: block; width: 100%; height: auto; border-radius: 3px; image-rendering: pixelated; }
+.visual-screen figcaption { font: .72rem/1.4 var(--mono); color: var(--muted); text-align: center; }
+.visual-code pre {
+  max-height: 300px; margin: 0; padding: 12px 0; overflow: hidden;
+  font: .78rem/1.7 var(--mono); color: #c9c9d1; background: #0d0d10;
+  counter-reset: line var(--first-line, 0);
+  /* longer code fades out at the bottom */
+  -webkit-mask-image: linear-gradient(#000 72%, transparent);
+  mask-image: linear-gradient(#000 72%, transparent);
+}
+.code-line::before {
+  counter-increment: line; content: counter(line);
+  display: inline-block; width: 3ch; margin: 0 14px 0 12px; text-align: right; color: #45454f;
+}
+.tok-comment { color: #6b6b76; font-style: italic; }
+.tok-string { color: #fcd34d; }
+.tok-number { color: #fca5a5; }
+.tok-bool { color: var(--xp); }
+.tok-keyword { color: var(--accent-hover); }
+.tok-key { color: #7dd3fc; }
+
+/* ---------- all projects: topic filter + cards ---------- */
+.all-projects { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.filter-chip {
+  display: inline-flex; align-items: center; gap: 8px; flex: none;
+  height: 34px; padding: 0 12px 0 14px;
+  border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface);
+  font: 500 .85rem/1 var(--font); color: var(--text-2); cursor: pointer;
+  transition: color .15s, border-color .15s, background-color .15s;
+}
+.filter-chip:hover { color: var(--text); border-color: #43434c; }
+.filter-chip[aria-pressed="true"] { border-color: transparent; background: var(--accent); color: var(--accent-ink); }
+.filter-count { font: 500 .72rem/1 var(--mono); opacity: .7; }
+.pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+.pcard {
+  position: relative; display: flex; flex-direction: column;
+  padding: 18px 20px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+  transition: border-color .2s, transform .2s, background-color .2s;
+  animation: pcard-in .35s ease both;
+}
+.pcard[hidden] { display: none; }
+.pcard:hover { border-color: rgb(var(--accent-rgb) / 0.5); background: var(--surface-hover); transform: translateY(-2px); }
+@keyframes pcard-in { from { opacity: 0; transform: translateY(6px); } }
+.pcard-top { display: flex; align-items: center; gap: 6px; min-height: 22px; }
+.pcard-top .quest-label { margin-right: auto; font-size: .68rem; }
+.pcard-flag { padding: 2px 7px; border-radius: 999px; background: rgb(255 255 255 / 0.06); font: 500 .7rem/1.4 var(--mono); color: var(--text-2); }
+.pcard-flag.star { color: #fbbf24; background: rgb(251 191 36 / 0.12); }
+.pcard h3 { margin-top: 12px; font: 600 1.05rem/1.3 var(--font); letter-spacing: -0.01em; transition: color .15s; }
+.pcard h3 a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; } /* whole card is the link */
+.pcard:hover h3 { color: var(--accent-hover); }
+.pcard-text {
+  margin-top: 6px; font-size: .875rem; color: var(--text-2);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.pcard .tech-line { margin-top: 12px; }
+/* above the card-wide link, so the buttons do their own thing */
+.pcard-actions { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 14px; }
+/* "Show all N projects" under the first cards */
+.more-toggle { align-self: center; }
+.more-toggle[hidden] { display: none; }
+.more-toggle .icon { display: flex; color: var(--muted); transition: transform .3s ease; }
+.more-toggle[aria-expanded="true"] .icon { transform: rotate(180deg); }
+
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* GitHub profile card under the projects: avatar + name, stats, language bar; the whole card is a link */
 .gh-card {
@@ -775,25 +877,18 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
   .section h2 { font-size: 1.6rem; }
 
   /* projects */
-  .project-grid, .projects-body { gap: 40px; }
-  .project-head { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .project-tech { gap: 6px 16px; }
-  .project h3 { font-size: 1.25rem; }
-  .project.featured { grid-template-columns: 1fr; gap: 20px; padding: 22px 18px; }
-  .project.featured h3 { font-size: 1.5rem; }
-  /* stat: one line under a hairline instead of a big column */
-  .featured-side {
-    flex-direction: row; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; text-align: left;
-    padding-top: 18px; border-top: 1px solid var(--line);
-  }
-  .featured-value { font-size: 2rem; }
-  .side-quest { grid-template-columns: 1fr; padding: 16px 12px; }
-  .side-details { justify-self: start; margin-top: 6px; }
-  .side-quest p { font-size: .95rem; }
-  .tech-line { font-size: .8rem; }
-  /* featured: the tech leaves the header (it wrapped into a ragged list there) and shows as pills */
-  .project-head .project-tech { display: none; }
-  .featured-pills { display: flex; }
+  .projects-body { gap: 40px; }
+  /* spotlight: picture above the text */
+  .slide { grid-template-columns: 1fr; }
+  .slide-visual { padding: 18px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .slide-body { padding: 20px 18px 22px; }
+  .slide-title { font-size: 1.45rem; }
+  .slide-stat-value { font-size: 1.5rem; }
+  .visual-code pre { max-height: 220px; font-size: .72rem; }
+  .screen-bezel { max-width: 260px; padding: 12px; }
+  /* filters: one row that scrolls sideways */
+  .filter-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -20px; padding: 0 20px; }
+  .filter-chips::-webkit-scrollbar { display: none; }
 
   /* project details: a bottom sheet with a grab handle; dragging the header down closes it (script.js) */
   .details-dialog {
@@ -864,16 +959,13 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 @media (hover: none) {
   /* cards aren't one big link here (a tap while reading would open GitHub in a new tab):
      the title is the link, marked with an arrow, plus the buttons */
-  .project h3 a::after { content: "↗"; position: static; margin-left: 6px; font-size: .75em; color: var(--muted); }
-  .side-quest h3 a::after { content: none; }
+  .pcard h3 a::after { content: "↗"; position: static; margin-left: 6px; font-size: .75em; color: var(--muted); }
+  .pcard h3 a.internal::after { content: "→"; } /* case study: stays on this site */
   .paper.clickable { cursor: auto; }
 
   /* hover effects would stick after a tap */
-  .project:hover h3, .paper.clickable:hover h3, .side-quest:hover h3 { color: inherit; }
-  .side-quest:hover h3::after { color: var(--muted); transform: none; }
-  .side-quest:hover { background: none; }
-  .side-quest:hover::before { transform: scaleY(0); }
-  .project.featured:hover { border-color: var(--line); }
+  .pcard:hover h3, .slide-title a:hover, .paper.clickable:hover h3 { color: inherit; }
+  .pcard:hover { border-color: var(--line); transform: none; }
   .stack-item:hover { color: var(--text-2); }
   .stack-item:hover .stack-logo { color: var(--muted); }
   .brand:hover .bm-l, .brand:hover .bm-r { transform: none; }
@@ -885,7 +977,7 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
   .btn, .chip, .other-toggle, .status-badge { transition: transform .1s, background-color .1s, border-color .1s; }
   .btn:active, .chip:active, .other-toggle:active, a.status-badge:active { transform: scale(.97); background-color: var(--surface-hover); }
   .btn-primary:active, .contact .chip[data-profile="email"]:active { background-color: var(--accent-hover); }
-  .project h3 a:active, .side-quest h3 a:active, .about-link:active { color: var(--accent-hover); }
+  .pcard h3 a:active, .slide-title a:active, .about-link:active { color: var(--accent-hover); }
   .gh-card:hover { border-color: var(--line); }
   .gh-card:hover .gh-name { color: inherit; }
   .gh-card:active { border-color: var(--line-strong); background-color: var(--surface-hover); }
@@ -895,4 +987,214 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
   html { scroll-behavior: auto; }
   * { transition: none !important; animation: none !important; }
   .voxel.burst .vox { --jx: 0px; --jy: 0px; --jr: 0deg; --js: 1; }
+}
+
+/* ---------- case-study pages (projects/*.html) ---------- */
+/* Same frame as the home page: hero, then sections with the sticky heading on the left */
+.case-page .topbar-end a { display: inline-flex; gap: 6px; }
+.case-hero .hero-inner { padding-top: 96px; padding-bottom: 104px; }
+.case-hero h1 { margin-top: 18px; }
+.case-hero .tagline { max-width: 640px; }
+/* role, course, timeframe, stack */
+.case-facts {
+  display: grid; grid-template-columns: max-content 1fr; gap: 10px 24px;
+  max-width: 620px; margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line);
+}
+.case-facts dt { padding-top: 3px; font: 500 .7rem/1.6 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.case-facts dd { font-size: .925rem; color: var(--text-2); }
+/* screenshot under the hero text, across both columns, in a small browser frame */
+.case-shot {
+  grid-column: 1 / -1; margin: 16px 0 0; overflow: hidden;
+  border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface);
+  box-shadow: 0 40px 80px -40px rgb(var(--accent-rgb) / 0.35);
+}
+.case-shot-bar { display: flex; align-items: center; gap: 14px; height: 38px; padding: 0 14px; border-bottom: 1px solid var(--line); }
+/* three window dots, drawn with shadows of one 8px dot */
+.case-shot-dots { width: 8px; height: 8px; border-radius: 50%; background: var(--line-strong); box-shadow: 14px 0 var(--line-strong), 28px 0 var(--line-strong); margin-right: 28px; }
+.case-shot-url {
+  flex: 1; max-width: 360px; margin: 0 auto; padding: 4px 12px; border-radius: 6px;
+  background: var(--bg); text-align: center;
+  font: .75rem/1.4 var(--mono); color: var(--muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.case-shot a { display: block; }
+.case-shot img { display: block; width: 100%; height: auto; transition: opacity .2s; }
+.case-shot a:hover img { opacity: .92; }
+
+.cs-body { display: flex; flex-direction: column; gap: 48px; min-width: 0; max-width: 820px; }
+.cs-body h4, .cs-body ol, .cs-body blockquote { margin: 0; padding: 0; }
+.cs-body ol { list-style: none; }
+.cs-lead { max-width: 720px; font: 400 1.25rem/1.5 var(--font); letter-spacing: -0.01em; color: var(--text); }
+.cs-block { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.cs-block-title { margin-bottom: 2px; }
+.cs-text { max-width: 720px; color: var(--text-2); }
+.cs-caption { max-width: 680px; font-size: .825rem; color: var(--muted); }
+.cs-upcoming { align-self: flex-start; }
+
+/* the question the project started from */
+.cs-challenge p {
+  max-width: 720px;
+  font: 600 clamp(1.5rem, 3vw, 2.125rem)/1.2 var(--font); letter-spacing: -0.03em;
+}
+.cs-challenge p::before { content: "“"; color: var(--accent); }
+.cs-challenge p::after { content: "”"; color: var(--accent); }
+
+/* numbers: tiles separated by hairlines (the gap shows the line color behind them) */
+.cs-stats {
+  display: flex; flex-wrap: wrap; gap: 1px;
+  background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+}
+.cs-stat { flex: 1 1 140px; display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: 6px; padding: 18px 20px; background: var(--surface); }
+.cs-stat dd { font: 600 1.75rem/1.1 var(--font); letter-spacing: -0.03em; color: var(--text); }
+.cs-stat dt { font: 500 .7rem/1.4 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+
+/* the process at a glance: five stages joined by a line; the one still to come is dashed */
+.cs-stages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.cs-stage a {
+  position: relative; display: flex; flex-direction: column; gap: 6px; height: 100%;
+  padding: 14px 14px 16px;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--surface);
+  transition: border-color .15s, background-color .15s;
+}
+.cs-stage:not(:last-child) a::after {
+  content: ""; position: absolute; top: 50%; right: -9px; width: 8px; height: 1px; background: var(--line-strong);
+}
+.cs-stage a:hover { border-color: rgb(var(--accent-rgb) / 0.6); background: var(--surface-hover); }
+.cs-stage-n { font: 500 .72rem/1 var(--mono); color: var(--accent); }
+.cs-stage-name { font: 600 1rem/1.3 var(--font); letter-spacing: -0.01em; }
+.cs-stage-when { font: .72rem/1.4 var(--mono); color: var(--muted); }
+.cs-stage.next a { border-style: dashed; border-color: var(--line-strong); background: transparent; }
+.cs-stage.next .cs-stage-n { color: var(--muted); }
+
+/* position in the process, under each phase heading: done · current · to come */
+.phase-dots { display: flex; gap: 6px; margin: 16px 0 0; padding: 0; list-style: none; }
+.phase-dots li { width: 8px; height: 8px; background: var(--line-strong); }
+.phase-dots li.done { background: rgb(var(--accent-rgb) / 0.5); }
+.phase-dots li.current { background: var(--accent); box-shadow: 0 0 0 3px rgb(var(--accent-rgb) / 0.2); }
+.is-next .phase-dots li.current { background: transparent; box-shadow: none; outline: 1px dashed var(--muted); outline-offset: -1px; }
+
+/* cards: clusters and insights; the chosen one is marked */
+.cs-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.cs-card { padding: 18px 20px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.cs-card.marked {
+  border-color: rgb(var(--accent-rgb) / 0.45);
+  background: radial-gradient(320px 160px at 0% 0%, rgb(var(--accent-rgb) / 0.1), transparent 70%), var(--surface);
+}
+.cs-card-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
+.cs-tag { padding: 5px 8px; border: 1px solid rgb(var(--accent-rgb) / 0.35); border-radius: 6px; font: 500 .75rem/1 var(--mono); color: var(--accent); }
+.cs-card h4 { font: 600 1rem/1.35 var(--font); letter-spacing: -0.01em; }
+.cs-card p { margin-top: 6px; font-size: .9rem; color: var(--text-2); }
+
+/* point of view, how-might-we question */
+.cs-body .cs-quote { padding: 4px 0 4px 22px; border-left: 2px solid var(--accent); }
+.cs-quote p:last-child { max-width: 700px; margin-top: 8px; font: 400 1.125rem/1.55 var(--font); color: var(--text); }
+
+/* numbered list (learning goals) */
+.cs-list { display: grid; gap: 10px; counter-reset: cs-list; }
+.cs-list li { display: grid; grid-template-columns: 32px 1fr; counter-increment: cs-list; color: var(--text-2); }
+.cs-list li::before { content: counter(cs-list, decimal-leading-zero); font: 500 .8rem/1.9 var(--mono); color: var(--accent); }
+
+/* short steps in a row, joined by arrows; the last one is the result */
+.cs-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 0; }
+.cs-flow li {
+  position: relative; display: inline-flex; align-items: center; gap: 8px;
+  height: 36px; padding: 0 14px 0 11px;
+  border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface);
+  font-size: .875rem; color: var(--text);
+}
+.cs-flow li + li { margin-left: 26px; }
+.cs-flow li + li::before { content: "→"; position: absolute; left: -20px; color: var(--muted); }
+.cs-flow li:last-child { border-color: rgb(var(--accent-rgb) / 0.55); color: var(--accent-hover); }
+.cs-flow-n { font: 500 .7rem/1 var(--mono); color: var(--muted); }
+
+/* iterations on a vertical line */
+.cs-step { position: relative; display: grid; grid-template-columns: 40px 1fr; gap: 16px; padding-bottom: 26px; }
+.cs-step:last-child { padding-bottom: 0; }
+.cs-step:not(:last-child)::before { content: ""; position: absolute; left: 19.5px; top: 38px; bottom: 6px; width: 1px; background: var(--line-strong); }
+.cs-step-n {
+  display: grid; place-items: center; width: 40px; height: 32px;
+  border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface);
+  font: 500 .75rem/1 var(--mono); color: var(--accent);
+}
+.cs-step h4 { padding-top: 5px; font: 600 1rem/1.4 var(--font); letter-spacing: -0.01em; }
+.cs-step p { margin-top: 4px; font-size: .925rem; color: var(--text-2); }
+
+/* documents (persona, concept brief, test guide): framed images that open the PDF */
+.cs-figure {
+  position: relative; display: block; overflow: hidden;
+  border: 1px solid var(--line); border-radius: 12px; background: #fff;
+  transition: border-color .2s;
+}
+.cs-figure img { display: block; width: 100%; height: auto; }
+.cs-figure:hover { border-color: var(--accent); }
+.cs-open {
+  position: absolute; top: 10px; right: 10px; padding: 7px 11px; border-radius: 999px;
+  background: rgb(9 9 11 / 0.85); color: var(--text); font: 500 .75rem/1 var(--font);
+  opacity: 0; transform: translateY(-4px); transition: opacity .2s, transform .2s;
+}
+.cs-figure:hover .cs-open, .cs-figure:focus-visible .cs-open { opacity: 1; transform: none; }
+.cs-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+/* tables (insight → mechanic, deviations from the brief) */
+.cs-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+.other-panel .cs-table-wrap { margin-top: 12px; }
+/* long toggle titles may wrap instead of pushing the row wider than the screen */
+.cs-block .other-title { flex: 0 1 auto; min-width: 0; }
+.cs-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.cs-table th {
+  padding: 12px 16px; text-align: left;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+  font: 500 .7rem/1.4 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
+}
+.cs-table td { padding: 14px 16px; vertical-align: top; border-bottom: 1px solid var(--line); color: var(--text-2); }
+.cs-table tr:last-child td { border-bottom: 0; }
+.cs-table td:first-child { width: 28%; font-weight: 500; color: var(--text); }
+
+/* decisions and outlook: open blocks under a hairline, two per row */
+.cs-notes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 36px 40px; }
+.cs-note h4 { font: 600 1.05rem/1.35 var(--font); letter-spacing: -0.015em; }
+.cs-note p { margin-top: 12px; font-size: .925rem; color: var(--text-2); }
+.cs-next .cta-row { margin-top: 0; }
+
+@media (max-width: 820px) {
+  /* the section links fold into the menu: keep the back link and the menu button together on the right */
+  .case-page .topbar-end { margin-left: auto; }
+  .cs-stages { grid-template-columns: 1fr; gap: 6px; }
+  .cs-stage a { flex-direction: row; align-items: baseline; gap: 12px; padding: 12px 14px; }
+  .cs-stage-when { margin-left: auto; text-align: right; }
+  .cs-stage:not(:last-child) a::after { top: 100%; right: auto; left: 21px; width: 1px; height: 6px; }
+}
+
+@media (max-width: 720px) {
+  .case-page .back-text { display: none; } /* just the arrow, so it fits next to the name */
+  .case-page .topbar-end a { padding: 8px 12px; font-size: 1.1rem; color: var(--text-2); }
+  .case-hero .hero-inner { padding-top: 40px; padding-bottom: 56px; }
+  .case-facts { grid-template-columns: 1fr; gap: 2px; }
+  .case-facts dd + dt { margin-top: 10px; }
+  .cs-body { gap: 40px; }
+  .cs-lead { font-size: 1.125rem; }
+  .cs-stat { flex-basis: 120px; padding: 14px 16px; }
+  .cs-stat dd { font-size: 1.5rem; }
+  .cs-notes { grid-template-columns: 1fr; gap: 28px; }
+  .cs-gallery { gap: 8px; }
+  .cs-flow li + li { margin-left: 24px; }
+
+  /* tables: each row becomes a small card, with the column name above each value */
+  .cs-table thead { display: none; }
+  .cs-table, .cs-table tbody, .cs-table tr, .cs-table td { display: block; }
+  .cs-table tr { padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  .cs-table tr:last-child { border-bottom: 0; }
+  .cs-table td, .cs-table td:first-child { width: auto; padding: 0; border: 0; }
+  .cs-table td + td { margin-top: 10px; }
+  .cs-table td::before {
+    content: attr(data-label); display: block; margin-bottom: 2px;
+    font: 500 .68rem/1.4 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
+  }
+}
+
+@media (hover: none) {
+  .cs-open { opacity: 1; transform: none; }
+  .cs-figure:hover, .cs-stage a:hover { border-color: var(--line); }
+  .cs-stage a:hover { background: var(--surface); }
+  .cs-stage.next a:hover { background: transparent; border-color: var(--line-strong); }
 }

@@ -14,6 +14,9 @@ It shows my projects, scientific work, tech stack, education and contact links i
 ## Features
 
 - **Content in one file**: everything on the page comes from `data.js`. Adding a project or paper takes just a few lines, no HTML needed.
+- **Spotlight carousel**: the highlighted projects rotate with a picture each (screenshot, emulator screen or real code); swipe, arrows, dots or arrow keys switch by hand, and it pauses on hover, focus or off screen.
+- **Projects by topic**: every project as a card, filterable by topic (`category` in `PROJECTS`, order in `PROJECT_CATEGORIES`).
+- **Case studies**: long-form project pages under `projects/` (e.g. the NPC Workshop's Design Thinking process), with their content in `CASE_STUDIES` in `data.js`.
 - **Numbered sections**: Projects, Scientific work, Stack, Education, About and Contact (01 to 06).
 - **Voxel companion**: a figure made of small cubes that moves to the section you're reading and changes its shape for each one. There's also a hidden easter egg, so feel free to look around.
 - **Live GitHub activity**: stats and a contribution graph loaded from the GitHub API.
@@ -37,6 +40,8 @@ MyWebsite/
 ├── favicon.svg, favicon.ico, apple-touch-icon.png   # Pixel </> icon for browser tabs and home screens
 ├── og-image.png # Link preview image (1200 × 630)
 ├── sitemap.xml, robots.txt   # For search engines
+├── projects/    # Case-study pages (frame only; content from CASE_STUDIES in data.js)
+├── assets/      # Project pictures and case-study images and PDFs
 └── papers/      # PDFs of scientific works, linked from data.js
 ```
 
