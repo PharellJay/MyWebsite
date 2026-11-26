@@ -200,6 +200,10 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 }
 .btn-primary:hover { border-color: transparent; background: var(--accent-hover); }
 .btn-sm { height: 32px; padding: 0 12px; font-size: .8125rem; }
+.btn-icon { width: 38px; padding: 0; justify-content: center; }
+.btn-sm.btn-icon { width: 32px; }
+.btn-icon .icon { display: flex; color: var(--text-2); transition: color .15s; }
+.btn-icon:hover .icon { color: var(--text); }
 
 /* ---------- sections ---------- */
 .section { position: relative; border-bottom: 1px solid var(--line); }
@@ -443,6 +447,7 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 .pcard .tech-line { margin-top: 12px; }
 /* above the card-wide link, so the buttons do their own thing */
 .pcard-actions { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 14px; }
+.pcard-more { margin-left: auto; } /* the details button sits at the far right of the row */
 /* "Show all N projects" under the first cards */
 .more-toggle { align-self: center; }
 .more-toggle[hidden] { display: none; }
@@ -952,6 +957,7 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 @media (pointer: coarse) {
   .chip:not(.chip-sm), .btn { height: 44px; }
   .chip-icon:not(.chip-sm) { width: 44px; }
+  .btn-icon, .btn-sm.btn-icon { width: 44px; }
   .stack-item:hover { transform: none; }
 }
 

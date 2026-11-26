@@ -144,6 +144,8 @@
     chevron: '<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>',
     // Lucide "send" (paper plane)
     send: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></g>',
+    // Lucide "ellipsis" (details button on project cards)
+    more: '<g fill="currentColor"><circle cx="5" cy="12" r="1.75"/><circle cx="12" cy="12" r="1.75"/><circle cx="19" cy="12" r="1.75"/></g>',
   };
 
   function icon(key) {
@@ -192,8 +194,8 @@
 
   const hasDetails = (p) => Boolean(p.details?.length || p.highlights?.length);
 
-  function detailsButton(p, className) {
-    const button = el("button", { type: "button", class: className, "aria-haspopup": "dialog" }, "Details");
+  function detailsButton(p, className, attrs = {}, content = "Details") {
+    const button = el("button", { type: "button", class: className, "aria-haspopup": "dialog", ...attrs }, content);
     button.addEventListener("click", () => openDetails(p));
     return button;
   }
@@ -465,11 +467,17 @@
 
   /* ---------- all projects: filter chips + cards ---------- */
   // Every project as a card (spotlight ones included, marked with a star), filtered by topic.
-  // The card links to the case study or repository; "Details" opens the details window.
+  // The card links to the case study or repository; "View project" goes there too, a live demo gets its
+  // own button, and the "⋯" button opens the details window.
   function renderProjectCard(p) {
+    const target = p.caseStudy ? asset(p.caseStudy) : p.repo;
+    const external = !p.caseStudy ? { target: "_blank", rel: "noopener" } : {};
     const actions = [
-      hasDetails(p) ? detailsButton(p, "btn btn-sm") : null,
-      p.caseStudy ? el("a", { href: asset(p.caseStudy), class: "btn btn-sm" }, "Case study →") : null,
+      target ? el("a", { href: target, ...external, class: "btn btn-sm btn-primary" }, "View project") : null,
+      p.demo ? el("a", { href: p.demo, target: "_blank", rel: "noopener", class: "btn btn-sm" }, p.demoLabel || "Live demo") : null,
+      hasDetails(p)
+        ? detailsButton(p, "btn btn-sm btn-icon pcard-more", { "aria-label": `Details: ${p.title}`, title: "Details" }, icon("more"))
+        : null,
     ].filter(Boolean);
     const card = el("article", { class: "pcard" },
       el("div", { class: "pcard-top" },
