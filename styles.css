@@ -687,6 +687,7 @@ a.status-badge:hover { color: var(--text); border-color: rgb(var(--xp-rgb) / 0.4
 .footer a { font-weight: 500; transition: color .15s; }
 .footer a:hover { color: var(--text); }
 .footer-links { display: flex; gap: 20px; }
+.footer-live a { color: var(--text-2); }
 
 /* ---------- imprint page ---------- */
 .section-title { margin: 10px 0 0; }
