@@ -168,8 +168,9 @@
       if (p.repo) actions.append(el("a", { href: p.repo, target: "_blank", rel: "noopener", class: "chip chip-icon", "aria-label": "View code on GitHub", title: "View code on GitHub" }, icon("github")));
       return actions;
     }
-    if (p.repo) actions.append(el("a", { href: p.repo, target: "_blank", rel: "noopener", class: "btn btn-primary" }, "View project"));
-    if (p.demo) actions.append(el("a", { href: p.demo, target: "_blank", rel: "noopener", class: "btn" }, p.demoLabel || "Live demo"));
+    // A live version is the highlighted call to action; the code comes second
+    if (p.demo) actions.append(el("a", { href: p.demo, target: "_blank", rel: "noopener", class: "btn btn-primary" }, p.demoLabel || "Live demo"));
+    if (p.repo) actions.append(el("a", { href: p.repo, target: "_blank", rel: "noopener", class: `btn${p.demo ? "" : " btn-primary"}` }, "View project"));
     return actions.childElementCount ? actions : null;
   }
 
