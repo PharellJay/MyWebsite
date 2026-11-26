@@ -41,6 +41,7 @@ const PROFILE = {
  *   tech         list of technologies
  *   repo         link to the GitHub repository (the title links there)
  *   demo         optional link to a live version ("" to hide)
+ *   demoLabel    optional text for the demo button (defaults to "Live demo")
  *   highlight    true = in the spotlight carousel at the top (one slide each, with its picture); every project,
  *                spotlight or not, is also listed as a card under "All projects by topic"
  *   category     topic of the project, one of PROJECT_CATEGORIES below (the filter chips use it;
@@ -141,7 +142,8 @@ const PROJECTS = [
       type: "browser", src: "assets/projects/lua-obfuscator-web.webp", width: 1145, height: 796, label: "Deadeye Obfuscator · web UI",
       alt: "The obfuscator's web UI: preset and pass settings on the left, an example file obfuscated in the browser with its build log on the right",
     },
-    demo: "",
+    demo: "https://luaobfuscator.pharelljay.me",
+    demoLabel: "Try it out",
     highlight: true,
   },
   {
@@ -170,6 +172,28 @@ const PROJECTS = [
     },
     demo: "",
     highlight: true,
+  },
+  {
+    title: "MineSweepML",
+    category: "AI & Machine Learning",
+    description: "A Minesweeper player that teaches itself from its own games, sized to train on a CPU, with a local web interface to create bots, train them live and watch them play.",
+    details: [
+      "A fully convolutional residual network predicts, for every covered cell, the probability that it hides a mine, and clicks the safest one. Every game is labelled by the simulator that knows where the mines are, so a single game is a training example for every covered cell at once. " +
+        "This is learning from self-generated, simulator-labelled data rather than reward-based reinforcement learning, which is what makes it trainable in minutes on a CPU.",
+      "A local web interface runs the whole process: create, fork and manage bots, start, pause and resume training by number of games, by time or until you press stop, and follow loss, win rate and every game in progress live. " +
+        "Any game can be replayed at speeds from 0.25x to 1000x with the network's mine probabilities overlaid, and exported as a GIF.",
+    ],
+    highlights: [
+      "Fully convolutional residual network (6 blocks × 32 channels, ~115k parameters) with no dense layers, so one set of weights plays every board size, from Beginner to Expert and custom boards",
+      "Learns from self-generated, simulator-labelled positions with binary cross-entropy over the covered cells, not reward-based reinforcement learning, so it trains in minutes on a CPU",
+      "Multi-process pipeline: self-play workers each playing 32 games at once with one batched forward pass per move, a trainer with per-difficulty replay buffers, and a separate benchmark process",
+      "Training control by games, wall-clock time or until you stop, with intensity presets that scale to your core count and learning-rate drops when benchmarks stop improving",
+      "Live FastAPI and WebSocket dashboard: loss, win rate per difficulty, throughput, CPU per core and every game in progress with the network's P(mine) overlaid",
+      "Replay any game from 0.25x to 1000x, step through it move by move, overlay the network's or a rule-based solver's P(mine), export GIFs, and benchmark win rate with a 95% interval",
+    ],
+    tech: ["Python", "PyTorch", "FastAPI", "JavaScript"],
+    repo: "https://github.com/PharellJay/MineSweepML",
+    demo: "",
   },
   {
     title: "Game Boy Emulator",
